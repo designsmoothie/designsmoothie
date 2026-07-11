@@ -55,6 +55,13 @@ export const metadata: Metadata = {
     canonical: "/",
   },
 
+  verification: {
+  google: "vK0Pxr5n5bF8P7aZ2WcdDdXYFwW6LHAt3Z-i",
+  other: {
+    "naver-site-verification": "1d3c959632c1136789092f03bc7606ed870def18",
+  },
+},
+
   icons: {
     icon: "/favicon.png?v=2",
     shortcut: "/favicon.png?v=2",
