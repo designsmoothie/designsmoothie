@@ -13,6 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://designsmoothie.kr"),
+
   title: {
     default: "디자인스무디 | 브랜딩 · 사이니지 · 공간그래픽 디자인",
     template: "%s | 디자인스무디",
@@ -20,12 +22,6 @@ export const metadata: Metadata = {
 
   description:
     "브랜딩부터 간판, 파사드, 공간그래픽, 배너, 인쇄물까지. 디자인스무디는 브랜드의 시작부터 공간까지 연결하는 디자인 스튜디오입니다.",
-
-    icons: {
-  icon: "/favicon.png?v=2",
-  shortcut: "/favicon.png?v=2",
-  apple: "/favicon.png?v=2",
-},
 
   keywords: [
     "디자인스무디",
@@ -48,31 +44,62 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "Design Smoothie",
+      url: "https://designsmoothie.kr",
     },
   ],
 
   creator: "Design Smoothie",
+  publisher: "Design Smoothie",
+
+  alternates: {
+    canonical: "/",
+  },
+
+  icons: {
+    icon: "/favicon.png?v=2",
+    shortcut: "/favicon.png?v=2",
+    apple: "/favicon.png?v=2",
+  },
 
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 
   openGraph: {
     title: "디자인스무디 | 브랜딩 · 사이니지 디자인",
     description:
-      "브랜딩부터 간판까지, 기억에 남는 브랜드를 만듭니다.",
+      "브랜딩부터 간판까지, 브랜드의 시작과 공간을 연결하는 디자인 스튜디오입니다.",
+    url: "/",
     type: "website",
     locale: "ko_KR",
     siteName: "Design Smoothie",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "디자인스무디 브랜딩 및 사이니지 디자인 스튜디오",
+      },
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
     title: "디자인스무디 | 브랜딩 · 사이니지 디자인",
     description:
-      "브랜딩부터 간판까지, 기억에 남는 브랜드를 만듭니다.",
+      "브랜딩부터 간판까지, 브랜드의 시작과 공간을 연결하는 디자인 스튜디오입니다.",
+    images: ["/og-image.jpg"],
   },
+
+  category: "design",
 };
 
 export default function RootLayout({
