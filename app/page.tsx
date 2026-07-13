@@ -6,23 +6,40 @@ import Service from "@/components/Service";
 import Hero from "@/components/Hero";
 import Header from "@/components/Header";
 import Process from "@/components/Process";
-
+import Reveal from "@/components/Reveal";
 
 export default function Home() {
   return (
-   <>
-  <Header />
+    <>
+      <Header />
 
-  <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
-    <Hero />
-    <Service />
-    <Portfolio />
-    <About />
-    <Process />
-    <ContactSection />
-  </main>
+      <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
+        <Hero />
 
-  <SiteFooter />
-</>
+        <Reveal>
+          <Service />
+        </Reveal>
+
+        <Reveal>
+          <Portfolio />
+        </Reveal>
+
+        <Reveal>
+          <About />
+        </Reveal>
+
+        <Reveal>
+          <Process />
+        </Reveal>
+
+        <Reveal>
+          <ContactSection />
+        </Reveal>
+      </main>
+
+      <Reveal>
+        <SiteFooter />
+      </Reveal>
+    </>
   );
 }

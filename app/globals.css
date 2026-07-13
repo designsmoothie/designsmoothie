@@ -139,6 +139,68 @@ section {
   background: #aaa097;
 }
 
+/* Hero 첫 등장 애니메이션 */
+
+.hero-eyebrow {
+  animation: hero-fade-up 700ms ease-out 80ms both;
+}
+
+.hero-title {
+  animation: hero-fade-up 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+}
+
+.hero-description {
+  animation: hero-fade-up 850ms cubic-bezier(0.22, 1, 0.36, 1) 320ms both;
+}
+
+.hero-buttons {
+  animation: hero-fade-up 850ms cubic-bezier(0.22, 1, 0.36, 1) 440ms both;
+}
+
+.hero-image {
+  animation: hero-image-reveal 1100ms cubic-bezier(0.22, 1, 0.36, 1) 520ms both;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-image-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(36px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 스크롤 등장 애니메이션 */
+
+.reveal-section {
+  opacity: 0;
+  transform: translateY(48px);
+  transition:
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (max-width: 767px) {
   html {
     scroll-padding-top: 72px;
@@ -146,6 +208,11 @@ section {
 
   body {
     font-size: 15px;
+  }
+
+  .reveal-section {
+    transform: translateY(30px);
+    transition-duration: 750ms;
   }
 }
 
@@ -167,5 +234,10 @@ section {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .reveal-section {
+    opacity: 1;
+    transform: none;
   }
 }
