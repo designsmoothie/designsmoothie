@@ -1,5 +1,5 @@
-import Script from "next/script";
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -57,11 +57,12 @@ export const metadata: Metadata = {
   },
 
   verification: {
-  google: "vK0Pxr5n5bF8P7aZ2WcdDdXYFwW6LHAt3Z-i",
-  other: {
-    "naver-site-verification": "1d3c959632c1136789092f03bc7606ed870def18",
+    google: "vK0Pxr5n5bF8P7aZ2WcdDdXYFwW6LHAt3Z-i",
+    other: {
+      "naver-site-verification":
+        "1d3c959632c1136789092f03bc7606ed870def18",
+    },
   },
-},
 
   icons: {
     icon: "/favicon.png?v=2",
@@ -121,36 +122,43 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-  {children}
+        {children}
 
-  <Script
-    src="https://www.googletagmanager.com/gtag/js?id=G-5BWXM253QV"
-    strategy="afterInteractive"
-  />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-5BWXM253QV"
+          strategy="afterInteractive"
+        />
 
-  <Script id="google-analytics" strategy="afterInteractive">
-    {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
 
-      gtag('config', 'G-5BWXM253QV');
-    `}
-  </Script>
+            function gtag() {
+              window.dataLayer.push(arguments);
+            }
 
-  <Script id="microsoft-clarity" strategy="afterInteractive">
-    {`
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);
-        t.async=1;
-        t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];
-        y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "xlqykfucvc");
-    `}
-  </Script>
-</body>
+            gtag('js', new Date());
+            gtag('config', 'G-5BWXM253QV');
+          `}
+        </Script>
+
+        <Script id="microsoft-clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+              c[a] = c[a] || function(){
+                (c[a].q = c[a].q || []).push(arguments);
+              };
+
+              t = l.createElement(r);
+              t.async = 1;
+              t.src = "https://www.clarity.ms/tag/" + i;
+
+              y = l.getElementsByTagName(r)[0];
+              y.parentNode.insertBefore(t, y);
+            })(window, document, "clarity", "script", "xlqykfucvc");
+          `}
+        </Script>
+      </body>
     </html>
   );
 }
