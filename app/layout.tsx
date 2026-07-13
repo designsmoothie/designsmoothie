@@ -120,34 +120,37 @@ export default function RootLayout({
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}
-      
-      <Script
-  src="https://www.googletagmanager.com/gtag/js?id=G-5BWXM253QV"
-  strategy="afterInteractive"
-/>
+      <body className="flex min-h-full flex-col">
+  {children}
 
-<Script id="google-analytics" strategy="afterInteractive">
+  <Script
+    src="https://www.googletagmanager.com/gtag/js?id=G-5BWXM253QV"
+    strategy="afterInteractive"
+  />
 
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
+  <Script id="google-analytics" strategy="afterInteractive">
+    {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-5BWXM253QV');
+    `}
+  </Script>
+
+  <Script id="microsoft-clarity" strategy="afterInteractive">
+    {`
+      (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "xlqykfucvc");
-</script>
-
-  {`
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-5BWXM253QV', {
-  page_path: window.location.pathname,
-});
-  `}
-</Script>
-      </body>
+        t=l.createElement(r);
+        t.async=1;
+        t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];
+        y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", "xlqykfucvc");
+    `}
+  </Script>
+</body>
     </html>
   );
 }
