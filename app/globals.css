@@ -2,17 +2,28 @@
 
 :root {
   --cream: #f7f3ec;
-  --text: #726A63;        /* 기본 글씨 */
-  --heading: #5D564F;     /* 제목 */
-  --muted: #9A938B;       /* 설명 */
-  --text-dark: #5f574f;
+
+  --text: #726a63;
+  --heading: #5d564f;
+  --text-dark: #554e47;
   --muted: #958b82;
   --soft: #b7ada3;
-  --line: #e8dfd2;
+  --line: #e7ded3;
 
   --green: #bfdc59;
+  --green-hover: #cbe96a;
   --orange: #f6b55b;
   --coral: #ee8d9b;
+
+  --background-soft: #f2eee7;
+  --background-white: rgba(255, 255, 255, 0.72);
+
+  --shadow-soft: 0 20px 70px rgba(57, 48, 40, 0.06);
+  --shadow-hover: 0 32px 90px rgba(57, 48, 40, 0.1);
+
+  --radius-large: 40px;
+  --radius-medium: 28px;
+  --radius-small: 18px;
 }
 
 * {
@@ -21,14 +32,55 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--cream);
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
   background: var(--cream);
   color: var(--text);
-  font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  font-family:
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "SF Pro Text",
+    "Segoe UI",
     sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-dark);
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
@@ -36,7 +88,84 @@ a {
   text-decoration: none;
 }
 
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+section {
+  position: relative;
+}
+
 ::selection {
   background: var(--green);
   color: var(--text-dark);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid var(--cream);
+  border-radius: 999px;
+  background: #c8beb4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa097;
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-padding-top: 72px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 82px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
