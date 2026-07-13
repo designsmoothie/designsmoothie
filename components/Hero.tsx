@@ -8,24 +8,26 @@ export default function Hero() {
       className="relative overflow-hidden bg-[var(--cream)]"
     >
       <div className="mx-auto max-w-[1440px] px-6 pb-12 pt-20 sm:pt-24 md:px-12 md:pb-20 md:pt-36">
-        <div className="mx-auto max-w-[1100px] text-center">
-          <p className="mb-6 text-[10px] font-semibold tracking-[0.24em] text-[var(--muted)] sm:text-xs sm:tracking-[0.3em] md:text-sm">
+        <div className="mx-auto max-w-[1200px] text-center">
+          <p className="text-[10px] font-semibold tracking-[0.24em] text-[var(--muted)] sm:text-xs sm:tracking-[0.3em] md:text-sm">
             BRANDING & SIGNAGE DESIGN STUDIO
           </p>
 
-          <h1 className="text-[3rem] font-semibold leading-[1.06] tracking-[-0.06em] text-[var(--text-dark)] sm:text-6xl sm:leading-[1.02] md:text-8xl lg:text-[7.5rem] mb-8 sm:mb-10 md:mb-12">
+          <h1 className="mt-5 text-[3rem] font-semibold leading-[1.06] tracking-[-0.06em] text-[var(--text-dark)] sm:text-6xl sm:leading-[1.02] md:text-8xl lg:text-[7.5rem]">
             Design that stays.
             <br />
             Not just looks.
           </h1>
 
-          <p className="mx-auto mt-0 max-w-2xl text-lg font-medium leading-[1.55] text-[var(--text)] sm:text-xl md:text-2xl md:leading-[1.6]">
-            브랜딩부터 간판까지,
-            <br className="sm:hidden" />
-            오래 기억되는 브랜드 경험을 만듭니다.
-          </p>
+          <div className="mt-14 flex justify-center sm:mt-16 md:mt-20">
+            <p className="max-w-2xl text-center text-lg font-medium leading-[1.45] text-[var(--text)] sm:text-xl md:text-2xl md:leading-[1.5]">
+              브랜딩부터 간판까지,
+              <br />
+              오래 기억되는 브랜드 경험을 만듭니다.
+            </p>
+          </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10 md:mt-12">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3 md:mt-12">
             <Link
               href="/portfolio"
               className="inline-flex items-center justify-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)] transition duration-300 hover:-translate-y-0.5 hover:bg-[var(--green-hover)]"
@@ -63,7 +65,7 @@ export default function Hero() {
                   SELECTED PROJECT
                 </p>
 
-                <p className="mt-2 text-xl font-semibold tracking-[-0.03em] sm:text-2xl md:text-4xl">
+                <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white sm:text-2xl md:text-4xl">
                   Signage & Brand Experience
                 </p>
               </div>
