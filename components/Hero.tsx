@@ -13,13 +13,13 @@ export default function Hero() {
             BRANDING & SIGNAGE DESIGN STUDIO
           </p>
 
-          <h1 className="text-[3rem] font-semibold leading-[1.04] tracking-[-0.06em] text-[var(--text-dark)] sm:text-6xl sm:leading-[1] md:text-8xl lg:text-[7.5rem]">
+          <h1 className="text-[3rem] font-semibold leading-[1.06] tracking-[-0.06em] text-[var(--text-dark)] sm:text-6xl sm:leading-[1.02] md:text-8xl lg:text-[7.5rem] mb-8 sm:mb-10 md:mb-12">
             Design that stays.
             <br />
             Not just looks.
           </h1>
 
-          <p className="mx-auto mt-20 max-w-2xl text-lg font-medium leading-[1.8] text-[var(--text)] sm:mt-12 sm:text-xl md:mt-14 md:text-2xl md:leading-relaxed">
+          <p className="mx-auto mt-0 max-w-2xl text-lg font-medium leading-[1.55] text-[var(--text)] sm:text-xl md:text-2xl md:leading-[1.6]">
             브랜딩부터 간판까지,
             <br className="sm:hidden" />
             오래 기억되는 브랜드 경험을 만듭니다.
