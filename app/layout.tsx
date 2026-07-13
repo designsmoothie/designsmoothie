@@ -111,6 +111,63 @@ export const metadata: Metadata = {
   category: "design",
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://designsmoothie.kr/#organization",
+  name: "Design Smoothie",
+  alternateName: "디자인스무디",
+  url: "https://designsmoothie.kr",
+  logo: "https://designsmoothie.kr/designsmoothie_logo1.png",
+  description:
+    "디자인스무디는 부산을 기반으로 브랜딩, 로고, 간판, 파사드, 공간그래픽, 배너와 인쇄물 디자인을 제공하는 디자인 스튜디오입니다.",
+  areaServed: {
+    "@type": "Country",
+    name: "대한민국",
+  },
+  knowsAbout: [
+    "브랜딩",
+    "브랜드 디자인",
+    "로고 디자인",
+    "간판 디자인",
+    "사이니지 디자인",
+    "파사드 디자인",
+    "공간그래픽",
+    "배너 디자인",
+    "인쇄 디자인",
+    "옥외광고",
+  ],
+  sameAs: [
+    // 실제 공개 중인 인스타그램 주소가 있으면 여기에 넣기
+    // "https://www.instagram.com/계정명",
+  ],
+};
+
+const serviceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": "https://designsmoothie.kr/#service",
+  name: "브랜딩 및 사이니지 디자인 서비스",
+  serviceType: [
+    "브랜딩",
+    "로고 디자인",
+    "간판 디자인",
+    "사이니지 디자인",
+    "파사드 디자인",
+    "공간그래픽",
+    "배너 디자인",
+    "인쇄 디자인",
+  ],
+  provider: {
+    "@id": "https://designsmoothie.kr/#organization",
+  },
+  areaServed: {
+    "@type": "Country",
+    name: "대한민국",
+  },
+  url: "https://designsmoothie.kr",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -123,6 +180,20 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         {children}
+
+        <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+  }}
+/>
+
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(serviceJsonLd).replace(/</g, "\\u003c"),
+  }}
+/>
 
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-5BWXM253QV"
