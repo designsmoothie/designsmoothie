@@ -56,7 +56,9 @@ export const portfolioCategories = [
     color: "bg-[#f7d69a]",
     description: "인쇄물 디자인",
     images: [
-    
+  "/images/portfolio/print/metis.jpg",
+ 
+
     ],
   },
 
