@@ -19,13 +19,13 @@ export default function Hero() {
             Not just looks.
           </h1>
 
-          <p className="mx-auto mt-14 max-w-2xl text-lg font-medium leading-[1.8] text-[var(--text)] sm:mt-12 sm:text-xl md:mt-14 md:text-2xl md:leading-relaxed">
+          <p className="mx-auto mt-20 max-w-2xl text-lg font-medium leading-[1.8] text-[var(--text)] sm:mt-12 sm:text-xl md:mt-14 md:text-2xl md:leading-relaxed">
             브랜딩부터 간판까지,
             <br className="sm:hidden" />
             오래 기억되는 브랜드 경험을 만듭니다.
           </p>
 
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-3 sm:mt-10 md:mt-12">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10 md:mt-12">
             <Link
               href="/portfolio"
               className="inline-flex items-center justify-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)] transition duration-300 hover:-translate-y-0.5 hover:bg-[var(--green-hover)]"
