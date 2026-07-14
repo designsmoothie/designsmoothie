@@ -1,3 +1,5 @@
+import MotionProvider from "@/components/MotionProvider";
+import ScrollProgress from "@/components/ScrollProgress";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -179,7 +181,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+<MotionProvider>
+    <ScrollProgress />      
         {children}
+        </MotionProvider>
 
         <script
   type="application/ld+json"

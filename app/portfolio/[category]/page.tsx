@@ -1,3 +1,4 @@
+import PageTransition from "@/components/PageTransition";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -32,6 +33,7 @@ export default async function PortfolioCategoryPage({ params }: Props) {
   const isBanner = currentCategory.slug === "banner";
 
   return (
+    <PageTransition>
     <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
       <section className="mx-auto max-w-[1440px] px-6 pb-24 pt-10 md:px-12 md:pb-36 md:pt-14">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -193,5 +195,6 @@ export default async function PortfolioCategoryPage({ params }: Props) {
         </div>
       </section>
     </main>
+    </PageTransition>
   );
 }

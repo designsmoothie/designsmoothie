@@ -1,9 +1,11 @@
+import PageTransition from "@/components/PageTransition";
 import Image from "next/image";
 import Link from "next/link";
 import { portfolioCategories } from "@/data/portfolio";
 
 export default function PortfolioPage() {
   return (
+    <PageTransition>
     <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
       <section className="mx-auto max-w-[1440px] px-6 pb-24 pt-10 md:px-12 md:pb-36 md:pt-14">
         <div className="flex items-center justify-between">
@@ -150,5 +152,6 @@ export default function PortfolioPage() {
         </div>
       </section>
     </main>
+    </PageTransition>
   );
 }

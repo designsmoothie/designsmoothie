@@ -1,3 +1,4 @@
+import PageTransition from "@/components/PageTransition";
 import Link from "next/link";
 
 const guideItems = [
@@ -95,6 +96,7 @@ const guideItems = [
 
 export default function GuidePage() {
   return (
+    <PageTransition>
     <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
       <section className="mx-auto max-w-[1440px] px-6 pb-24 pt-10 md:px-12 md:pb-36 md:pt-14">
         <div className="flex items-center justify-between">
@@ -272,5 +274,6 @@ export default function GuidePage() {
         </section>
       </section>
     </main>
+    </PageTransition>
   );
 }
