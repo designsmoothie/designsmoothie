@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const menuItems = [
@@ -9,32 +10,40 @@ const menuItems = [
     label: "PORTFOLIO",
     description: "Selected Works",
     href: "/#portfolio",
+    sectionId: "portfolio",
   },
   {
     label: "SERVICE",
     description: "Branding & Signage",
     href: "/#service",
+    sectionId: "service",
   },
   {
     label: "PROCESS",
     description: "How We Work",
     href: "/#process",
+    sectionId: "process",
   },
   {
     label: "ABOUT",
     description: "Design Smoothie",
     href: "/#about",
+    sectionId: "about",
   },
   {
     label: "CONTACT",
     description: "Let’s Start",
     href: "/contact",
+    sectionId: "contact",
   },
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeMenu, setActiveMenu] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,12 +51,16 @@ export default function Header() {
     };
 
     handleScroll();
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "";
@@ -56,6 +69,82 @@ export default function Header() {
       document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (pathname.startsWith("/portfolio")) {
+      setActiveMenu("PORTFOLIO");
+      return;
+    }
+
+    if (pathname.startsWith("/contact")) {
+      setActiveMenu("CONTACT");
+      return;
+    }
+
+    if (pathname !== "/") {
+      setActiveMenu("");
+      return;
+    }
+
+    const sectionElements = menuItems
+      .map((item) => {
+        const element = document.getElementById(item.sectionId);
+
+        if (!element) {
+          return null;
+        }
+
+        return {
+          label: item.label,
+          element,
+        };
+      })
+      .filter(
+        (
+          item
+        ): item is {
+          label: string;
+          element: HTMLElement;
+        } => item !== null
+      );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort(
+            (firstEntry, secondEntry) =>
+              secondEntry.intersectionRatio - firstEntry.intersectionRatio
+          );
+
+        const mostVisibleEntry = visibleEntries[0];
+
+        if (!mostVisibleEntry) {
+          return;
+        }
+
+        const matchedSection = sectionElements.find(
+          (item) => item.element === mostVisibleEntry.target
+        );
+
+        if (matchedSection) {
+          setActiveMenu(matchedSection.label);
+        }
+      },
+      {
+        rootMargin: "-28% 0px -58% 0px",
+        threshold: [0, 0.1, 0.25, 0.5],
+      }
+    );
+
+    sectionElements.forEach((item) => {
+      observer.observe(item.element);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [pathname]);
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -88,22 +177,35 @@ export default function Header() {
 
         <div className="hidden items-center gap-10 md:flex">
           <nav className="flex items-center gap-8">
-            {menuItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="group relative py-2 text-[11px] font-semibold tracking-[0.12em] text-[var(--text)] transition duration-300 hover:text-[var(--text-dark)]"
-              >
-                {item.label}
+            {menuItems.map((item) => {
+              const isActive = activeMenu === item.label;
 
-                <span className="absolute bottom-0 left-1/2 h-px w-0 -translate-x-1/2 bg-[var(--green)] transition-all duration-300 group-hover:w-full" />
-              </Link>
-            ))}
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`group relative py-2 text-[11px] font-semibold tracking-[0.12em] transition duration-300 ${
+                    isActive
+                      ? "text-[var(--green)]"
+                      : "text-[var(--text)] hover:text-[var(--text-dark)]"
+                  }`}
+                >
+                  {item.label}
+
+                  <span
+                    className={`absolute bottom-0 left-1/2 h-px -translate-x-1/2 bg-[var(--green)] transition-all duration-300 ${
+                      isActive ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
           <Link
             href="/guide"
-            className="inline-flex items-center justify-center rounded-full bg-[var(--green)] px-5 py-2.5 text-xs font-semibold text-[var(--text-dark)] transition duration-300 hover:-translate-y-0.5 hover:bg-[var(--green-hover)]"
+            className="premium-button inline-flex items-center justify-center rounded-full bg-[var(--green)] px-5 py-2.5 text-xs font-semibold text-[var(--text-dark)] hover:bg-[var(--green-hover)]"
           >
             디자인 의뢰 안내
           </Link>
@@ -111,7 +213,7 @@ export default function Header() {
 
         <button
           type="button"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
+          onClick={() => setIsMenuOpen((previous) => !previous)}
           className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/45 backdrop-blur-md transition hover:bg-white/75 md:hidden"
           aria-label={isMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
           aria-expanded={isMenuOpen}
@@ -149,42 +251,60 @@ export default function Header() {
             : "pointer-events-none -translate-y-4 opacity-0"
         }`}
       >
-        <nav className="flex h-full flex-col px-6 pb-8 pt-6">
+        <nav className="flex h-full flex-col overflow-y-auto px-6 pb-8 pt-6">
           <div className="flex flex-col">
-            {menuItems.map((item, index) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={closeMenu}
-                className="group border-b border-black/6 py-5 transition duration-300"
-                style={{
-                  transitionDelay: isMenuOpen ? `${index * 45}ms` : "0ms",
-                }}
-              >
-                <div className="flex items-end justify-between gap-4">
-                  <div>
-                    <span className="block text-[2rem] font-semibold leading-none tracking-[-0.045em] text-[var(--text-dark)] transition group-hover:text-[var(--green)]">
-                      {item.label}
-                    </span>
+            {menuItems.map((item, index) => {
+              const isActive = activeMenu === item.label;
 
-                    <span className="mt-2 block text-xs font-medium tracking-[0.08em] text-[var(--muted)]">
-                      {item.description}
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={closeMenu}
+                  className="group border-b border-black/6 py-5 transition duration-300"
+                  style={{
+                    transitionDelay: isMenuOpen
+                      ? `${index * 45}ms`
+                      : "0ms",
+                  }}
+                >
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <span
+                        className={`block text-[2rem] font-semibold leading-none tracking-[-0.045em] transition ${
+                          isActive
+                            ? "text-[var(--green)]"
+                            : "text-[var(--text-dark)] group-hover:text-[var(--green)]"
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+
+                      <span className="mt-2 block text-xs font-medium tracking-[0.08em] text-[var(--muted)]">
+                        {item.description}
+                      </span>
+                    </div>
+
+                    <span
+                      className={`pb-1 text-lg transition-transform duration-300 group-hover:translate-x-1 ${
+                        isActive
+                          ? "text-[var(--green)]"
+                          : "text-[var(--muted)]"
+                      }`}
+                    >
+                      →
                     </span>
                   </div>
-
-                  <span className="pb-1 text-lg text-[var(--muted)] transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="mt-auto pt-8">
             <Link
               href="/guide"
               onClick={closeMenu}
-              className="inline-flex w-full items-center justify-center rounded-full bg-[var(--green)] px-6 py-4 text-sm font-semibold text-[var(--text-dark)] transition hover:bg-[var(--green-hover)]"
+              className="premium-button inline-flex w-full items-center justify-center rounded-full bg-[var(--green)] px-6 py-4 text-sm font-semibold text-[var(--text-dark)] hover:bg-[var(--green-hover)]"
             >
               디자인 의뢰 안내사항
             </Link>

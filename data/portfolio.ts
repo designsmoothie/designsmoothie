@@ -22,31 +22,31 @@ export const portfolioCategories = [
   },
 
   {
-    number: "02",
-    slug: "signage",
-    title: "Signage",
-    subtitle: "Exterior · Storefront",
-    href: "/portfolio/signage",
-    color: "bg-[#d1c6b8]",
-    description: "간판 및 사인 디자인",
-    images: [
-      
-    ],
-  },
-
-  {
-    number: "03",
-    slug: "facade",
-    title: "Facade",
-    subtitle: "Space Graphic",
-    href: "/portfolio/facade",
-    color: "bg-[#f2c7c7]",
-    description: "공간 브랜딩",
-    images: [
-      
-    ],
-  },
-
+  number: "02",
+  slug: "signage",
+  title: "Signage & Facade",
+  subtitle: "간판 · 파사드 디자인",
+  description:
+    "간판부터 건물 외관까지 브랜드의 첫인상을 만드는 시각 환경을 설계합니다.",
+  href: "/portfolio/signage",
+  color: "bg-[#d1c6b8]",
+  images: [
+    "/images/portfolio/signage&facade/feelymeal1.png",
+  ],
+},
+{
+  number: "03",
+  slug: "interior",
+  title: "Interior",
+  subtitle: "인테리어 · 공간 디자인",
+  description:
+    "브랜드의 성격과 동선을 고려해 공간의 분위기와 시각 경험을 설계합니다.",
+  href: "/portfolio/interior",
+  color: "bg-[#f2c7c7]",
+  images: [
+    "/images/portfolio/interior/cafe.png",
+  ],
+},
   {
     number: "04",
     slug: "print",
