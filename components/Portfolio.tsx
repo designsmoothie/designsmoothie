@@ -1,6 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { portfolioCategories } from "@/data/portfolio";
+
+const cardTransition = {
+  duration: 0.65,
+  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+};
 
 export default function Portfolio() {
   return (
@@ -9,8 +17,26 @@ export default function Portfolio() {
       className="scroll-mt-28 overflow-hidden bg-[#f5f4f0] py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
+        {/* 섹션 제목 */}
         <div className="flex flex-col justify-between gap-10 md:flex-row md:items-end">
-          <div className="max-w-4xl">
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 32,
+              filter: "blur(8px)",
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              filter: "blur(0px)",
+            }}
+            viewport={{
+              once: true,
+              amount: 0.3,
+            }}
+            transition={cardTransition}
+            className="max-w-4xl"
+          >
             <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
               SELECTED WORK
             </p>
@@ -20,11 +46,29 @@ export default function Portfolio() {
               <br />
               결과로 보여드립니다.
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="max-w-md md:pb-2">
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 26,
+            }}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+            }}
+            viewport={{
+              once: true,
+              amount: 0.3,
+            }}
+            transition={{
+              ...cardTransition,
+              delay: 0.1,
+            }}
+            className="max-w-md md:pb-2"
+          >
             <p className="text-base leading-8 text-[var(--text)] md:text-lg">
-              브랜딩부터 간판, 공간 그래픽까지.
+              브랜딩부터 간판, 파사드와 공간 디자인까지.
               <br />
               브랜드가 실제 공간에서 완성되는 과정을 담았습니다.
             </p>
@@ -35,115 +79,169 @@ export default function Portfolio() {
             >
               전체 포트폴리오 보기
 
-              <span className="transition-transform duration-300 group-hover:translate-x-1">
+              <span className="transition-transform duration-300 group-hover:translate-x-1.5">
                 →
               </span>
             </Link>
-          </div>
+          </motion.div>
         </div>
 
+        {/* 포트폴리오 카드 */}
         <div className="mt-20 grid gap-8 md:mt-28 md:grid-cols-2">
           {portfolioCategories.map((category, categoryIndex) => {
-            const previewImages =
-              category.slug === "banner"
-                ? category.images.slice(0, 3)
-                : category.images.slice(0, 4);
+            const isFeatured = categoryIndex === 0;
+            const isBanner = category.slug === "banner";
+
+            const previewImages = isBanner
+              ? category.images.slice(0, 3)
+              : category.images.slice(0, 4);
 
             return (
-              <Link
+              <motion.div
                 key={category.slug}
-                href={category.href}
-                className={`group relative overflow-hidden rounded-[32px] bg-white shadow-[0_20px_70px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_90px_rgba(0,0,0,0.1)] md:rounded-[40px] ${
-                  categoryIndex === 0 ? "md:col-span-2" : ""
-                }`}
+                initial={{
+                  opacity: 0,
+                  y: 44,
+                  scale: 0.985,
+                  filter: "blur(9px)",
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  filter: "blur(0px)",
+                }}
+                viewport={{
+                  once: true,
+                  amount: 0.12,
+                  margin: "0px 0px -40px 0px",
+                }}
+                transition={{
+                  ...cardTransition,
+                  delay: Math.min(categoryIndex * 0.07, 0.28),
+                }}
+                className={isFeatured ? "md:col-span-2" : ""}
               >
-                <div
-                  className={`relative overflow-hidden bg-[#dedbd3] ${
-                    categoryIndex === 0
-                      ? "aspect-[4/3] sm:aspect-[16/9]"
-                      : "aspect-[4/3]"
-                  }`}
+                <Link
+                  href={category.href}
+                  className="group block h-full"
                 >
-                  {previewImages.length > 0 ? (
+                  <motion.article
+                    whileHover={{
+                      y: -9,
+                    }}
+                    transition={{
+                      duration: 0.42,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="relative h-full overflow-hidden rounded-[32px] border border-black/5 bg-white shadow-[0_20px_70px_rgba(57,48,40,0.055)] transition-shadow duration-500 group-hover:shadow-[0_38px_100px_rgba(57,48,40,0.13)] md:rounded-[42px]"
+                  >
+                    {/* 이미지 영역 */}
                     <div
-                      className={`grid h-full w-full ${
-                        category.slug === "banner"
-                          ? "grid-cols-3 gap-2 p-3 md:gap-4 md:p-5"
-                          : previewImages.length === 1
-                            ? "grid-cols-1"
-                            : "grid-cols-2"
+                      className={`relative overflow-hidden bg-[#dedbd3] ${
+                        isFeatured
+                          ? "aspect-[4/3] sm:aspect-[16/9]"
+                          : "aspect-[4/3]"
                       }`}
                     >
-                      {previewImages.map((image, imageIndex) => (
+                      {previewImages.length > 0 ? (
                         <div
-                          key={image}
-                          className={`relative overflow-hidden ${
-                            category.slug === "banner"
-                              ? "rounded-[18px] bg-white/60"
+                          className={`grid h-full w-full ${
+                            isBanner
+                              ? "grid-cols-3 gap-2 p-3 md:gap-4 md:p-5"
                               : previewImages.length === 1
-                                ? ""
-                                : "bg-white/50"
+                                ? "grid-cols-1"
+                                : "grid-cols-2"
                           }`}
                         >
-                          <Image
-                            src={image}
-                            alt={`${category.title} 포트폴리오 미리보기 ${
-                              imageIndex + 1
-                            }`}
-                            fill
-                            sizes={
-                              categoryIndex === 0
-                                ? "(max-width: 768px) 100vw, 1400px"
-                                : "(max-width: 768px) 100vw, 700px"
-                            }
-                            className={`transition-transform duration-700 group-hover:scale-[1.035] ${
-                              category.slug === "banner"
-                                ? "object-cover"
-                                : "object-cover"
-                            }`}
-                          />
+                          {previewImages.map((image, imageIndex) => (
+                            <div
+                              key={image}
+                              className={`relative overflow-hidden ${
+                                isBanner
+                                  ? "rounded-[18px] bg-white/65"
+                                  : previewImages.length === 1
+                                    ? ""
+                                    : "bg-white/45"
+                              }`}
+                            >
+                              <Image
+                                src={image}
+                                alt={`${category.title} 포트폴리오 미리보기 ${
+                                  imageIndex + 1
+                                }`}
+                                fill
+                                sizes={
+                                  isFeatured
+                                    ? "(max-width: 768px) 100vw, 1400px"
+                                    : "(max-width: 768px) 100vw, 700px"
+                                }
+                                className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045] ${
+                                  isBanner
+                                    ? "object-cover"
+                                    : "object-cover"
+                                }`}
+                              />
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        <div
+                          className={`flex h-full items-center justify-center ${category.color}`}
+                        >
+                          <span className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
+                            DESIGN SMOOTHIE
+                          </span>
+                        </div>
+                      )}
+
+                      {/* 이미지 오버레이 */}
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
+
+                      {/* 번호 */}
+                      <div className="absolute left-5 top-5 md:left-7 md:top-7">
+                        <span className="inline-flex items-center rounded-full border border-white/30 bg-black/15 px-4 py-2 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-md">
+                          {category.number}
+                        </span>
+                      </div>
+
+                      {/* 이미지 위 하단 정보 */}
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-5 p-6 text-white md:p-9">
+                        <div>
+                          <p className="text-[10px] font-semibold tracking-[0.2em] text-white/65 md:text-xs">
+                            {category.subtitle}
+                          </p>
+
+                          <h3
+                            className={`mt-2 font-semibold tracking-[-0.045em] text-white ${
+                              isFeatured
+                                ? "text-3xl md:text-5xl"
+                                : "text-3xl md:text-4xl"
+                            }`}
+                          >
+                            {category.title}
+                          </h3>
+                        </div>
+
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-lg text-white backdrop-blur-md transition-all duration-500 group-hover:translate-x-1.5 group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:h-14 md:w-14">
+                          →
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <div
-                      className={`flex h-full items-center justify-center ${category.color}`}
-                    >
-                      <span className="text-sm font-semibold tracking-[0.24em] text-[var(--muted)]">
-                        DESIGN SMOOTHIE
+
+                    {/* 카드 설명 영역 */}
+                    <div className="flex items-start justify-between gap-6 p-7 md:p-9">
+                      <p className="max-w-2xl text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
+                        {category.description}
+                      </p>
+
+                      <span className="hidden shrink-0 text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] sm:block">
+                        VIEW PROJECT
                       </span>
                     </div>
-                  )}
-
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-80" />
-
-                  <div className="absolute left-5 top-5 md:left-7 md:top-7">
-                    <span className="rounded-full border border-white/30 bg-black/15 px-4 py-2 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-md">
-                      {category.number}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-end justify-between gap-6 p-7 md:p-10">
-                  <div>
-                    <p className="text-[11px] font-semibold tracking-[0.2em] text-[var(--muted)]">
-                      {category.subtitle}
-                    </p>
-
-                    <h3 className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-[var(--text-dark)] md:text-4xl">
-                      {category.title}
-                    </h3>
-
-                    <p className="mt-4 max-w-xl text-sm leading-7 text-[var(--text)] md:text-base">
-                      {category.description}
-                    </p>
-                  </div>
-
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--green)] text-lg text-[var(--text-dark)] transition-all duration-300 group-hover:translate-x-1 group-hover:bg-[#cbe96a] md:h-14 md:w-14">
-                    →
-                  </span>
-                </div>
-              </Link>
+                  </motion.article>
+                </Link>
+              </motion.div>
             );
           })}
         </div>
