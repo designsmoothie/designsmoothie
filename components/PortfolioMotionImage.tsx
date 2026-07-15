@@ -1,14 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "motion/react";
-import { useRef } from "react";
+import { motion, useReducedMotion } from "motion/react";
 
 type PortfolioMotionImageProps = {
   src: string;
@@ -25,54 +18,39 @@ export default function PortfolioMotionImage({
   priority = false,
   isBanner = false,
 }: PortfolioMotionImageProps) {
-  const imageRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  const { scrollYProgress } = useScroll({
-    target: imageRef,
-    offset: ["start 95%", "end 5%"],
-  });
-
-  const rawY = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    isBanner ? [-10, 0, 10] : [-42, 0, 42]
-  );
-
-  const rawScale = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    isBanner ? [1.015, 1.005, 1.015] : [1.1, 1.035, 1.1]
-  );
-
-  const smoothY = useSpring(rawY, {
-    stiffness: 70,
-    damping: 22,
-    mass: 0.5,
-  });
-
-  const smoothScale = useSpring(rawScale, {
-    stiffness: 70,
-    damping: 22,
-    mass: 0.5,
-  });
-
   return (
-    <div ref={imageRef} className="absolute inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden">
       <motion.div
-        className={
-          isBanner
-            ? "absolute inset-0"
-            : "absolute inset-x-[-6%] inset-y-[-12%]"
+        className="absolute inset-0"
+        initial={
+          shouldReduceMotion
+            ? false
+            : {
+                opacity: 0,
+                scale: isBanner ? 1.025 : 1.08,
+                filter: "blur(12px)",
+              }
         }
-        style={
+        whileInView={
           shouldReduceMotion
             ? undefined
             : {
-                y: smoothY,
-                scale: smoothScale,
+                opacity: 1,
+                scale: 1,
+                filter: "blur(0px)",
               }
         }
+        viewport={{
+          once: true,
+          amount: 0.28,
+          margin: "0px 0px -8% 0px",
+        }}
+        transition={{
+          duration: 0.9,
+          ease: [0.22, 1, 0.36, 1],
+        }}
       >
         <Image
           src={src}
@@ -80,7 +58,7 @@ export default function PortfolioMotionImage({
           fill
           priority={priority}
           sizes={sizes}
-          className={`transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:scale-[1.045] ${
+          className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:scale-[1.045] ${
             isBanner ? "object-contain" : "object-cover"
           }`}
         />
