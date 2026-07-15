@@ -30,31 +30,31 @@ export default function PortfolioMotionImage({
 
   const { scrollYProgress } = useScroll({
     target: imageRef,
-    offset: ["start end", "end start"],
+    offset: ["start 95%", "end 5%"],
   });
 
   const rawY = useTransform(
     scrollYProgress,
-    [0, 1],
-    isBanner ? [-5, 5] : [-16, 16]
+    [0, 0.5, 1],
+    isBanner ? [-10, 0, 10] : [-42, 0, 42]
   );
 
   const rawScale = useTransform(
     scrollYProgress,
     [0, 0.5, 1],
-    isBanner ? [1.005, 1, 1.005] : [1.025, 1, 1.025]
+    isBanner ? [1.015, 1.005, 1.015] : [1.1, 1.035, 1.1]
   );
 
   const smoothY = useSpring(rawY, {
-    stiffness: 90,
-    damping: 24,
-    mass: 0.35,
+    stiffness: 70,
+    damping: 22,
+    mass: 0.5,
   });
 
   const smoothScale = useSpring(rawScale, {
-    stiffness: 90,
-    damping: 24,
-    mass: 0.35,
+    stiffness: 70,
+    damping: 22,
+    mass: 0.5,
   });
 
   return (
@@ -63,7 +63,7 @@ export default function PortfolioMotionImage({
         className={
           isBanner
             ? "absolute inset-0"
-            : "absolute inset-[-4%]"
+            : "absolute inset-x-[-6%] inset-y-[-12%]"
         }
         style={
           shouldReduceMotion
@@ -80,7 +80,7 @@ export default function PortfolioMotionImage({
           fill
           priority={priority}
           sizes={sizes}
-          className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035] ${
+          className={`transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:scale-[1.045] ${
             isBanner ? "object-contain" : "object-cover"
           }`}
         />
