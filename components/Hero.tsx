@@ -20,25 +20,25 @@ export default function Hero() {
   const imageY = useTransform(
     scrollYProgress,
     [0, 1],
-    ["0%", "10%"]
+    ["-2%", "10%"]
   );
 
   const imageScale = useTransform(
     scrollYProgress,
     [0, 1],
-    [1, 1.06]
+    [1.03, 1.08]
   );
 
   const contentOpacity = useTransform(
     scrollYProgress,
     [0, 0.65],
-    [1, 0.5]
+    [1, 0.55]
   );
 
   const contentY = useTransform(
     scrollYProgress,
     [0, 1],
-    [0, 36]
+    [0, 32]
   );
 
   return (
@@ -47,7 +47,8 @@ export default function Hero() {
       id="top"
       className="relative overflow-hidden bg-[var(--cream)]"
     >
-      <div className="mx-auto max-w-[1440px] px-6 pb-12 pt-12 sm:pt-16 md:px-12 md:pb-20 md:pt-28">
+      {/* 상단 텍스트 영역 */}
+      <div className="mx-auto max-w-[1440px] px-6 pb-14 pt-12 sm:pt-16 md:px-12 md:pb-24 md:pt-28">
         <motion.div
           className="mx-auto max-w-[1200px] text-center"
           style={{
@@ -112,7 +113,7 @@ export default function Hero() {
           >
             <Link
               href="/portfolio"
-              className="premium-button inline-flex items-center justify-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)]"
+              className="premium-button inline-flex items-center justify-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)] hover:bg-[var(--green-hover)]"
             >
               포트폴리오 보기
               <span className="ml-2">→</span>
@@ -120,70 +121,71 @@ export default function Hero() {
 
             <Link
               href="/contact"
-              className="premium-button inline-flex items-center justify-center rounded-full border border-[var(--soft)] bg-white/40 px-7 py-3.5 text-sm font-semibold text-[var(--text)] backdrop-blur-sm"
+              className="premium-button inline-flex items-center justify-center rounded-full border border-[var(--soft)] bg-white/40 px-7 py-3.5 text-sm font-semibold text-[var(--text)] backdrop-blur-sm hover:border-[var(--text-dark)] hover:text-[var(--text-dark)]"
             >
               상담 문의
               <span className="ml-2">→</span>
             </Link>
           </motion.div>
         </motion.div>
+      </div>
 
-        <motion.div
-          initial={{
-            opacity: 0,
-            y: 36,
-            scale: 0.985,
-          }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            scale: 1,
-          }}
-          transition={{
-            duration: 1,
-            delay: 0.46,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="relative mt-14 overflow-hidden rounded-[28px] bg-[#ded7cb] sm:mt-16 md:mt-24 md:rounded-[44px]"
-        >
-          <div className="relative aspect-[4/5] overflow-hidden sm:aspect-[16/10] lg:aspect-[16/8]">
-            <motion.div
-              className="absolute inset-[-6%]"
-              style={{
-                y: imageY,
-                scale: imageScale,
-              }}
-            >
-              <Image
-                src="/images/hero/signage.jpg"
-                alt="Design Smoothie signage project"
-                fill
-                priority
-                sizes="(max-width: 640px) 100vw, (max-width: 1200px) 90vw, 1360px"
-                className="object-cover"
-              />
-            </motion.div>
+      {/* 브라우저 전체 폭 대표 이미지 */}
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 40,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 1,
+          delay: 0.46,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        className="relative w-full overflow-hidden bg-[#ded7cb]"
+      >
+        <div className="relative h-[70vh] min-h-[520px] max-h-[920px] w-full sm:h-[76vh] md:min-h-[680px]">
+          <motion.div
+            className="absolute inset-[-7%]"
+            style={{
+              y: imageY,
+              scale: imageScale,
+            }}
+          >
+            <Image
+              src="/images/hero/signage.jpg"
+              alt="Design Smoothie signage project"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          </motion.div>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
 
-            <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between p-6 text-white md:p-10">
+          <div className="absolute inset-x-0 bottom-0">
+            <div className="mx-auto flex max-w-[1440px] items-end justify-between gap-8 px-6 pb-8 text-white md:px-12 md:pb-12">
               <div>
-                <p className="text-[10px] font-semibold tracking-[0.18em] text-white/70 sm:text-xs sm:tracking-[0.22em]">
+                <p className="text-[10px] font-semibold tracking-[0.2em] text-white/65 sm:text-xs">
                   SELECTED PROJECT
                 </p>
 
-                <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white sm:text-2xl md:text-4xl">
+                <p className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl md:text-5xl">
                   Signage & Brand Experience
                 </p>
               </div>
 
-              <p className="hidden text-sm font-medium text-white/70 md:block">
+              <p className="hidden text-xs font-medium tracking-[0.12em] text-white/65 md:block">
                 DESIGN SMOOTHIE
               </p>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </section>
   );
 }
