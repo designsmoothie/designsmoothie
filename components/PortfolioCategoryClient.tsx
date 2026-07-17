@@ -1,35 +1,49 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
+import PortfolioMotionImage from "@/components/PortfolioMotionImage";
+import type { PortfolioProject } from "@/data/projects";
 
 type PortfolioCategory = {
   number: string;
   slug: string;
   title: string;
+  heroTitle: string;
   subtitle: string;
   href: string;
   color: string;
   description: string;
+  overviewTitle: string;
+  overview: string;
+  services: string[];
+  keywords: string[];
   images: string[];
 };
 
 type PortfolioCategoryClientProps = {
   currentCategory: PortfolioCategory;
   nextCategory: PortfolioCategory;
+  projects: PortfolioProject[];
 };
 
 const cardTransition = {
   duration: 0.65,
-  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+  ease: [0.22, 1, 0.36, 1] as [
+    number,
+    number,
+    number,
+    number,
+  ],
 };
 
 export default function PortfolioCategoryClient({
   currentCategory,
   nextCategory,
+  projects,
 }: PortfolioCategoryClientProps) {
   const isBanner = currentCategory.slug === "banner";
+  const hasProjects = projects.length > 0;
 
   return (
     <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
@@ -76,7 +90,7 @@ export default function PortfolioCategoryClient({
             </p>
 
             <h1 className="mt-6 text-5xl font-semibold leading-[0.98] tracking-[-0.065em] text-[var(--text-dark)] sm:text-6xl md:text-8xl lg:text-[7.5rem]">
-              {currentCategory.title}
+              {currentCategory.heroTitle}
             </h1>
 
             <p className="mt-5 text-sm font-semibold tracking-[0.2em] text-[var(--muted)]">
@@ -89,27 +103,47 @@ export default function PortfolioCategoryClient({
               {currentCategory.description}
             </p>
 
-            <p className="mt-6 text-sm leading-7 text-[var(--muted)]">
-              총 {currentCategory.images.length}개의 작업 이미지를 확인할 수
-              있습니다.
-            </p>
+            <div className="mt-8">
+              <p className="text-xs font-semibold tracking-[0.18em] text-[var(--muted)]">
+                SERVICES
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {currentCategory.services.map((service) => (
+                  <span
+                    key={service}
+                    className="rounded-full border border-[var(--line)] bg-white/70 px-4 py-2 text-sm text-[var(--text)]"
+                  >
+                    {service}
+                  </span>
+                ))}
+              </div>
+
+              <p className="mt-8 text-base leading-8 text-[var(--text)]">
+                {currentCategory.overview}
+              </p>
+            </div>
           </div>
         </motion.div>
 
-        {currentCategory.images.length > 0 ? (
-          <div
-            className={`mt-16 grid gap-6 md:mt-24 ${
-              isBanner
-                ? "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                : "md:grid-cols-2"
-            }`}
-          >
-            {currentCategory.images.map((image, index) => {
-              const isWideCard = !isBanner && index % 5 === 0;
+        {hasProjects ? (
+          <div className="mt-16 grid gap-6 md:mt-24 md:grid-cols-2">
+            {projects.map((project, index) => {
+              const isWideCard = index % 5 === 0;
+
+              const imageSizes = isWideCard
+                ? "(max-width: 768px) 100vw, 1400px"
+                : "(max-width: 768px) 100vw, 700px";
 
               return (
-                <motion.article
-                  key={image}
+  <Link
+    key={project.slug}
+    href={`/portfolio/project/${project.slug}`}
+    className={`block ${
+      isWideCard ? "md:col-span-2" : ""
+    }`}
+  >
+    <motion.article
                   initial={{
                     opacity: 0,
                     y: 42,
@@ -143,6 +177,133 @@ export default function PortfolioCategoryClient({
                 >
                   <div
                     className={`relative overflow-hidden bg-[#e5e1da] ${
+                      isWideCard
+                        ? "aspect-[4/3] md:aspect-[16/9]"
+                        : "aspect-[4/3]"
+                    }`}
+                  >
+                    <PortfolioMotionImage
+                      src={project.thumbnail}
+                      alt={`${project.title} ${project.subtitle}`}
+                      priority={index < 2}
+                      sizes={imageSizes}
+                      isBanner={false}
+                    />
+
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-80" />
+
+                    <div className="absolute left-5 top-5">
+                      <span className="rounded-full border border-white/35 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+
+                    {project.featured && (
+                      <div className="absolute right-5 top-5">
+                        <span className="rounded-full border border-white/35 bg-white/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
+                          FEATURED
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-5 p-6 text-white md:p-8">
+                      <div>
+                        <p className="text-[10px] font-semibold tracking-[0.2em] text-white/70">
+                          {project.subtitle}
+                        </p>
+
+                        <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white md:text-4xl">
+                          {project.title}
+                        </h2>
+                      </div>
+
+                      <span className="hidden text-xs font-semibold tracking-[0.16em] text-white/70 sm:block">
+                        PROJECT
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 md:p-8">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] font-semibold tracking-[0.16em] text-[var(--muted)]">
+                      <span>{project.industry}</span>
+                      <span className="h-1 w-1 rounded-full bg-[var(--muted)]/40" />
+                      <span>{project.location}</span>
+                      <span className="h-1 w-1 rounded-full bg-[var(--muted)]/40" />
+                      <span>{project.year}</span>
+                    </div>
+
+                    <p className="mt-5 max-w-2xl text-sm leading-7 text-[var(--text)] md:text-base">
+                      {project.summary}
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {project.services.slice(0, 4).map((service) => (
+                        <span
+                          key={service}
+                          className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[11px] text-[var(--muted)]"
+                        >
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                    </motion.article>
+  </Link>
+              );
+            })}
+          </div>
+        ) : currentCategory.images.length > 0 ? (
+          <div
+            className={`mt-16 grid gap-6 md:mt-24 ${
+              isBanner
+                ? "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                : "md:grid-cols-2"
+            }`}
+          >
+            {currentCategory.images.map((image, index) => {
+              const isWideCard = !isBanner && index % 5 === 0;
+
+              const imageSizes = isBanner
+                ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                : isWideCard
+                  ? "(max-width: 768px) 100vw, 1400px"
+                  : "(max-width: 768px) 100vw, 700px";
+
+              return (
+                <motion.article
+                  key={image}
+                  initial={{
+                    opacity: 0,
+                    y: 42,
+                    scale: 0.985,
+                    filter: "blur(10px)",
+                  }}
+                  whileInView={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                  }}
+                  viewport={{
+                    once: true,
+                    amount: 0.1,
+                    margin: "0px 0px -40px 0px",
+                  }}
+                  transition={{
+                    ...cardTransition,
+                    delay: Math.min(index * 0.055, 0.28),
+                  }}
+                  whileHover={{
+                    y: -8,
+                  }}
+                  whileTap={{
+                    scale: 0.985,
+                  }}
+                  className={`group overflow-hidden rounded-[28px] border border-black/5 bg-white/65 shadow-[0_18px_60px_rgba(57,48,40,0.045)] backdrop-blur-xl transition-shadow duration-500 hover:shadow-[0_34px_90px_rgba(57,48,40,0.12)] md:rounded-[36px] 
+                    `}
+                >
+                  <div
+                    className={`relative overflow-hidden bg-[#e5e1da] ${
                       isBanner
                         ? "aspect-[2.96/4]"
                         : isWideCard
@@ -150,21 +311,12 @@ export default function PortfolioCategoryClient({
                           : "aspect-[4/3]"
                     }`}
                   >
-                    <Image
+                    <PortfolioMotionImage
                       src={image}
                       alt={`${currentCategory.title} 프로젝트 ${index + 1}`}
-                      fill
                       priority={index < 2}
-                      sizes={
-                        isBanner
-                          ? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          : isWideCard
-                            ? "(max-width: 768px) 100vw, 1400px"
-                            : "(max-width: 768px) 100vw, 700px"
-                      }
-                      className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035] ${
-                        isBanner ? "object-contain" : "object-cover"
-                      }`}
+                      sizes={imageSizes}
+                      isBanner={isBanner}
                     />
 
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
