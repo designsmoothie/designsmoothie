@@ -1,7 +1,16 @@
 import type { MetadataRoute } from "next";
+import { portfolioCategories } from "@/data/portfolio";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://designsmoothie.kr";
+
+  const categoryPages: MetadataRoute.Sitemap =
+    portfolioCategories.map((category) => ({
+      url: `${baseUrl}/portfolio/${category.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    }));
 
   return [
     {
@@ -16,6 +25,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+
+    ...categoryPages,
+
     {
       url: `${baseUrl}/contact`,
       lastModified: new Date(),

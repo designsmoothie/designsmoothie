@@ -4,6 +4,8 @@ import PageTransition from "@/components/PageTransition";
 import Link from "next/link";
 import { useState } from "react";
 
+
+
 const emailAddress = "hello_smoothie@naver.com";
 const kakaoChannelUrl = "http://pf.kakao.com/_geqBn/chat";
 

@@ -1,5 +1,15 @@
 import PageTransition from "@/components/PageTransition";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "디자인 의뢰 준비 가이드",
+  description:
+    "브랜딩, 간판, 파사드, 인쇄물, 배너와 디자인 디렉션 의뢰 전 준비사항을 확인하세요.",
+  alternates: {
+    canonical: "/guide",
+  },
+};
 
 const guideItems = [
   {

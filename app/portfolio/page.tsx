@@ -1,7 +1,17 @@
 import PageTransition from "@/components/PageTransition";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { portfolioCategories } from "@/data/portfolio";
+
+export const metadata: Metadata = {
+  title: "포트폴리오",
+  description:
+    "디자인스무디의 브랜딩, 간판, 파사드, 인테리어, 인쇄물, 배너 및 디자인 디렉션 포트폴리오를 확인하세요.",
+  alternates: {
+    canonical: "/portfolio",
+  },
+};
 
 export default function PortfolioPage() {
   return (
