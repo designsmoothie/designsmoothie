@@ -62,6 +62,8 @@ export default async function PortfolioProjectPage({
     notFound();
   }
 
+  const isBannerProject = project.category === "banner";
+
   const currentProjectIndex = portfolioProjects.findIndex(
     (item) => item.slug === project.slug,
   );
@@ -70,6 +72,10 @@ export default async function PortfolioProjectPage({
     portfolioProjects[
       (currentProjectIndex + 1) % portfolioProjects.length
     ];
+
+  const galleryImages = isBannerProject
+    ? project.images
+    : project.images.slice(1);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -96,6 +102,7 @@ export default async function PortfolioProjectPage({
       />
 
       <section className="mx-auto max-w-[1440px] px-6 pb-24 pt-10 md:px-12 md:pb-36 md:pt-14">
+        {/* 상단 이동 링크 */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <Link
             href={`/portfolio/${project.category}`}
@@ -116,6 +123,7 @@ export default async function PortfolioProjectPage({
           </Link>
         </div>
 
+        {/* 프로젝트 제목 */}
         <div className="mt-20 border-b border-[var(--line)] pb-16 md:mt-24 md:pb-24">
           <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
             {project.categoryTitle.toUpperCase()} PROJECT
@@ -176,17 +184,21 @@ export default async function PortfolioProjectPage({
           </div>
         </div>
 
-        <div className="relative mt-12 aspect-[4/3] overflow-hidden rounded-[28px] bg-[#e5e1da] md:mt-16 md:aspect-[16/9] md:rounded-[40px]">
-          <Image
-            src={project.thumbnail}
-            alt={`${project.title} ${project.subtitle}`}
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw, 1440px"
-            className="object-cover"
-          />
-        </div>
+        {/* 일반 프로젝트 대표 이미지 */}
+        {!isBannerProject && (
+          <div className="relative mt-12 aspect-[4/3] overflow-hidden rounded-[28px] bg-[#e5e1da] md:mt-16 md:aspect-[16/9] md:rounded-[40px]">
+            <Image
+              src={project.thumbnail}
+              alt={`${project.title} ${project.subtitle}`}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 1440px"
+              className="object-cover"
+            />
+          </div>
+        )}
 
+        {/* 프로젝트 소개 */}
         <section className="grid gap-12 border-b border-[var(--line)] py-20 md:py-28 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
@@ -222,27 +234,94 @@ export default async function PortfolioProjectPage({
           </div>
         </section>
 
-        {project.images.length > 1 && (
-  <section className="mt-16 space-y-6 md:mt-24 md:space-y-10">
-    {project.images.slice(1).map((image, index) => (
-      <figure
-        key={`${project.slug}-${image}-${index}`}
-        className="overflow-hidden rounded-[28px] bg-[#e5e1da] md:rounded-[40px]"
-      >
-        <div className="relative aspect-[4/3] md:aspect-[16/10]">
-          <Image
-            src={image}
-            alt={`${project.title} 프로젝트 이미지 ${index + 2}`}
-            fill
-            sizes="(max-width: 768px) 100vw, 1440px"
-            className="object-cover"
-          />
-        </div>
-      </figure>
-    ))}
+        {/* 배너 프로젝트 안내 문구 */}
+        {isBannerProject && (
+          <section className="pt-20 text-center md:pt-28">
+            <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
+              CAMPAIGN GALLERY
+            </p>
+
+            <h2 className="mx-auto mt-5 max-w-3xl text-3xl font-semibold leading-[1.08] tracking-[-0.05em] text-[var(--text-dark)] md:text-5xl">
+              다양한 브랜드의 메시지를
+              <br />
+              세로형 캠페인 디자인으로 담았습니다.
+            </h2>
+          </section>
+        )}
+
+       {/* 프로젝트 갤러리 */}
+{galleryImages.length > 0 && (
+  <section
+    className={
+      isBannerProject
+        ? "mt-14 md:mt-20"
+        : "mt-16 space-y-6 md:mt-24 md:space-y-10"
+    }
+  >
+    {isBannerProject ? (
+      /*
+       * 배너 전용 갤러리
+       * 모바일 1열 / 태블릿 2열 / 데스크톱 3열
+       * 열마다 높이를 살짝 다르게 배치해 Behance 스타일로 구성
+       */
+      <div className="grid items-start gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-10">
+        {galleryImages.map((image, index) => {
+          const desktopOffset =
+            index % 3 === 1
+              ? "lg:mt-20"
+              : index % 3 === 2
+                ? "lg:mt-10"
+                : "lg:mt-0";
+
+          const tabletOffset =
+            index % 2 === 1
+              ? "sm:mt-14 lg:mt-0"
+              : "sm:mt-0";
+
+          return (
+            <figure
+              key={`${project.slug}-${image}-${index}`}
+              className={`group overflow-hidden rounded-[22px] border border-black/5 bg-[#e9e6df] shadow-[0_18px_55px_rgba(57,48,40,0.07)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(57,48,40,0.14)] md:rounded-[28px] ${tabletOffset} ${desktopOffset}`}
+            >
+              <div className="relative aspect-[2/3] w-full overflow-hidden">
+                <Image
+                  src={image}
+                  alt={`${project.title} 배너 디자인 ${index + 1}`}
+                  fill
+                  priority={index < 3}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.025]"
+                />
+              </div>
+            </figure>
+          );
+        })}
+      </div>
+    ) : (
+      /*
+       * 일반 프로젝트 갤러리
+       */
+      galleryImages.map((image, index) => (
+        <figure
+          key={`${project.slug}-${image}-${index}`}
+          className="overflow-hidden rounded-[28px] bg-[#e5e1da] md:rounded-[40px]"
+        >
+          <div className="relative aspect-[4/3] md:aspect-[16/10]">
+            <Image
+              src={image}
+              alt={`${project.title} 프로젝트 이미지 ${index + 1}`}
+              fill
+              sizes="(max-width: 768px) 100vw, 1440px"
+              className="object-cover"
+            />
+          </div>
+        </figure>
+      ))
+    )}
   </section>
 )}
 
+        {/* 다음 프로젝트 */}
         <section className="mt-24 border-t border-[var(--line)] pt-12 md:mt-36 md:pt-16">
           <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
             NEXT PROJECT
