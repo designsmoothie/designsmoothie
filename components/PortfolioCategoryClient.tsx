@@ -28,14 +28,15 @@ type PortfolioCategoryClientProps = {
   projects: PortfolioProject[];
 };
 
-type ProjectHoverPreviewProps = {
+type ProjectImagePreviewProps = {
   project: PortfolioProject;
-  isWideCard: boolean;
+  isWide: boolean;
   priority: boolean;
+  projectIndex: number;
 };
 
-const cardTransition = {
-  duration: 0.65,
+const revealTransition = {
+  duration: 0.75,
   ease: [0.22, 1, 0.36, 1] as [
     number,
     number,
@@ -52,42 +53,33 @@ function getProjectImages(project: PortfolioProject) {
   return [project.thumbnail];
 }
 
-function getImageLabel(count: number) {
-  return `${count} ${count === 1 ? "IMAGE" : "IMAGES"}`;
-}
-
-function ProjectHoverPreview({
+function ProjectImagePreview({
   project,
-  isWideCard,
+  isWide,
   priority,
-}: ProjectHoverPreviewProps) {
+  projectIndex,
+}: ProjectImagePreviewProps) {
   const images = useMemo(
-    () => getProjectImages(project),
+    () => getProjectImages(project).slice(0, 6),
     [project],
   );
-
-  const previewImages = images.slice(0, 3);
-  const hoverImages = images.slice(0, 6);
 
   const [isHovering, setIsHovering] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const imageCount = images.length;
-  const remainingCount = Math.max(imageCount - 3, 0);
-  const isBannerProject = project.category === "banner";
-
-  const imageSizes = isWideCard
+  const imageSizes = isWide
     ? "(max-width: 768px) 100vw, 1400px"
     : "(max-width: 768px) 100vw, 700px";
 
-  const previewAspectClass = isBannerProject
-    ? "aspect-[16/10]"
-    : isWideCard
-      ? "aspect-[4/3] md:aspect-[16/9]"
-      : "aspect-[4/3]";
+  const aspectClass =
+    project.category === "banner"
+      ? "aspect-[16/11]"
+      : isWide
+        ? "aspect-[4/3] md:aspect-[16/8.6]"
+        : "aspect-[4/3]";
 
   useEffect(() => {
-    if (!isHovering || hoverImages.length <= 1) {
+    if (!isHovering || images.length <= 1) {
       setActiveIndex(0);
       return;
     }
@@ -95,160 +87,88 @@ function ProjectHoverPreview({
     const intervalId = window.setInterval(() => {
       setActiveIndex(
         (currentIndex) =>
-          (currentIndex + 1) % hoverImages.length,
+          (currentIndex + 1) % images.length,
       );
-    }, 1250);
+    }, 1350);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [hoverImages.length, isHovering]);
+  }, [images.length, isHovering]);
 
   return (
     <div
-      className={`relative overflow-hidden bg-[#e5e1da] ${previewAspectClass}`}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      className={`relative overflow-hidden rounded-[22px] bg-[#e4dfd7] md:rounded-[30px] ${aspectClass}`}
+      onMouseEnter={() => {
+        setIsHovering(true);
+      }}
+      onMouseLeave={() => {
+        setIsHovering(false);
+      }}
     >
-      {/* 기본 미리보기: 이미지 1장 */}
-      {previewImages.length === 1 && (
-        <div className="absolute inset-0">
-          <Image
-            src={previewImages[0]}
-            alt={`${project.title} 프로젝트 미리보기`}
-            fill
-            priority={priority}
-            sizes={imageSizes}
-            className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
-          />
-        </div>
-      )}
+      {images.map((image, index) => {
+        const isActive = activeIndex === index;
 
-      {/* 기본 미리보기: 이미지 2장 */}
-      {previewImages.length === 2 && (
-        <div className="absolute inset-0 grid grid-cols-2">
-          {previewImages.map((image, index) => (
-            <div
-              key={`${project.slug}-base-${index}`}
-              className="relative overflow-hidden border-r border-white/25 last:border-r-0"
-            >
-              <Image
-                src={image}
-                alt={`${project.title} 프로젝트 미리보기 ${
-                  index + 1
-                }`}
-                fill
-                priority={priority && index === 0}
-                sizes={imageSizes}
-                className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* 기본 미리보기: 이미지 3장 이상 */}
-      {previewImages.length >= 3 && (
-        <div
-          className={`absolute inset-0 grid ${
-            isWideCard
-              ? "grid-cols-[1.3fr_0.7fr]"
-              : "grid-cols-[1.15fr_0.85fr]"
-          }`}
-        >
-          <div className="relative overflow-hidden border-r border-white/25">
+        return (
+          <div
+            key={`${project.slug}-${image}-${index}`}
+            className={`absolute inset-0 transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              isActive
+                ? "scale-100 opacity-100"
+                : "scale-[1.035] opacity-0"
+            }`}
+          >
             <Image
-              src={previewImages[0]}
-              alt={`${project.title} 프로젝트 대표 미리보기`}
+              src={image}
+              alt={`${project.title} 프로젝트 이미지 ${
+                index + 1
+              }`}
               fill
-              priority={priority}
+              priority={priority && index === 0}
               sizes={imageSizes}
-              className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+              className="object-cover"
             />
           </div>
+        );
+      })}
 
-          <div className="grid grid-rows-2">
-            {previewImages.slice(1, 3).map((image, index) => (
-              <div
-                key={`${project.slug}-side-${index}`}
-                className="relative overflow-hidden border-b border-white/25 last:border-b-0"
-              >
-                <Image
-                  src={image}
-                  alt={`${project.title} 프로젝트 추가 미리보기 ${
-                    index + 2
-                  }`}
-                  fill
-                  sizes={imageSizes}
-                  className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-                />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                {index === 1 &&
-                  remainingCount > 0 &&
-                  !isHovering && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
-                      <span className="text-2xl font-semibold tracking-[-0.04em] text-white md:text-4xl">
-                        +{remainingCount}
-                      </span>
-                    </div>
-                  )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="absolute left-5 top-5 z-10 md:left-7 md:top-7">
+        <span className="inline-flex rounded-full border border-white/30 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
+          {String(projectIndex + 1).padStart(2, "0")}
+        </span>
+      </div>
 
-      {/* 데스크톱 호버 자동 프리뷰 */}
-      {hoverImages.length > 1 && (
-        <div
-          className={`pointer-events-none absolute inset-0 z-10 bg-[#e5e1da] transition-opacity duration-500 ${
-            isHovering ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          {hoverImages.map((image, index) => (
-            <div
-              key={`${project.slug}-hover-${index}`}
-              className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                activeIndex === index
-                  ? "scale-100 opacity-100"
-                  : "scale-[1.035] opacity-0"
-              }`}
-            >
-              <Image
-                src={image}
-                alt={`${project.title} 호버 미리보기 ${
-                  index + 1
-                }`}
-                fill
-                sizes={imageSizes}
-                className="object-cover"
-              />
-            </div>
-          ))}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-black/10" />
-
-          <div className="absolute right-5 top-5 rounded-full border border-white/35 bg-black/20 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md md:right-7 md:top-7">
+      {images.length > 1 && (
+        <div className="absolute right-5 top-5 z-10 md:right-7 md:top-7">
+          <span className="inline-flex rounded-full border border-white/30 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md">
             {String(activeIndex + 1).padStart(2, "0")} /{" "}
-            {String(hoverImages.length).padStart(2, "0")}
-          </div>
-
-          <div className="absolute bottom-5 left-5 right-5 flex gap-1.5 md:bottom-7 md:left-7 md:right-7">
-            {hoverImages.map((_, index) => (
-              <span
-                key={`${project.slug}-progress-${index}`}
-                className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/35"
-              >
-                <span
-                  className={`absolute inset-y-0 left-0 bg-white transition-all duration-500 ${
-                    activeIndex === index ? "w-full" : "w-0"
-                  }`}
-                />
-              </span>
-            ))}
-          </div>
+            {String(images.length).padStart(2, "0")}
+          </span>
         </div>
       )}
+
+      {images.length > 1 && (
+        <div className="pointer-events-none absolute bottom-5 left-5 right-5 flex gap-1.5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:bottom-7 md:left-7 md:right-7">
+          {images.map((_, index) => (
+            <span
+              key={`${project.slug}-indicator-${index}`}
+              className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/35"
+            >
+              <span
+                className={`absolute inset-y-0 left-0 bg-white transition-all duration-500 ${
+                  activeIndex === index ? "w-full" : "w-0"
+                }`}
+              />
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="absolute bottom-5 right-5 z-10 flex h-12 w-12 translate-y-3 items-center justify-center rounded-full bg-[var(--green)] text-lg text-[var(--text-dark)] opacity-0 shadow-[0_12px_40px_rgba(0,0,0,0.14)] transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100 md:bottom-7 md:right-7 md:h-14 md:w-14">
+        ↗
+      </div>
     </div>
   );
 }
@@ -262,32 +182,33 @@ export default function PortfolioCategoryClient({
     currentCategory.slug === "banner";
 
   const hasProjects = projects.length > 0;
+  const projectCount = projects.length;
 
   return (
     <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
-      <section className="mx-auto max-w-[1440px] px-6 pb-24 pt-10 md:px-12 md:pb-36 md:pt-14">
-        {/* 상단 이동 링크 */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      <section className="mx-auto max-w-[1440px] px-5 pb-24 pt-8 md:px-12 md:pb-36 md:pt-12">
+        {/* 상단 네비게이션 */}
+        <div className="flex items-center justify-between gap-4">
           <Link
             href="/portfolio"
-            className="group inline-flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[var(--muted)] transition duration-300 hover:text-[var(--text-dark)]"
+            className="group inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] transition-colors duration-300 hover:text-[var(--text-dark)] md:text-xs"
           >
             <span className="transition-transform duration-300 group-hover:-translate-x-1">
               ←
             </span>
 
-            PORTFOLIO
+            ALL WORK
           </Link>
 
           <Link
             href="/"
-            className="text-xs font-semibold tracking-[0.18em] text-[var(--muted)] transition duration-300 hover:text-[var(--text-dark)]"
+            className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] transition-colors duration-300 hover:text-[var(--text-dark)] md:text-xs"
           >
             HOME
           </Link>
         </div>
 
-        {/* 카테고리 소개 */}
+        {/* 카테고리 Hero */}
         <motion.div
           initial={{
             opacity: 0,
@@ -299,48 +220,80 @@ export default function PortfolioCategoryClient({
             y: 0,
             filter: "blur(0px)",
           }}
-          transition={{
-            duration: 0.8,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="mt-20 grid gap-12 border-b border-[var(--line)] pb-16 md:mt-24 md:pb-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-end"
+          transition={revealTransition}
+          className="mt-20 border-b border-[var(--line)] pb-16 md:mt-28 md:pb-24"
         >
-          <div>
-            <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
-              PORTFOLIO / {currentCategory.number}
-            </p>
+          <div className="grid gap-12 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+            <div>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)] md:text-xs">
+                <span>PORTFOLIO</span>
+                <span className="h-px w-8 bg-[var(--line)]" />
+                <span>{currentCategory.number}</span>
+              </div>
 
-            <h1 className="mt-6 text-5xl font-semibold leading-[0.98] tracking-[-0.065em] text-[var(--text-dark)] sm:text-6xl md:text-8xl lg:text-[7.5rem]">
-              {currentCategory.heroTitle}
-            </h1>
+              <h1 className="mt-7 max-w-[1100px] text-[3.4rem] font-semibold leading-[0.92] tracking-[-0.075em] text-[var(--text-dark)] sm:text-6xl md:text-8xl lg:text-[7.8rem]">
+                {currentCategory.heroTitle}
+              </h1>
 
-            <p className="mt-5 text-sm font-semibold tracking-[0.2em] text-[var(--muted)]">
-              {currentCategory.subtitle}
-            </p>
+              <p className="mt-6 text-xs font-semibold tracking-[0.2em] text-[var(--muted)] md:text-sm">
+                {currentCategory.subtitle}
+              </p>
+            </div>
+
+            <div className="lg:pb-2">
+              <p className="max-w-xl text-lg leading-9 text-[var(--text)] md:text-xl">
+                {currentCategory.description}
+              </p>
+
+              <div className="mt-10 grid grid-cols-2 gap-6 border-t border-[var(--line)] pt-6">
+                <div>
+                  <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
+                    PROJECTS
+                  </p>
+
+                  <p className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-[var(--text-dark)]">
+                    {String(projectCount).padStart(2, "0")}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
+                    CATEGORY
+                  </p>
+
+                  <p className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-[var(--text-dark)]">
+                    {currentCategory.title}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="max-w-xl lg:pb-2">
-            <p className="text-lg leading-9 text-[var(--text)] md:text-xl">
-              {currentCategory.description}
-            </p>
-
-            <div className="mt-8">
-              <p className="text-xs font-semibold tracking-[0.18em] text-[var(--muted)]">
+          <div className="mt-14 grid gap-10 border-t border-[var(--line)] pt-10 md:mt-20 md:grid-cols-[0.75fr_1.25fr] md:pt-12">
+            <div>
+              <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
                 SERVICES
               </p>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-5 flex flex-wrap gap-2">
                 {currentCategory.services.map((service) => (
                   <span
                     key={service}
-                    className="rounded-full border border-[var(--line)] bg-white/70 px-4 py-2 text-sm text-[var(--text)]"
+                    className="rounded-full border border-[var(--line)] bg-white/35 px-4 py-2 text-xs text-[var(--text)] md:text-sm"
                   >
                     {service}
                   </span>
                 ))}
               </div>
+            </div>
 
-              <p className="mt-8 text-base leading-8 text-[var(--text)]">
+            <div>
+              <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
+                {currentCategory.overviewTitle ||
+                  "OVERVIEW"}
+              </p>
+
+              <p className="mt-5 max-w-3xl text-base leading-8 text-[var(--text)] md:text-lg md:leading-9">
                 {currentCategory.overview}
               </p>
             </div>
@@ -349,177 +302,161 @@ export default function PortfolioCategoryClient({
 
         {/* 프로젝트 목록 */}
         {hasProjects ? (
-          <div className="mt-16 grid items-start gap-7 md:mt-24 md:grid-cols-2 md:gap-9">
+          <div className="mt-20 grid items-start gap-x-9 gap-y-24 md:mt-28 md:grid-cols-2 md:gap-x-12 md:gap-y-36">
             {projects.map((project, index) => {
               const isOnlyProject = projects.length === 1;
-              const isWideCard =
-                isOnlyProject || index % 4 === 0;
+              const isWide =
+                isOnlyProject || index % 5 === 0;
 
-              const cardOffset =
-                !isWideCard && index % 4 === 2
-                  ? "md:mt-16"
-                  : !isWideCard && index % 4 === 3
+              const staggerClass =
+                !isWide && index % 5 === 2
+                  ? "md:mt-20"
+                  : !isWide && index % 5 === 3
                     ? "md:mt-8"
                     : "";
 
-              const imageCount =
-                project.images &&
-                project.images.length > 0
-                  ? project.images.length
-                  : 1;
-
               return (
-                <motion.div
+                <motion.article
                   key={project.slug}
                   initial={{
                     opacity: 0,
-                    y: 44,
-                    scale: 0.985,
+                    y: 50,
                     filter: "blur(10px)",
                   }}
                   whileInView={{
                     opacity: 1,
                     y: 0,
-                    scale: 1,
                     filter: "blur(0px)",
                   }}
                   viewport={{
                     once: true,
                     amount: 0.08,
-                    margin: "0px 0px -50px 0px",
+                    margin: "0px 0px -60px 0px",
                   }}
                   transition={{
-                    ...cardTransition,
-                    delay: Math.min(index * 0.06, 0.3),
+                    ...revealTransition,
+                    delay: Math.min(index * 0.055, 0.25),
                   }}
                   className={`${
-                    isWideCard ? "md:col-span-2" : ""
-                  } ${cardOffset}`}
+                    isWide ? "md:col-span-2" : ""
+                  } ${staggerClass}`}
                 >
                   <Link
                     href={`/portfolio/project/${project.slug}`}
                     className="group block"
                     aria-label={`${project.title} 프로젝트 상세보기`}
                   >
-                    <motion.article
-                      whileHover={{
-                        y: -8,
-                      }}
-                      whileTap={{
-                        scale: 0.988,
-                      }}
-                      transition={{
-                        duration: 0.42,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                      className="h-full overflow-hidden rounded-[28px] border border-black/5 bg-white/70 shadow-[0_18px_60px_rgba(57,48,40,0.05)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_36px_100px_rgba(57,48,40,0.14)] md:rounded-[38px]"
-                    >
-                      {/* 프로젝트 이미지 */}
-                      <div className="relative">
-                        <ProjectHoverPreview
-                          project={project}
-                          isWideCard={isWideCard}
-                          priority={index < 2}
-                        />
+                    {/* 작품 이미지 */}
+                    <ProjectImagePreview
+                      project={project}
+                      isWide={isWide}
+                      priority={index < 2}
+                      projectIndex={index}
+                    />
 
-                        {/* 하단 텍스트 가독성 오버레이 */}
-                        <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/65 via-black/5 to-transparent opacity-55 transition-opacity duration-500 group-hover:opacity-75" />
+                    {/* 이미지와 완전히 분리된 프로젝트 정보 */}
+                    <div className="mt-7 md:mt-9">
+                      <div className="flex items-start justify-between gap-6">
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] md:text-xs">
+                            {project.subtitle}
+                          </p>
 
-                        {/* 프로젝트 순번 */}
-                        <div className="absolute left-5 top-5 z-30 md:left-7 md:top-7">
-                          <span className="inline-flex rounded-full border border-white/35 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
-                            {String(index + 1).padStart(
-                              2,
-                              "0",
-                            )}
-                          </span>
+                          <h2
+                            className={`mt-3 font-semibold tracking-[-0.055em] text-[var(--text-dark)] transition-colors duration-300 group-hover:text-[var(--green)] ${
+                              isWide
+                                ? "text-4xl md:text-6xl"
+                                : "text-3xl md:text-[2.65rem]"
+                            }`}
+                          >
+                            {project.title}
+                          </h2>
                         </div>
 
-                        {/* 이미지 수 */}
-                        <div className="absolute right-5 top-5 z-30 transition-opacity duration-300 group-hover:opacity-0 md:right-7 md:top-7">
-                          <span className="inline-flex rounded-full border border-white/35 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md">
-                            {getImageLabel(imageCount)}
-                          </span>
-                        </div>
-
-                        {/* 프로젝트 제목 */}
-                        <div className="absolute inset-x-0 bottom-0 z-30 flex items-end justify-between gap-5 p-6 text-white md:p-9">
-                          <div>
-                            <p className="text-[10px] font-semibold tracking-[0.2em] text-white/70 md:text-xs">
-                              {project.subtitle}
-                            </p>
-
-                            <h2
-                              className={`mt-2 font-semibold tracking-[-0.045em] text-white ${
-                                isWideCard
-                                  ? "text-3xl md:text-5xl"
-                                  : "text-3xl md:text-4xl"
-                              }`}
-                            >
-                              {project.title}
-                            </h2>
-                          </div>
-
-                          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-base text-white backdrop-blur-md transition-all duration-500 group-hover:translate-x-1.5 group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:h-14 md:w-14 md:text-lg">
-                            →
-                          </span>
-                        </div>
+                        <span className="mt-1 shrink-0 text-xl text-[var(--muted)] transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-[var(--text-dark)] md:text-2xl">
+                          →
+                        </span>
                       </div>
 
-                      {/* 프로젝트 정보 */}
-                      <div className="p-6 md:p-9">
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] font-semibold tracking-[0.16em] text-[var(--muted)]">
-                          <span>{project.industry}</span>
+                      <div className="mt-6 border-t border-[var(--line)] pt-6">
+                        <div
+                          className={`grid gap-6 ${
+                            isWide
+                              ? "md:grid-cols-[1.1fr_0.9fr]"
+                              : ""
+                          }`}
+                        >
+                          <p className="max-w-3xl text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
+                            {project.summary}
+                          </p>
 
-                          <span className="h-1 w-1 rounded-full bg-[var(--muted)]/40" />
+                          <div
+                            className={
+                              isWide ? "md:text-right" : ""
+                            }
+                          >
+                            <div
+                              className={`flex flex-wrap gap-x-3 gap-y-2 text-[10px] font-semibold tracking-[0.15em] text-[var(--muted)] ${
+                                isWide
+                                  ? "md:justify-end"
+                                  : ""
+                              }`}
+                            >
+                              <span>{project.industry}</span>
+                              <span className="text-[var(--line)]">
+                                •
+                              </span>
+                              <span>{project.location}</span>
+                              <span className="text-[var(--line)]">
+                                •
+                              </span>
+                              <span>{project.year}</span>
+                            </div>
 
-                          <span>{project.location}</span>
-
-                          <span className="h-1 w-1 rounded-full bg-[var(--muted)]/40" />
-
-                          <span>{project.year}</span>
+                            <div
+                              className={`mt-5 flex flex-wrap gap-2 ${
+                                isWide
+                                  ? "md:justify-end"
+                                  : ""
+                              }`}
+                            >
+                              {project.services
+                                .slice(0, 4)
+                                .map((service) => (
+                                  <span
+                                    key={service}
+                                    className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[10px] text-[var(--muted)] transition-colors duration-300 group-hover:border-[var(--green)]/50 md:text-[11px]"
+                                  >
+                                    {service}
+                                  </span>
+                                ))}
+                            </div>
+                          </div>
                         </div>
 
-                        <p className="mt-5 max-w-3xl text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
-                          {project.summary}
-                        </p>
-
-                        <div className="mt-7 flex flex-wrap items-end justify-between gap-5">
-                          <div className="flex flex-wrap gap-2">
-                            {project.services
-                              .slice(0, 4)
-                              .map((service) => (
-                                <span
-                                  key={service}
-                                  className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[11px] text-[var(--muted)]"
-                                >
-                                  {service}
-                                </span>
-                              ))}
-                          </div>
-
-                          <span className="text-[10px] font-semibold tracking-[0.18em] text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--text-dark)]">
+                        <div className="mt-7 flex justify-end">
+                          <span className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--text-dark)]">
                             VIEW FULL PROJECT
                           </span>
                         </div>
                       </div>
-                    </motion.article>
+                    </div>
                   </Link>
-                </motion.div>
+                </motion.article>
               );
             })}
           </div>
         ) : currentCategory.images.length > 0 ? (
-          /* 레거시 이미지 */
+          /* 레거시 이미지 목록 */
           <div
-            className={`mt-16 grid gap-6 md:mt-24 ${
+            className={`mt-20 grid gap-x-8 gap-y-20 md:mt-28 ${
               isBannerCategory
-                ? "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                ? "sm:grid-cols-2 lg:grid-cols-3"
                 : "md:grid-cols-2"
             }`}
           >
             {currentCategory.images.map((image, index) => {
-              const isWideCard =
+              const isWide =
                 !isBannerCategory && index % 5 === 0;
 
               return (
@@ -527,34 +464,31 @@ export default function PortfolioCategoryClient({
                   key={`${image}-${index}`}
                   initial={{
                     opacity: 0,
-                    y: 42,
-                    scale: 0.985,
-                    filter: "blur(10px)",
+                    y: 44,
+                    filter: "blur(9px)",
                   }}
                   whileInView={{
                     opacity: 1,
                     y: 0,
-                    scale: 1,
                     filter: "blur(0px)",
                   }}
                   viewport={{
                     once: true,
                     amount: 0.1,
-                    margin: "0px 0px -40px 0px",
                   }}
                   transition={{
-                    ...cardTransition,
-                    delay: Math.min(index * 0.055, 0.28),
+                    ...revealTransition,
+                    delay: Math.min(index * 0.05, 0.25),
                   }}
-                  className={`overflow-hidden rounded-[28px] border border-black/5 bg-white/65 shadow-[0_18px_60px_rgba(57,48,40,0.045)] md:rounded-[36px] ${
-                    isWideCard ? "md:col-span-2" : ""
+                  className={`${
+                    isWide ? "md:col-span-2" : ""
                   }`}
                 >
                   <div
-                    className={`relative overflow-hidden bg-[#e5e1da] ${
+                    className={`relative overflow-hidden rounded-[22px] bg-[#e4dfd7] md:rounded-[30px] ${
                       isBannerCategory
                         ? "aspect-[2.96/4]"
-                        : isWideCard
+                        : isWide
                           ? "aspect-[4/3] md:aspect-[16/9]"
                           : "aspect-[4/3]"
                     }`}
@@ -568,10 +502,10 @@ export default function PortfolioCategoryClient({
                       priority={index < 2}
                       sizes={
                         isBannerCategory
-                          ? "(max-width: 640px) 100vw, 25vw"
+                          ? "(max-width: 640px) 100vw, 33vw"
                           : "(max-width: 768px) 100vw, 700px"
                       }
-                      className="object-cover"
+                      className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.025]"
                     />
 
                     <div className="absolute left-5 top-5">
@@ -584,12 +518,12 @@ export default function PortfolioCategoryClient({
                     </div>
                   </div>
 
-                  <div className="p-6 md:p-8">
+                  <div className="mt-6 border-t border-[var(--line)] pt-5">
                     <p className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
-                      LEGACY PORTFOLIO IMAGE
+                      SELECTED WORK
                     </p>
 
-                    <h2 className="mt-3 text-xl font-semibold tracking-[-0.035em] text-[var(--text-dark)] md:text-2xl">
+                    <h2 className="mt-2 text-2xl font-semibold tracking-[-0.045em] text-[var(--text-dark)] md:text-3xl">
                       {currentCategory.title} Project
                     </h2>
                   </div>
@@ -608,17 +542,14 @@ export default function PortfolioCategoryClient({
               opacity: 1,
               y: 0,
             }}
-            transition={{
-              duration: 0.7,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="mt-20 rounded-[32px] border border-[var(--line)] bg-white/55 px-8 py-20 text-center md:mt-28"
+            transition={revealTransition}
+            className="mt-24 border-y border-[var(--line)] px-6 py-24 text-center md:mt-32 md:py-32"
           >
-            <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
+            <p className="text-[10px] font-semibold tracking-[0.24em] text-[var(--muted)] md:text-xs">
               PORTFOLIO UPDATE
             </p>
 
-            <h2 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-[var(--text-dark)] md:text-5xl">
+            <h2 className="mt-5 text-3xl font-semibold tracking-[-0.05em] text-[var(--text-dark)] md:text-5xl">
               작업 이미지를 준비하고 있습니다.
             </h2>
 
@@ -633,7 +564,7 @@ export default function PortfolioCategoryClient({
         <motion.div
           initial={{
             opacity: 0,
-            y: 36,
+            y: 40,
             filter: "blur(8px)",
           }}
           whileInView={{
@@ -643,50 +574,42 @@ export default function PortfolioCategoryClient({
           }}
           viewport={{
             once: true,
-            amount: 0.25,
+            amount: 0.2,
           }}
-          transition={{
-            duration: 0.8,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="mt-24 border-t border-[var(--line)] pt-12 md:mt-36 md:pt-16"
+          transition={revealTransition}
+          className="mt-28 border-t border-[var(--line)] pt-12 md:mt-44 md:pt-16"
         >
-          <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
-            NEXT CATEGORY
-          </p>
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)] md:text-xs">
+              NEXT CATEGORY
+            </p>
+
+            <span className="text-[10px] font-semibold tracking-[0.18em] text-[var(--muted)]">
+              {nextCategory.number}
+            </span>
+          </div>
 
           <Link
             href={nextCategory.href}
-            className="group mt-6 block"
+            className="group mt-8 block"
           >
-            <motion.div
-              whileHover={{
-                y: -6,
-              }}
-              whileTap={{
-                scale: 0.99,
-              }}
-              transition={{
-                duration: 0.42,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="flex flex-col justify-between gap-8 overflow-hidden rounded-[32px] bg-[var(--text-dark)] p-8 text-white shadow-[0_22px_70px_rgba(57,48,40,0.12)] transition-shadow duration-500 group-hover:shadow-[0_36px_100px_rgba(57,48,40,0.22)] md:flex-row md:items-end md:p-12"
-            >
-              <div>
-                <p className="text-xs font-semibold tracking-[0.2em] text-white/50">
-                  {nextCategory.number} ·{" "}
-                  {nextCategory.subtitle}
-                </p>
+            <div className="border-b border-[var(--line)] pb-10 md:pb-14">
+              <div className="flex items-end justify-between gap-6">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.2em] text-[var(--muted)]">
+                    {nextCategory.subtitle}
+                  </p>
 
-                <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white md:text-6xl">
-                  {nextCategory.title}
-                </h2>
+                  <h2 className="mt-4 text-4xl font-semibold tracking-[-0.06em] text-[var(--text-dark)] transition-colors duration-300 group-hover:text-[var(--green)] sm:text-5xl md:text-7xl lg:text-8xl">
+                    {nextCategory.title}
+                  </h2>
+                </div>
+
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[var(--line)] text-xl text-[var(--text-dark)] transition-all duration-400 group-hover:translate-x-2 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] md:h-16 md:w-16 md:text-2xl">
+                  →
+                </span>
               </div>
-
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--green)] text-xl text-[var(--text-dark)] transition-transform duration-300 group-hover:translate-x-1.5 md:h-16 md:w-16">
-                →
-              </span>
-            </motion.div>
+            </div>
           </Link>
         </motion.div>
       </section>
