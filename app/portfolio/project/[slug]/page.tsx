@@ -3,10 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import * as motion from "motion/react-client";
-import {
-  getProjectBySlug,
-  portfolioProjects,
-} from "@/data/projects";
+import { getProjectBySlug, portfolioProjects } from "@/data/projects";
 
 type Props = {
   params: Promise<{
@@ -14,12 +11,7 @@ type Props = {
   }>;
 };
 
-const premiumEase = [0.22, 1, 0.36, 1] as [
-  number,
-  number,
-  number,
-  number,
-];
+const premiumEase = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const revealTransition = {
   duration: 0.9,
@@ -32,9 +24,7 @@ export function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
 
@@ -65,9 +55,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function PortfolioProjectPage({
-  params,
-}: Props) {
+export default async function PortfolioProjectPage({ params }: Props) {
   const { slug } = await params;
   const project = getProjectBySlug(slug);
 
@@ -87,15 +75,12 @@ export default async function PortfolioProjectPage({
   );
 
   const nextProject =
-    portfolioProjects[
-      (currentProjectIndex + 1) % portfolioProjects.length
-    ];
+    portfolioProjects[(currentProjectIndex + 1) % portfolioProjects.length];
 
   const relatedProjects = portfolioProjects
     .filter(
       (item) =>
-        item.slug !== project.slug &&
-        item.category === project.category,
+        item.slug !== project.slug && item.category === project.category,
     )
     .slice(0, 2);
 
@@ -215,14 +200,13 @@ export default async function PortfolioProjectPage({
           </Link>
         </div>
       </motion.div>
-
-      {/* 프로젝트 히어로 */}
-      <section className="mx-auto max-w-[1440px] px-6 pb-14 pt-16 md:px-12 md:pb-24 md:pt-24">
+            {/* 프로젝트 히어로 */}
+      <section className="mx-auto max-w-[1440px] px-6 pb-10 pt-12 md:px-12 md:pb-14 md:pt-16">
         <motion.div
           initial={{
             opacity: 0,
-            y: 38,
-            filter: "blur(12px)",
+            y: 34,
+            filter: "blur(10px)",
           }}
           animate={{
             opacity: 1,
@@ -231,75 +215,99 @@ export default async function PortfolioProjectPage({
           }}
           transition={revealTransition}
         >
-          <div className="flex flex-wrap items-center justify-between gap-5">
-            <p className="text-[10px] font-semibold tracking-[0.3em] text-[var(--muted)] md:text-xs">
-              {project.categoryTitle.toUpperCase()} PROJECT
+          <div className="flex items-center justify-between border-b border-[var(--line)] pb-5">
+            <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)] md:text-[10px]">
+              SELECTED WORK
             </p>
 
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)] md:text-xs">
+            <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)] md:text-[10px]">
               {String(currentProjectIndex + 1).padStart(2, "0")} /{" "}
               {String(portfolioProjects.length).padStart(2, "0")}
             </p>
           </div>
 
-          <div className="mt-8 grid gap-14 lg:grid-cols-[1.22fr_0.78fr] lg:items-end">
-            <div>
-              <h1 className="max-w-5xl text-[clamp(3.5rem,10vw,9rem)] font-semibold leading-[0.84] tracking-[-0.08em] text-[var(--text-dark)]">
+          <div className="grid gap-10 pt-7 md:pt-9 lg:grid-cols-[1fr_260px] lg:items-end lg:gap-16">
+            <div className="min-w-0">
+              <motion.h1
+                initial={{
+                  opacity: 0,
+                  y: 42,
+                  filter: "blur(12px)",
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                }}
+                transition={{
+                  ...revealTransition,
+                  delay: 0.08,
+                }}
+                className="break-words text-[clamp(4.8rem,13vw,12rem)] font-semibold uppercase leading-[0.76] tracking-[-0.09em] text-[var(--text-dark)]"
+              >
                 {project.title}
-              </h1>
-
-              <div className="mt-9 flex flex-wrap items-center gap-4">
-                <span className="h-px w-12 bg-[var(--green)]" />
-
-                <p className="text-xs font-semibold tracking-[0.22em] text-[var(--muted)] md:text-sm">
-                  {project.subtitle}
-                </p>
-              </div>
+              </motion.h1>
             </div>
 
             <motion.div
               initial={{
                 opacity: 0,
-                y: 28,
-                scale: 0.985,
+                y: 24,
               }}
               animate={{
                 opacity: 1,
                 y: 0,
-                scale: 1,
               }}
               transition={{
-                ...revealTransition,
-                delay: 0.12,
+                duration: 0.78,
+                delay: 0.22,
+                ease: premiumEase,
               }}
-              className="rounded-[28px] border border-black/5 bg-white/55 p-6 shadow-[0_20px_70px_rgba(57,48,40,0.06)] backdrop-blur-xl md:p-8"
+              className="grid grid-cols-2 gap-x-8 gap-y-7 border-t border-[var(--line)] pt-6 lg:grid-cols-1 lg:border-t-0 lg:pb-2 lg:pt-0"
             >
-              <div className="grid grid-cols-2 gap-x-6 gap-y-8">
-                {projectInformation.map((item) => (
-                  <div key={item.label}>
-                    <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)] md:text-[10px]">
-                      {item.label}
-                    </p>
+              <div>
+                <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                  SERVICES
+                </p>
 
-                    <p className="mt-2 text-sm font-semibold leading-6 text-[var(--text-dark)]">
-                      {item.value}
+                <div className="mt-3 flex flex-col gap-1">
+                  {project.services.slice(0, 3).map((service) => (
+                    <p
+                      key={service}
+                      className="text-sm font-medium leading-6 text-[var(--text-dark)]"
+                    >
+                      {service}
                     </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                  LOCATION
+                </p>
+
+                <p className="mt-3 text-sm font-medium leading-6 text-[var(--text-dark)]">
+                  {project.location}
+                </p>
+
+                <p className="text-sm font-medium leading-6 text-[var(--text-dark)]">
+                  {project.year}
+                </p>
               </div>
             </motion.div>
           </div>
         </motion.div>
       </section>
 
-      {/* 대표 이미지 */}
+            {/* 대표 이미지 */}
       {!isBannerProject && (
         <motion.section
           initial={{
             opacity: 0,
-            y: 56,
-            scale: 0.98,
-            filter: "blur(14px)",
+            y: 48,
+            scale: 0.99,
+            filter: "blur(12px)",
           }}
           animate={{
             opacity: 1,
@@ -311,85 +319,60 @@ export default async function PortfolioProjectPage({
             ...revealTransition,
             delay: 0.16,
           }}
-          className="mx-auto max-w-[1640px] px-3 md:px-6"
+          className="mx-auto max-w-[1440px] px-6 md:px-12"
         >
-          <div className="group relative aspect-[4/3] overflow-hidden rounded-[28px] bg-[#e5e1da] shadow-[0_26px_90px_rgba(57,48,40,0.1)] md:aspect-[16/9] md:rounded-[52px]">
+          <div className="group relative aspect-[4/3] overflow-hidden bg-[#e5e1da] md:aspect-[16/8.5]">
             <Image
               src={project.thumbnail}
               alt={`${project.title} ${project.subtitle}`}
               fill
               priority
-              sizes="(max-width: 768px) 100vw, 1640px"
-              className="premium-image object-cover transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.025]"
+              sizes="(max-width: 768px) 100vw, 1440px"
+              className="premium-image object-cover transition-transform duration-[1600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.018]"
             />
-
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/5" />
-
-            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 p-6 text-white md:p-10">
-              <div>
-                <p className="text-[9px] font-semibold tracking-[0.22em] text-white/60 md:text-[10px]">
-                  SELECTED WORK
-                </p>
-
-                <p className="mt-2 text-sm font-semibold md:text-base">
-                  {project.title} · {project.year}
-                </p>
-              </div>
-
-              <span className="hidden rounded-full border border-white/25 bg-black/10 px-4 py-2 text-[9px] font-semibold tracking-[0.2em] text-white backdrop-blur-md sm:block">
-                DESIGN SMOOTHIE
-              </span>
-            </div>
           </div>
         </motion.section>
       )}
-
       {/* 프로젝트 개요 */}
       <section className="mx-auto max-w-[1440px] px-6 md:px-12">
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 48,
-            filter: "blur(10px)",
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-          }}
-          viewport={{
-            once: true,
-            amount: 0.16,
-          }}
+          initial={{ opacity: 0, y: 48, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.16 }}
           transition={revealTransition}
-          className="grid gap-14 border-b border-[var(--line)] py-24 md:py-36 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24"
+          className="grid gap-16 border-b border-[var(--line)] py-24 md:py-36 lg:grid-cols-[0.42fr_1.58fr] lg:gap-24"
         >
-          <div>
-            <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
-              01 · PROJECT OVERVIEW
-            </p>
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <p className="section-label">01 · PROJECT OVERVIEW</p>
 
-            <h2 className="mt-7 max-w-xl text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-[var(--text-dark)] md:text-6xl">
-              {project.overviewTitle}
-            </h2>
-          </div>
-
-          <div>
-            <p className="max-w-4xl text-lg leading-9 text-[var(--text)] md:text-[1.65rem] md:leading-[1.7]">
-              {project.overview}
-            </p>
-
-            <div className="mt-14 border-t border-[var(--line)] pt-8">
-              <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-                <p className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)]">
-                  PROVIDED SERVICES
+            <div className="mt-10 space-y-7 border-t border-[var(--line)] pt-7">
+              <div>
+                <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                  PROJECT
                 </p>
+                <p className="mt-2 text-sm font-semibold text-[var(--text-dark)]">
+                  {project.title}
+                </p>
+              </div>
 
-                <div className="flex max-w-2xl flex-wrap gap-2.5 md:justify-end">
+              <div>
+                <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                  CATEGORY
+                </p>
+                <p className="mt-2 text-sm font-semibold text-[var(--text-dark)]">
+                  {project.categoryTitle}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[9px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                  SERVICES
+                </p>
+                <div className="mt-3 flex flex-col gap-1.5">
                   {project.services.map((service) => (
                     <span
                       key={service}
-                      className="rounded-full border border-[var(--line)] bg-white/55 px-4 py-2.5 text-sm text-[var(--text)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--green)] hover:bg-white"
+                      className="text-sm leading-6 text-[var(--text)]"
                     >
                       {service}
                     </span>
@@ -397,139 +380,108 @@ export default async function PortfolioProjectPage({
                 </div>
               </div>
             </div>
+          </aside>
+
+          <div>
+            <h2 className="max-w-5xl text-[clamp(2.8rem,6vw,6.5rem)] font-semibold leading-[0.96] tracking-[-0.07em] text-[var(--text-dark)]">
+              {project.overviewTitle}
+            </h2>
+
+            <p className="mt-12 max-w-4xl text-lg leading-9 text-[var(--text)] md:mt-16 md:text-[1.7rem] md:leading-[1.65]">
+              {project.overview}
+            </p>
+
+            <div className="mt-16 grid gap-8 border-t border-[var(--line)] pt-8 sm:grid-cols-2">
+              <p className="text-xs font-semibold tracking-[0.22em] text-[var(--muted)]">
+                BRAND CONTEXT
+              </p>
+              <p className="text-base leading-8 text-[var(--muted)]">
+                브랜드의 목적과 실제 사용 환경을 함께 고려해, 시각적 인상과
+                기능이 분리되지 않는 하나의 경험으로 설계했습니다.
+              </p>
+            </div>
           </div>
         </motion.div>
       </section>
-
       {/* 프로젝트 스토리 */}
       <section className="mx-auto max-w-[1440px] px-6 md:px-12">
         <div className="border-b border-[var(--line)] py-24 md:py-36">
           <motion.div
-            initial={{
-              opacity: 0,
-              y: 42,
-              filter: "blur(10px)",
-            }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-            }}
-            viewport={{
-              once: true,
-              amount: 0.18,
-            }}
+            initial={{ opacity: 0, y: 42, filter: "blur(10px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.18 }}
             transition={revealTransition}
+            className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-end"
           >
-            <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
-              02 · PROJECT STORY
-            </p>
-
-            <div className="mt-7 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-              <h2 className="max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-[var(--text-dark)] md:text-6xl">
+            <div>
+              <p className="section-label">02 · PROJECT STORY</p>
+              <h2 className="mt-7 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-[var(--text-dark)] md:text-6xl">
                 문제를 발견하고,
                 <br />
                 디자인으로 답했습니다.
               </h2>
-
-              <p className="max-w-lg text-base leading-8 text-[var(--muted)] lg:justify-self-end">
-                브랜드가 놓인 환경을 관찰하고, 핵심 문제를 정리한 뒤
-                실제 사용 환경에서 작동하는 디자인으로 연결했습니다.
-              </p>
             </div>
+
+            <p className="max-w-xl text-base leading-8 text-[var(--muted)] lg:justify-self-end">
+              브랜드가 놓인 환경을 관찰하고 핵심 문제를 정리한 뒤, 실제 사용
+              환경에서 작동하는 디자인 언어로 연결했습니다.
+            </p>
           </motion.div>
 
-          <div className="mt-16 grid gap-5 md:mt-24 lg:grid-cols-3">
+          <div className="mt-16 border-t border-[var(--line)] md:mt-24">
             {storyItems.map((item, index) => (
               <motion.article
                 key={item.label}
-                initial={{
-                  opacity: 0,
-                  y: 46,
-                  scale: 0.98,
-                  filter: "blur(10px)",
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  filter: "blur(0px)",
-                }}
-                viewport={{
-                  once: true,
-                  amount: 0.14,
-                }}
-                transition={{
-                  ...revealTransition,
-                  delay: index * 0.08,
-                }}
-                className="group relative flex min-h-[420px] flex-col overflow-hidden rounded-[30px] border border-black/5 bg-white/60 p-7 shadow-[0_18px_60px_rgba(57,48,40,0.045)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:bg-white/80 hover:shadow-[0_34px_100px_rgba(57,48,40,0.12)] md:rounded-[40px] md:p-9"
+                initial={{ opacity: 0, y: 36, filter: "blur(8px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, amount: 0.14 }}
+                transition={{ ...revealTransition, delay: index * 0.06 }}
+                className="grid gap-8 border-b border-[var(--line)] py-12 md:grid-cols-[0.24fr_0.62fr_1.14fr] md:gap-12 md:py-16"
               >
-                <div className="pointer-events-none absolute -right-24 -top-24 h-52 w-52 rounded-full bg-[var(--green)]/0 blur-3xl transition-colors duration-700 group-hover:bg-[var(--green)]/15" />
-
-                <div className="relative z-10 flex items-center justify-between">
-                  <p className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                <div className="flex items-start justify-between md:block">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-[var(--green)]">
+                    {item.number}
+                  </p>
+                  <p className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)] md:mt-4">
                     {item.label}
                   </p>
-
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)] text-xs font-semibold text-[var(--muted)] transition-all duration-500 group-hover:rotate-12 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)]">
-                    {item.number}
-                  </span>
                 </div>
 
-                <div className="relative z-10 mt-auto pt-20">
-                  <h3 className="text-2xl font-semibold leading-[1.15] tracking-[-0.045em] text-[var(--text-dark)] md:text-3xl">
-                    {item.title}
-                  </h3>
+                <h3 className="text-2xl font-semibold leading-[1.15] tracking-[-0.045em] text-[var(--text-dark)] md:text-3xl">
+                  {item.title}
+                </h3>
 
-                  <p className="mt-7 text-base leading-8 text-[var(--text)]">
-                    {item.text}
-                  </p>
-                </div>
+                <p className="max-w-2xl text-base leading-8 text-[var(--text)] md:text-lg md:leading-9">
+                  {item.text}
+                </p>
               </motion.article>
             ))}
           </div>
         </div>
       </section>
-
       {/* 갤러리 제목 */}
       <section className="mx-auto max-w-[1440px] px-6 pt-24 md:px-12 md:pt-36">
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 42,
-            filter: "blur(10px)",
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-            filter: "blur(0px)",
-          }}
-          viewport={{
-            once: true,
-            amount: 0.18,
-          }}
+          initial={{ opacity: 0, y: 42, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.18 }}
           transition={revealTransition}
-          className="flex flex-col justify-between gap-12 md:flex-row md:items-end"
+          className="grid gap-12 border-b border-[var(--line)] pb-12 md:grid-cols-[1.45fr_0.55fr] md:items-end md:pb-16"
         >
           <div>
-            <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
-              03 · PROJECT GALLERY
-            </p>
-
-            <h2 className="mt-7 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-[var(--text-dark)] md:text-6xl">
+            <p className="section-label">03 · PROJECT GALLERY</p>
+            <h2 className="mt-7 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-[var(--text-dark)] md:text-6xl">
               {isBannerProject
                 ? "각기 다른 메시지를 하나의 흐름으로."
                 : "디테일이 모여 완성된 브랜드 경험."}
             </h2>
           </div>
 
-          <div className="border-l border-[var(--line)] pl-6 md:text-right">
-            <p className="text-3xl font-semibold tracking-[-0.05em] text-[var(--text-dark)] md:text-4xl">
+          <div className="md:text-right">
+            <p className="text-5xl font-semibold tracking-[-0.07em] text-[var(--text-dark)] md:text-7xl">
               {String(projectImages.length).padStart(2, "0")}
             </p>
-
-            <p className="mt-2 text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
+            <p className="mt-3 text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
               ARCHIVE IMAGES
             </p>
           </div>
@@ -564,7 +516,7 @@ export default async function PortfolioProjectPage({
                   ...revealTransition,
                   delay: Math.min((index % 6) * 0.05, 0.25),
                 }}
-                className="group mb-5 break-inside-avoid overflow-hidden rounded-[24px] border border-black/5 bg-[#e5e1da] shadow-[0_18px_60px_rgba(57,48,40,0.07)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_105px_rgba(57,48,40,0.16)] md:mb-7 md:rounded-[32px]"
+                className="group mb-5 break-inside-avoid overflow-hidden bg-[#e5e1da] transition-opacity duration-500 hover:opacity-95 md:mb-7"
               >
                 <div className="relative aspect-[2/3] overflow-hidden">
                   <Image
@@ -598,8 +550,7 @@ export default async function PortfolioProjectPage({
           <div className="grid gap-5 md:grid-cols-2 md:gap-8">
             {galleryImages.map((image, index) => {
               const isFullWidth = index % 5 === 0;
-              const isPortrait =
-                index % 5 === 2 || index % 5 === 3;
+              const isPortrait = index % 5 === 2 || index % 5 === 3;
 
               return (
                 <motion.figure
@@ -625,7 +576,7 @@ export default async function PortfolioProjectPage({
                     ...revealTransition,
                     delay: Math.min((index % 5) * 0.055, 0.24),
                   }}
-                  className={`group overflow-hidden rounded-[26px] bg-[#e5e1da] shadow-[0_18px_65px_rgba(57,48,40,0.07)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_36px_105px_rgba(57,48,40,0.16)] md:rounded-[42px] ${
+                  className={`group overflow-hidden bg-[#e5e1da] transition-opacity duration-500 hover:opacity-95 ${
                     isFullWidth ? "md:col-span-2" : ""
                   }`}
                 >
@@ -640,9 +591,7 @@ export default async function PortfolioProjectPage({
                   >
                     <Image
                       src={image}
-                      alt={`${project.title} 프로젝트 이미지 ${
-                        index + 1
-                      }`}
+                      alt={`${project.title} 프로젝트 이미지 ${index + 1}`}
                       fill
                       sizes={
                         isFullWidth
@@ -668,55 +617,33 @@ export default async function PortfolioProjectPage({
           </div>
         </section>
       )}
-
       {/* 프로젝트 결과 */}
-      <section className="mx-auto max-w-[1440px] px-6 md:px-12">
+      <section className="mt-10 bg-[var(--text-dark)] text-white md:mt-16">
         <motion.div
-          initial={{
-            opacity: 0,
-            y: 52,
-            scale: 0.985,
-            filter: "blur(11px)",
-          }}
-          whileInView={{
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: "blur(0px)",
-          }}
-          viewport={{
-            once: true,
-            amount: 0.18,
-          }}
+          initial={{ opacity: 0, y: 52, filter: "blur(11px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.18 }}
           transition={revealTransition}
-          className="relative overflow-hidden rounded-[34px] bg-[var(--text-dark)] px-8 py-16 text-white shadow-[0_32px_110px_rgba(57,48,40,0.18)] md:rounded-[54px] md:px-14 md:py-24 lg:px-20"
+          className="mx-auto grid max-w-[1440px] gap-16 px-6 py-24 md:px-12 md:py-36 lg:grid-cols-[0.42fr_1.58fr]"
         >
-          <div className="pointer-events-none absolute -right-32 -top-40 h-[420px] w-[420px] rounded-full bg-[var(--green)]/15 blur-3xl" />
+          <div>
+            <p className="text-xs font-semibold tracking-[0.24em] text-white/45">
+              04 · PROJECT RESULT
+            </p>
+          </div>
 
-          <div className="pointer-events-none absolute -bottom-40 left-0 h-[340px] w-[340px] rounded-full bg-white/5 blur-3xl" />
+          <div>
+            <p className="display-en-sm text-[var(--green)]">Built to work.</p>
 
-          <div className="relative z-10 grid gap-16 lg:grid-cols-[0.65fr_1.35fr] lg:items-end">
-            <div>
-              <p className="text-xs font-semibold tracking-[0.24em] text-white/45">
-                04 · PROJECT RESULT
-              </p>
+            <h2 className="mt-7 max-w-6xl text-4xl font-semibold leading-[1.02] tracking-[-0.065em] text-white md:text-7xl">
+              보기 좋은 디자인을 넘어,
+              <br className="hidden md:block" />
+              실제 환경에서 작동하도록.
+            </h2>
 
-              <div className="mt-12 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--green)] text-xl font-semibold text-[var(--text-dark)] md:h-20 md:w-20 md:text-2xl">
-                ✓
-              </div>
-            </div>
-
-            <div>
-              <h2 className="max-w-5xl text-4xl font-semibold leading-[1.04] tracking-[-0.06em] text-white md:text-6xl">
-                보기 좋은 디자인을 넘어,
-                <br className="hidden md:block" />
-                실제 환경에서 작동하도록.
-              </h2>
-
-              <p className="mt-9 max-w-3xl text-base leading-8 text-white/65 md:text-xl md:leading-10">
-                {resultText}
-              </p>
-            </div>
+            <p className="mt-10 max-w-4xl text-base leading-8 text-white/65 md:text-xl md:leading-10">
+              {resultText}
+            </p>
           </div>
         </motion.div>
       </section>
@@ -755,7 +682,6 @@ export default async function PortfolioProjectPage({
               className="group hidden items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[var(--muted)] transition-colors duration-300 hover:text-[var(--text-dark)] sm:inline-flex"
             >
               VIEW CATEGORY
-
               <span className="transition-transform duration-300 group-hover:translate-x-1">
                 →
               </span>
@@ -789,33 +715,30 @@ export default async function PortfolioProjectPage({
                   href={`/portfolio/project/${relatedProject.slug}`}
                   className="group block"
                 >
-                  <article className="overflow-hidden rounded-[28px] border border-black/5 bg-white/60 shadow-[0_18px_65px_rgba(57,48,40,0.06)] transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_36px_105px_rgba(57,48,40,0.15)] md:rounded-[40px]">
+                  <article className="border-t border-[var(--line)] pt-6 transition-opacity duration-500 group-hover:opacity-80">
                     <div className="relative aspect-[4/3] overflow-hidden bg-[#e5e1da]">
                       <Image
                         src={relatedProject.thumbnail}
                         alt={`${relatedProject.title} 프로젝트`}
                         fill
                         sizes="(max-width: 768px) 100vw, 720px"
-                        className="premium-image object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                        className="premium-image object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                       />
+                    </div>
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-
-                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-5 p-6 text-white md:p-9">
-                        <div>
-                          <p className="text-[9px] font-semibold tracking-[0.2em] text-white/60">
-                            {relatedProject.subtitle}
-                          </p>
-
-                          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em] md:text-3xl">
-                            {relatedProject.title}
-                          </h3>
-                        </div>
-
-                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-md transition-all duration-500 group-hover:translate-x-1 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)]">
-                          →
-                        </span>
+                    <div className="mt-6 flex items-end justify-between gap-6">
+                      <div>
+                        <p className="text-[9px] font-semibold tracking-[0.2em] text-[var(--muted)]">
+                          {relatedProject.subtitle}
+                        </p>
+                        <h3 className="mt-2 text-2xl font-semibold tracking-[-0.05em] text-[var(--text-dark)] md:text-3xl">
+                          {relatedProject.title}
+                        </h3>
                       </div>
+
+                      <span className="text-2xl text-[var(--text-dark)] transition-transform duration-300 group-hover:translate-x-1">
+                        →
+                      </span>
                     </div>
                   </article>
                 </Link>
@@ -859,7 +782,7 @@ export default async function PortfolioProjectPage({
             href={`/portfolio/project/${nextProject.slug}`}
             className="group mt-7 block"
           >
-            <article className="relative overflow-hidden rounded-[34px] bg-[var(--text-dark)] shadow-[0_26px_90px_rgba(57,48,40,0.16)] transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_44px_130px_rgba(57,48,40,0.27)] md:rounded-[54px]">
+            <article className="relative overflow-hidden bg-[var(--text-dark)] transition-opacity duration-500 group-hover:opacity-95">
               <div className="absolute inset-0 opacity-25 transition-all duration-[1400ms] group-hover:scale-[1.04] group-hover:opacity-40">
                 <Image
                   src={nextProject.thumbnail}
