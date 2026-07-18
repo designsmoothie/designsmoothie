@@ -3,6 +3,32 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 
+const services = [
+  "BRAND IDENTITY",
+  "SIGNAGE & FACADE",
+  "SPACE GRAPHIC",
+  "PRINT & EDITORIAL",
+];
+
+const contactLinks = [
+  {
+    number: "01",
+    label: "KAKAO CHANNEL",
+    title: "카카오채널로 상담하기",
+    description:
+      "프로젝트의 목적과 필요한 작업, 현재 고민을 가장 편하게 전달할 수 있는 상담 채널입니다.",
+    href: "/contact",
+  },
+  {
+    number: "02",
+    label: "PROJECT INQUIRY",
+    title: "프로젝트 문의 남기기",
+    description:
+      "브랜딩, 간판, 파사드, 인쇄물과 공간 그래픽 작업을 문의할 수 있습니다.",
+    href: "/contact",
+  },
+];
+
 const ease = [0.22, 1, 0.36, 1] as [
   number,
   number,
@@ -13,199 +39,164 @@ const ease = [0.22, 1, 0.36, 1] as [
 export default function ContactSection() {
   const reduceMotion = useReducedMotion();
 
+  const reveal = {
+    initial: reduceMotion
+      ? false
+      : {
+          opacity: 0,
+          y: 36,
+          filter: "blur(9px)",
+        },
+    whileInView: reduceMotion
+      ? undefined
+      : {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+        },
+    viewport: {
+      once: true,
+      amount: 0.2,
+      margin: "0px 0px -70px 0px",
+    },
+  };
+
   return (
     <section
       id="contact"
-      className="overflow-hidden bg-[var(--cream)] py-28 md:py-40"
+      className="scroll-mt-28 overflow-hidden bg-[var(--cream)] py-24 sm:py-28 md:py-36 lg:py-[9vw]"
     >
-      <div className="mx-auto max-w-[1440px] px-6 md:px-12">
+      <div className="px-5 sm:px-8 md:px-12 lg:px-[4vw]">
+        <div className="grid gap-12 border-b border-[var(--line)] pb-16 md:gap-16 md:pb-24 lg:grid-cols-[0.7fr_1.3fr] lg:items-end lg:pb-[7vw]">
+          <motion.div
+            {...reveal}
+            transition={{
+              duration: 0.82,
+              ease,
+            }}
+          >
+            <p className="section-label">START A PROJECT</p>
+
+            <div className="mt-7 h-px w-full max-w-[180px] bg-[var(--line)] md:mt-9" />
+
+            <p className="mt-7 max-w-xs text-sm leading-7 text-[var(--muted)] md:mt-9">
+              BRANDING
+              <br />
+              SIGNAGE
+              <br />
+              SPACE GRAPHIC
+            </p>
+          </motion.div>
+
+          <motion.div
+            {...reveal}
+            transition={{
+              duration: 0.92,
+              delay: reduceMotion ? 0 : 0.08,
+              ease,
+            }}
+          >
+            <p className="display-en-sm text-[var(--green)]">
+              Let&apos;s make it memorable.
+            </p>
+
+            <h2 className="display-xl mt-8 max-w-[1200px] md:mt-10">
+              당신의 브랜드는
+              <br />
+              어떤 기억으로 남고 있나요?
+            </h2>
+
+            <div className="mt-10 grid gap-8 border-t border-[var(--line)] pt-8 md:mt-14 md:grid-cols-2 md:gap-12 md:pt-10">
+              <p className="body-large">
+                로고 하나를 만드는 일부터 브랜드가 공간에서 보이는
+                방식까지, 필요한 지점을 함께 찾습니다.
+              </p>
+
+              <p className="body-large">
+                아직 작업 범위와 방향이 명확하지 않아도 괜찮습니다.
+                현재의 고민부터 편하게 들려주세요.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
         <motion.div
-          initial={
-            reduceMotion
-              ? false
-              : {
-                  opacity: 0,
-                  y: 44,
-                  scale: 0.99,
-                  filter: "blur(10px)",
-                }
-          }
-          whileInView={
-            reduceMotion
-              ? undefined
-              : {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  filter: "blur(0px)",
-                }
-          }
-          viewport={{
-            once: true,
-            amount: 0.18,
-            margin: "0px 0px -60px 0px",
-          }}
+          {...reveal}
           transition={{
-            duration: 0.9,
+            duration: 0.88,
             ease,
           }}
-          className="relative overflow-hidden rounded-[40px] bg-[var(--text-dark)] px-8 py-16 text-white md:px-16 md:py-24 lg:px-20"
+          className="border-b border-[var(--line)] py-20 md:py-28 lg:py-[8vw]"
         >
-          <div className="motion-glow absolute -right-40 -top-40 h-[420px] w-[420px] rounded-full bg-[var(--green)]/12 blur-3xl" />
-
-          <div className="motion-glow-delayed absolute -bottom-32 left-0 h-[260px] w-[260px] rounded-full bg-white/5 blur-3xl" />
-
-          <div className="relative z-10 grid gap-14 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div className="grid gap-14 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
             <div>
-              <motion.p
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        y: 18,
-                      }
-                }
-                whileInView={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        y: 0,
-                      }
-                }
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.65,
-                  delay: reduceMotion ? 0 : 0.12,
-                  ease,
-                }}
-                className="text-xs font-semibold tracking-[0.28em] text-white/55"
-              >
-                START YOUR PROJECT
-              </motion.p>
+              <p className="section-label">WHAT WE CAN CREATE</p>
 
-              <motion.h2
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        y: 28,
-                        filter: "blur(7px)",
-                      }
-                }
-                whileInView={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        y: 0,
-                        filter: "blur(0px)",
-                      }
-                }
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.9,
-                  delay: reduceMotion ? 0 : 0.2,
-                  ease,
-                }}
-                className="mt-6 text-5xl font-semibold leading-[1.02] tracking-[-0.055em] text-white md:text-7xl lg:text-8xl"
-              >
-                함께 만들면
+              <h3 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-[var(--text-dark)] sm:text-5xl md:mt-8 md:text-6xl">
+                하나의 인상을
                 <br />
-                더 오래 기억됩니다.
-              </motion.h2>
-
-              <motion.p
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        y: 22,
-                      }
-                }
-                whileInView={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        y: 0,
-                      }
-                }
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.75,
-                  delay: reduceMotion ? 0 : 0.3,
-                  ease,
-                }}
-                className="mt-8 max-w-2xl text-base leading-8 text-white/70 md:text-xl md:leading-9"
-              >
-                브랜딩부터 간판, 파사드, 공간 그래픽까지.
-                <br />
-                브랜드가 가장 좋은 모습으로 기억될 수 있도록
-                디자인 스무디가 함께합니다.
-              </motion.p>
-
-              <motion.div
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        y: 20,
-                      }
-                }
-                whileInView={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        y: 0,
-                      }
-                }
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.7,
-                  delay: reduceMotion ? 0 : 0.4,
-                  ease,
-                }}
-                className="mt-12 flex flex-wrap gap-4"
-              >
-                <Link
-                  href="/contact"
-                  className="premium-button group inline-flex items-center justify-center rounded-full bg-[var(--green)] px-8 py-4 text-sm font-semibold text-[var(--text-dark)] hover:bg-[var(--green-hover)]"
-                >
-                  프로젝트 문의하기
-
-                  <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-
-                <Link
-                  href="/guide"
-                  className="premium-button group inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 py-4 text-sm font-semibold text-white backdrop-blur-sm hover:border-white/40 hover:bg-white/10"
-                >
-                  의뢰 안내 보기
-
-                  <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-              </motion.div>
+                여러 접점으로 연결합니다.
+              </h3>
             </div>
 
+            <div className="border-t border-[var(--line)]">
+              {services.map((service, index) => (
+                <motion.div
+                  key={service}
+                  initial={
+                    reduceMotion
+                      ? false
+                      : {
+                          opacity: 0,
+                          x: 24,
+                        }
+                  }
+                  whileInView={
+                    reduceMotion
+                      ? undefined
+                      : {
+                          opacity: 1,
+                          x: 0,
+                        }
+                  }
+                  viewport={{
+                    once: true,
+                    amount: 0.4,
+                  }}
+                  transition={{
+                    duration: 0.58,
+                    delay: reduceMotion ? 0 : index * 0.05,
+                    ease,
+                  }}
+                  className="group grid grid-cols-[50px_1fr_auto] items-center gap-4 border-b border-[var(--line)] py-7 sm:grid-cols-[64px_1fr_auto] md:py-9"
+                >
+                  <span className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] md:text-xs">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+
+                  <span className="text-xl font-semibold tracking-[-0.025em] text-[var(--text-dark)] transition-transform duration-500 group-hover:translate-x-1 sm:text-2xl md:text-3xl">
+                    {service}
+                  </span>
+
+                  <span className="text-lg text-[var(--muted)] transition-all duration-300 group-hover:translate-x-1 group-hover:text-[var(--green)]">
+                    →
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="border-b border-[var(--line)]">
+          {contactLinks.map((item, index) => (
             <motion.div
+              key={item.number}
               initial={
                 reduceMotion
                   ? false
                   : {
                       opacity: 0,
-                      y: 34,
-                      scale: 0.985,
-                      filter: "blur(8px)",
+                      y: 36,
                     }
               }
               whileInView={
@@ -214,82 +205,105 @@ export default function ContactSection() {
                   : {
                       opacity: 1,
                       y: 0,
-                      scale: 1,
-                      filter: "blur(0px)",
                     }
               }
               viewport={{
                 once: true,
-                amount: 0.35,
+                amount: 0.3,
               }}
               transition={{
-                duration: 0.8,
-                delay: reduceMotion ? 0 : 0.28,
+                duration: 0.72,
+                delay: reduceMotion ? 0 : index * 0.07,
                 ease,
               }}
-              whileHover={
-                reduceMotion
-                  ? undefined
-                  : {
-                      y: -7,
-                    }
-              }
-              className="flex flex-col gap-6 rounded-[28px] border border-white/10 bg-white/5 p-8 shadow-[0_24px_80px_rgba(0,0,0,0.12)] backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-500 hover:border-white/15 hover:bg-white/[0.07] hover:shadow-[0_32px_100px_rgba(0,0,0,0.18)]"
             >
-              <div>
-                <p className="text-xs tracking-[0.22em] text-white/45">
-                  RESPONSE
+              <Link
+                href={item.href}
+                className="group grid gap-7 border-t border-[var(--line)] py-10 sm:grid-cols-[56px_1fr] md:py-14 lg:grid-cols-[0.16fr_0.9fr_0.8fr_auto] lg:items-center lg:gap-10 lg:py-[4.5vw]"
+              >
+                <span className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] md:text-xs">
+                  {item.number}
+                </span>
+
+                <div className="sm:col-start-2 lg:col-start-auto">
+                  <p className="section-label">{item.label}</p>
+
+                  <h3 className="mt-4 max-w-xl text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-[var(--text-dark)] transition-all duration-500 group-hover:translate-x-1 group-hover:text-[var(--green)] sm:text-4xl md:text-5xl">
+                    {item.title}
+                  </h3>
+                </div>
+
+                <p className="max-w-xl text-sm leading-7 text-[var(--text)] sm:col-start-2 md:text-base md:leading-8 lg:col-start-auto">
+                  {item.description}
                 </p>
 
-                <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white">
-                  빠르고 명확하게
-                  <br />
-                  답변드립니다.
-                </h3>
-              </div>
-
-              <div className="space-y-5 border-t border-white/10 pt-6">
-                <div className="flex items-start justify-between gap-8">
-                  <span className="text-white/55">
-                    상담 채널
-                  </span>
-
-                  <span className="font-medium text-white">
-                    카카오채널
-                  </span>
-                </div>
-
-                <div className="flex items-start justify-between gap-8">
-                  <span className="text-white/55">
-                    상담 분야
-                  </span>
-
-                  <span className="text-right font-medium text-white">
-                    Branding
-                    <br />
-                    Signage
-                    <br />
-                    Space Graphic
-                  </span>
-                </div>
-
-                <div className="flex items-start justify-between gap-8">
-                  <span className="text-white/55">
-                    진행 방식
-                  </span>
-
-                  <span className="font-medium text-white">
-                    온라인 · 오프라인
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-2 rounded-2xl bg-white/[0.06] p-5 text-sm leading-7 text-white/70">
-                프로젝트의 규모와 업종에 맞는 방향을 함께 고민하며
-                가장 적합한 디자인 솔루션을 제안드립니다.
-              </div>
+                <span className="flex h-14 w-14 items-center justify-center border border-[var(--text-dark)] text-xl text-[var(--text-dark)] transition-all duration-300 group-hover:translate-x-2 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] sm:col-start-2 md:h-16 md:w-16 lg:col-start-auto">
+                  →
+                </span>
+              </Link>
             </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          {...reveal}
+          transition={{
+            duration: 0.88,
+            ease,
+          }}
+          className="py-20 md:py-28 lg:py-[8vw]"
+        >
+          <div className="grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
+            <div>
+              <p className="section-label">A SIMPLE BEGINNING</p>
+
+              <h3 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-[var(--text-dark)] sm:text-5xl md:mt-8 md:text-6xl">
+                시작은
+                <br />
+                간단해도 괜찮습니다.
+              </h3>
+            </div>
+
+            <div className="lg:self-end">
+              <p className="max-w-2xl text-base leading-8 text-[var(--text)] md:text-lg md:leading-9">
+                업종과 필요한 작업, 오픈 예정일 또는 현재 가장 고민되는
+                부분만 알려주셔도 충분합니다.
+              </p>
+
+              <p className="mt-6 max-w-2xl text-sm leading-7 text-[var(--muted)] md:text-base md:leading-8">
+                확인 후 작업 가능 여부와 예상 범위, 진행 방향을
+                순서대로 안내드립니다.
+              </p>
+            </div>
           </div>
+        </motion.div>
+
+        <motion.div
+          {...reveal}
+          transition={{
+            duration: 0.9,
+            ease,
+          }}
+          className="border-y border-[var(--line)] py-10 md:py-14 lg:py-[4vw]"
+        >
+          <Link
+            href="/contact"
+            className="group grid gap-10 md:grid-cols-[1fr_auto] md:items-end"
+          >
+            <div>
+              <p className="section-label">LET&apos;S WORK TOGETHER</p>
+
+              <h3 className="mt-5 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-[var(--text-dark)] transition-colors duration-300 group-hover:text-[var(--green)] sm:text-5xl md:mt-7 md:text-7xl lg:text-[6vw]">
+                함께 만들 이야기가
+                <br />
+                있다면, 들려주세요.
+              </h3>
+            </div>
+
+            <span className="flex h-14 w-14 items-center justify-center border border-[var(--text-dark)] text-xl text-[var(--text-dark)] transition-all duration-300 group-hover:translate-x-2 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] md:h-16 md:w-16">
+              →
+            </span>
+          </Link>
         </motion.div>
       </div>
     </section>

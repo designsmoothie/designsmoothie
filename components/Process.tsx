@@ -6,28 +6,33 @@ import { motion, useReducedMotion } from "motion/react";
 const process = [
   {
     number: "01",
-    title: "상담",
-    text: "카카오채널 또는 전화로 프로젝트의 목적과 필요한 작업을 편하게 알려주세요.",
+    english: "Listen",
+    title: "먼저, 충분히 듣습니다.",
+    text: "카카오채널 또는 전화로 프로젝트의 목적과 필요한 작업, 현재 고민을 편하게 알려주세요.",
   },
   {
     number: "02",
-    title: "견적 및 일정",
-    text: "작업 범위와 난이도를 확인한 뒤 비용과 예상 일정을 안내드립니다.",
+    english: "Define",
+    title: "범위와 방향을 정리합니다.",
+    text: "필요한 작업과 우선순위를 구체화한 뒤 진행 범위, 비용과 예상 일정을 안내드립니다.",
   },
   {
     number: "03",
-    title: "디자인 진행",
-    text: "브랜드의 방향과 사용 환경을 고려해 컨셉과 디자인 시안을 제작합니다.",
+    english: "Design",
+    title: "브랜드의 방향을 시각화합니다.",
+    text: "브랜드의 성격과 실제 사용 환경을 함께 고려해 컨셉과 디자인 시안을 제작합니다.",
   },
   {
     number: "04",
-    title: "수정 및 확정",
-    text: "전달해주신 피드백을 반영하고 세부 요소를 조정해 디자인을 완성합니다.",
+    english: "Refine",
+    title: "함께 완성도를 높입니다.",
+    text: "전달해주신 피드백을 바탕으로 세부 요소와 사용성을 조율해 최종 디자인을 완성합니다.",
   },
   {
     number: "05",
-    title: "최종 납품",
-    text: "인쇄용, 제작용, 웹용 등 실제 사용에 필요한 최종 파일을 전달드립니다.",
+    english: "Deliver",
+    title: "실제로 사용할 결과물을 전달합니다.",
+    text: "인쇄용, 제작용, 웹용 등 프로젝트 이후 바로 사용할 수 있는 최종 파일을 정리해 전달드립니다.",
   },
 ];
 
@@ -41,173 +46,216 @@ const ease = [0.22, 1, 0.36, 1] as [
 export default function Process() {
   const reduceMotion = useReducedMotion();
 
+  const reveal = {
+    initial: reduceMotion
+      ? false
+      : {
+          opacity: 0,
+          y: 36,
+          filter: "blur(9px)",
+        },
+    whileInView: reduceMotion
+      ? undefined
+      : {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+        },
+    viewport: {
+      once: true,
+      amount: 0.2,
+      margin: "0px 0px -70px 0px",
+    },
+  };
+
   return (
     <section
       id="process"
-      className="scroll-mt-28 overflow-hidden bg-[#f5f4f0] py-28 md:py-40"
+      className="scroll-mt-28 overflow-hidden bg-[#f5f4f0] py-24 sm:py-28 md:py-36 lg:py-[9vw]"
     >
-      <div className="mx-auto max-w-[1440px] px-6 md:px-12">
-        <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-24">
+      <div className="px-5 sm:px-8 md:px-12 lg:px-[4vw]">
+        <div className="grid gap-12 border-b border-[var(--line)] pb-16 md:gap-16 md:pb-24 lg:grid-cols-[0.7fr_1.3fr] lg:items-end lg:pb-[6vw]">
           <motion.div
-            initial={
-              reduceMotion
-                ? false
-                : {
-                    opacity: 0,
-                    y: 36,
-                    filter: "blur(8px)",
-                  }
-            }
-            whileInView={
-              reduceMotion
-                ? undefined
-                : {
-                    opacity: 1,
-                    y: 0,
-                    filter: "blur(0px)",
-                  }
-            }
-            viewport={{
-              once: true,
-              amount: 0.25,
-            }}
+            {...reveal}
             transition={{
-              duration: 0.85,
+              duration: 0.82,
               ease,
             }}
           >
-            <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
+            <p className="section-label">
               OUR PROCESS
             </p>
 
-            <h2 className="mt-5 text-4xl font-semibold leading-[1.08] tracking-[-0.055em] text-[var(--text-dark)] md:text-6xl lg:text-7xl">
-              의뢰부터 납품까지,
+            <div className="mt-7 h-px w-full max-w-[180px] bg-[var(--line)] md:mt-9" />
+
+            <p className="mt-7 max-w-xs text-sm leading-7 text-[var(--muted)] md:mt-9">
+              CLEAR PROCESS
               <br />
-              복잡하지 않게.
-            </h2>
-
-            <p className="mt-8 max-w-lg text-base leading-8 text-[var(--text)] md:text-lg">
-              필요한 내용을 명확하게 정리하고,
-              각 단계마다 진행 상황을 공유합니다.
-              처음 디자인을 의뢰하는 경우에도
-              어렵지 않게 진행할 수 있습니다.
+              SMOOTH COMMUNICATION
+              <br />
+              PRACTICAL RESULTS
             </p>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Link
-                href="/contact"
-                className="premium-button inline-flex items-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)] hover:bg-[var(--green-hover)]"
-              >
-                프로젝트 문의하기
-              </Link>
-
-              <Link
-                href="/guide"
-                className="premium-button inline-flex items-center rounded-full border border-black/10 bg-white/60 px-7 py-3.5 text-sm font-semibold backdrop-blur-sm hover:border-[var(--text-dark)]"
-              >
-                의뢰 안내 보기
-              </Link>
-            </div>
           </motion.div>
 
-          <div className="overflow-hidden rounded-[40px] border border-black/5 bg-white/70 shadow-[0_24px_80px_rgba(0,0,0,.05)] backdrop-blur-xl">
-            {process.map((item, index) => (
-              <motion.article
-                key={item.number}
-                initial={
-                  reduceMotion
-                    ? false
-                    : {
-                        opacity: 0,
-                        x: 30,
-                      }
-                }
-                whileInView={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        x: 0,
-                      }
-                }
-                viewport={{
-                  once: true,
-                }}
-                transition={{
-                  duration: 0.6,
-                  delay: reduceMotion ? 0 : index * 0.07,
-                  ease,
-                }}
-                whileHover={
-                  reduceMotion
-                    ? undefined
-                    : {
-                        x: 6,
-                      }
-                }
-                className={`group grid gap-6 p-8 transition-colors duration-300 hover:bg-white/85 md:grid-cols-[90px_0.55fr_1fr] md:items-center md:p-10 ${
-                  index !== process.length - 1
-                    ? "border-b border-black/5"
-                    : ""
-                }`}
-              >
-                <div className="flex justify-between md:block">
-                  <span className="text-sm font-semibold tracking-[0.18em] text-[var(--green)]">
-                    {item.number}
+          <motion.div
+            {...reveal}
+            transition={{
+              duration: 0.92,
+              delay: reduceMotion ? 0 : 0.08,
+              ease,
+            }}
+          >
+            <p className="display-en-sm text-[var(--green)]">
+              Good work begins with clarity.
+            </p>
+
+            <h2 className="display-xl mt-8 max-w-[1150px] md:mt-10">
+              좋은 결과는
+              <br />
+              좋은 과정에서 시작됩니다.
+            </h2>
+
+            <div className="mt-10 grid gap-8 border-t border-[var(--line)] pt-8 md:mt-14 md:grid-cols-2 md:gap-12 md:pt-10">
+              <p className="body-large">
+                필요한 내용을 명확하게 정리하고 각 단계마다 진행
+                상황을 공유합니다.
+              </p>
+
+              <p className="body-large">
+                처음 디자인을 의뢰하는 경우에도 무엇을 준비하고
+                결정해야 하는지 어렵지 않게 안내합니다.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="border-b border-[var(--line)]">
+          {process.map((item, index) => (
+            <motion.article
+              key={item.number}
+              initial={
+                reduceMotion
+                  ? false
+                  : {
+                      opacity: 0,
+                      y: 40,
+                    }
+              }
+              whileInView={
+                reduceMotion
+                  ? undefined
+                  : {
+                      opacity: 1,
+                      y: 0,
+                    }
+              }
+              viewport={{
+                once: true,
+                amount: 0.25,
+                margin: "0px 0px -50px 0px",
+              }}
+              transition={{
+                duration: 0.76,
+                delay: reduceMotion ? 0 : index * 0.055,
+                ease,
+              }}
+              className="group grid gap-7 border-t border-[var(--line)] py-10 sm:grid-cols-[56px_1fr] md:py-14 lg:grid-cols-[0.16fr_0.36fr_0.9fr_0.9fr] lg:items-start lg:gap-10 lg:py-[4.5vw]"
+            >
+              <span className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] md:text-xs">
+                {item.number}
+              </span>
+
+              <p className="text-sm font-semibold tracking-[0.08em] text-[var(--green)] sm:col-start-2 lg:col-start-auto md:text-base">
+                {item.english}
+              </p>
+
+              <h3 className="max-w-xl text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-[var(--text-dark)] transition-transform duration-500 group-hover:translate-x-1 sm:col-start-2 sm:text-4xl md:text-5xl lg:col-start-auto lg:text-[3.3vw]">
+                {item.title}
+              </h3>
+
+              <div className="sm:col-start-2 lg:col-start-auto lg:justify-self-end">
+                <p className="max-w-xl text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
+                  {item.text}
+                </p>
+
+                <div className="mt-7 flex items-center gap-4">
+                  <span className="h-px w-10 bg-[var(--line)] transition-all duration-500 group-hover:w-16 group-hover:bg-[var(--green)]" />
+
+                  <span className="text-[10px] font-semibold tracking-[0.16em] text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--text-dark)]">
+                    {index === process.length - 1
+                      ? "PROJECT COMPLETE"
+                      : "NEXT STEP"}
                   </span>
                 </div>
-
-                <h3 className="text-2xl font-semibold tracking-[-0.04em] text-[var(--text-dark)] md:text-3xl">
-                  {item.title}
-                </h3>
-
-                <div className="flex items-center justify-between gap-6">
-                  <p className="max-w-xl text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
-                    {item.text}
-                  </p>
-
-                  <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-black/10 text-sm transition-all duration-300 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:flex">
-                    {index !== process.length - 1 ? "↓" : "✓"}
-                  </span>
-                </div>
-              </motion.article>
-            ))}
-          </div>
+              </div>
+            </motion.article>
+          ))}
         </div>
 
         <motion.div
-          initial={
-            reduceMotion
-              ? false
-              : {
-                  opacity: 0,
-                }
-          }
-          whileInView={
-            reduceMotion
-              ? undefined
-              : {
-                  opacity: 1,
-                }
-          }
-          viewport={{
-            once: true,
-          }}
+          {...reveal}
           transition={{
-            duration: 0.8,
-            delay: 0.25,
+            duration: 0.86,
+            ease,
           }}
-          className="mt-20 flex flex-col justify-between gap-8 border-t border-[var(--line)] pt-10 md:mt-28 md:flex-row md:items-center md:pt-12"
+          className="mt-20 md:mt-28 lg:mt-[7vw]"
         >
-          <p className="text-sm leading-7 text-[var(--muted)]">
-            프로젝트의 범위와 제작 방식에 따라
-            <br className="hidden sm:block" />
-            일부 과정과 일정은 달라질 수 있습니다.
-          </p>
+          <div className="grid gap-12 border-b border-[var(--line)] pb-16 md:pb-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
+            <div>
+              <p className="section-label">
+                BEFORE WE BEGIN
+              </p>
 
-          <p className="text-xs font-semibold tracking-[0.2em] text-[var(--muted)]">
-            CLEAR PROCESS · SMOOTH COMMUNICATION
-          </p>
+              <h3 className="mt-6 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-[var(--text-dark)] sm:text-5xl md:mt-8 md:text-6xl">
+                완벽하게 정리해서
+                <br />
+                오실 필요는 없습니다.
+              </h3>
+            </div>
+
+            <div className="lg:self-end">
+              <p className="max-w-2xl text-base leading-8 text-[var(--text)] md:text-lg md:leading-9">
+                필요한 디자인의 종류나 방향이 아직 명확하지 않아도
+                괜찮습니다. 현재 상황과 해결하고 싶은 문제를 알려주시면
+                작업 범위부터 함께 정리해드립니다.
+              </p>
+
+              <p className="mt-6 max-w-2xl text-sm leading-7 text-[var(--muted)] md:text-base md:leading-8">
+                프로젝트의 규모와 제작 방식에 따라 일부 과정과 일정은
+                조정될 수 있습니다.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          {...reveal}
+          transition={{
+            duration: 0.88,
+            ease,
+          }}
+          className="mt-16 md:mt-24 lg:mt-[6vw]"
+        >
+          <Link
+            href="/contact"
+            className="group grid gap-10 border-y border-[var(--line)] py-10 md:grid-cols-[1fr_auto] md:items-end md:py-14 lg:py-[4vw]"
+          >
+            <div>
+              <p className="section-label">
+                START A PROJECT
+              </p>
+
+              <h3 className="mt-5 text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-[var(--text-dark)] transition-colors duration-300 group-hover:text-[var(--green)] sm:text-5xl md:mt-7 md:text-7xl lg:text-[6vw]">
+                이제, 당신의 이야기를
+                <br />
+                들려주세요.
+              </h3>
+            </div>
+
+            <span className="flex h-14 w-14 items-center justify-center border border-[var(--text-dark)] text-xl text-[var(--text-dark)] transition-all duration-300 group-hover:translate-x-2 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] md:h-16 md:w-16">
+              →
+            </span>
+          </Link>
         </motion.div>
       </div>
     </section>
