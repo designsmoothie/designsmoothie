@@ -1,3 +1,7 @@
+"use client";
+
+import { motion, useReducedMotion } from "motion/react";
+
 const credentials = [
   {
     number: "01",
@@ -64,7 +68,38 @@ const certifications = [
   },
 ];
 
+const ease = [0.22, 1, 0.36, 1] as [
+  number,
+  number,
+  number,
+  number,
+];
+
 export default function About() {
+  const reduceMotion = useReducedMotion();
+
+  const reveal = {
+    initial: reduceMotion
+      ? false
+      : {
+          opacity: 0,
+          y: 34,
+          filter: "blur(8px)",
+        },
+    whileInView: reduceMotion
+      ? undefined
+      : {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+        },
+    viewport: {
+      once: true,
+      amount: 0.25,
+      margin: "0px 0px -60px 0px",
+    },
+  };
+
   return (
     <section
       id="about"
@@ -72,7 +107,13 @@ export default function About() {
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
         <div className="grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
-          <div>
+          <motion.div
+            {...reveal}
+            transition={{
+              duration: 0.8,
+              ease,
+            }}
+          >
             <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
               ABOUT DESIGN SMOOTHIE
             </p>
@@ -84,9 +125,16 @@ export default function About() {
               <br />
               SPACE GRAPHIC DESIGN
             </p>
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            {...reveal}
+            transition={{
+              duration: 0.9,
+              delay: reduceMotion ? 0 : 0.08,
+              ease,
+            }}
+          >
             <h2 className="text-4xl font-semibold leading-[1.08] tracking-[-0.055em] text-[var(--text-dark)] md:text-6xl lg:text-7xl">
               보기 좋은 디자인을 넘어,
               <br />
@@ -102,131 +150,226 @@ export default function About() {
 
               <p>
                 각각의 디자인이 따로 보이지 않도록 브랜드와 공간의 성격을
-                이해하고, 오래 사용할 수 있는 일관된 시각 방향을
-                설계합니다.
+                이해하고 오래 사용할 수 있는 일관된 시각 방향을 설계합니다.
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="mt-24 overflow-hidden rounded-[32px] border border-black/5 bg-white/65 shadow-[0_24px_80px_rgba(0,0,0,0.04)] backdrop-blur-xl md:mt-32 md:rounded-[44px]">
-          <div className="grid md:grid-cols-3">
-            {trustItems.map((item, index) => (
-              <article
-                key={item.label}
-                className={`flex min-h-[280px] flex-col justify-between p-8 md:min-h-[360px] md:p-10 lg:p-12 ${
-                  index !== trustItems.length - 1
-                    ? "border-b border-black/5 md:border-b-0 md:border-r"
-                    : ""
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <p className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)]">
-                    {item.label.toUpperCase()}
-                  </p>
-
-                  <span className="text-xs text-[var(--muted)]">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
-
-                <div>
-                  <strong className="block text-6xl font-semibold tracking-[-0.065em] text-[var(--text-dark)] md:text-7xl lg:text-8xl">
-                    {item.value}
-                  </strong>
-
-                  <p className="mt-5 max-w-xs text-sm leading-7 text-[var(--text)] md:text-base">
-                    {item.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-20 grid gap-12 border-t border-[var(--line)] pt-16 md:mt-28 md:grid-cols-[0.8fr_1.2fr] md:gap-20 md:pt-20">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
-              PROFESSIONAL LICENSES
-            </p>
-
-            <h3 className="mt-5 text-3xl font-semibold leading-tight tracking-[-0.045em] text-[var(--text-dark)] md:text-5xl">
-              디자인과 공간을
-              <br />
-              함께 이해합니다.
-            </h3>
-
-            <p className="mt-7 max-w-md text-base leading-8 text-[var(--text)]">
-              시각 디자인의 완성도뿐 아니라 컬러, 제작, 시공과 공간 환경까지
-              고려해 실제 현장에서 구현 가능한 디자인을 제안합니다.
-            </p>
-          </div>
-
-          <div className="border-t border-[var(--line)]">
-            {credentials.map((credential) => (
-              <div
-                key={credential.name}
-                className="group grid grid-cols-[48px_1fr_auto] items-center gap-4 border-b border-[var(--line)] py-6 transition-colors duration-300 hover:bg-white/45 md:grid-cols-[64px_1fr_auto] md:px-4 md:py-7"
-              >
-                <span className="text-xs font-semibold tracking-[0.18em] text-[var(--muted)]">
-                  {credential.number}
+        <div className="mt-24 grid gap-7 md:mt-32 md:grid-cols-3">
+          {trustItems.map((item, index) => (
+            <motion.article
+              key={item.label}
+              initial={
+                reduceMotion
+                  ? false
+                  : {
+                      opacity: 0,
+                      y: 44,
+                      scale: 0.985,
+                    }
+              }
+              whileInView={
+                reduceMotion
+                  ? undefined
+                  : {
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                    }
+              }
+              viewport={{
+                once: true,
+                amount: 0.25,
+              }}
+              transition={{
+                duration: 0.72,
+                delay: reduceMotion ? 0 : index * 0.09,
+                ease,
+              }}
+              whileHover={
+                reduceMotion
+                  ? undefined
+                  : {
+                      y: -8,
+                    }
+              }
+              className="premium-card flex min-h-[340px] flex-col justify-between rounded-[36px] border border-black/5 bg-white/70 p-10 backdrop-blur-xl"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold tracking-[0.22em] text-[var(--muted)]">
+                  {item.label.toUpperCase()}
                 </span>
 
-                <span className="text-base font-semibold tracking-[-0.02em] text-[var(--text-dark)] md:text-xl">
-                  {credential.name}
-                </span>
-
-                <span className="hidden text-[10px] font-semibold tracking-[0.18em] text-[var(--muted)] sm:block">
-                  {credential.category}
+                <span className="text-xs text-[var(--muted)]">
+                  {String(index + 1).padStart(2, "0")}
                 </span>
               </div>
-            ))}
-          </div>
+
+              <div>
+                <strong className="block text-7xl font-semibold tracking-[-0.07em] text-[var(--text-dark)]">
+                  {item.value}
+                </strong>
+
+                <p className="mt-5 leading-8 text-[var(--text)]">
+                  {item.description}
+                </p>
+              </div>
+            </motion.article>
+          ))}
         </div>
 
-        <div className="mt-20 border-t border-[var(--line)] pt-16 md:mt-28 md:pt-20">
+        <motion.div
+          {...reveal}
+          transition={{
+            duration: 0.8,
+            delay: reduceMotion ? 0 : 0.12,
+            ease,
+          }}
+          className="mt-24 border-t border-[var(--line)] pt-20"
+        >
+          <div className="grid gap-14 md:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
+                PROFESSIONAL LICENSES
+              </p>
+
+              <h3 className="mt-5 text-5xl font-semibold tracking-[-0.05em] text-[var(--text-dark)]">
+                디자인과 공간을
+                <br />
+                함께 이해합니다.
+              </h3>
+            </div>
+
+            <div className="border-t border-[var(--line)]">
+              {credentials.map((credential, index) => (
+                <motion.div
+                  key={credential.name}
+                  initial={
+                    reduceMotion
+                      ? false
+                      : {
+                          opacity: 0,
+                          x: 24,
+                        }
+                  }
+                  whileInView={
+                    reduceMotion
+                      ? undefined
+                      : {
+                          opacity: 1,
+                          x: 0,
+                        }
+                  }
+                  viewport={{
+                    once: true,
+                  }}
+                  transition={{
+                    duration: 0.55,
+                    delay: reduceMotion ? 0 : index * 0.05,
+                    ease,
+                  }}
+                  className="group grid grid-cols-[60px_1fr_auto] items-center border-b border-[var(--line)] py-7 transition-colors duration-300 hover:bg-white/45"
+                >
+                  <span className="text-xs font-semibold tracking-[0.18em] text-[var(--muted)]">
+                    {credential.number}
+                  </span>
+
+                  <span className="text-xl font-semibold text-[var(--text-dark)]">
+                    {credential.name}
+                  </span>
+
+                  <span className="text-[10px] tracking-[0.18em] text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--text-dark)]">
+                    {credential.category}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          {...reveal}
+          transition={{
+            duration: 0.8,
+            delay: reduceMotion ? 0 : 0.18,
+            ease,
+          }}
+          className="mt-24 border-t border-[var(--line)] pt-20"
+        >
           <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
             <div>
               <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
                 COMPANY CERTIFICATIONS
               </p>
 
-              <h3 className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-[var(--text-dark)] md:text-5xl">
+              <h3 className="mt-5 text-5xl font-semibold tracking-[-0.05em] text-[var(--text-dark)]">
                 전문성과 신뢰를 갖춘
                 <br />
                 디자인 스튜디오.
               </h3>
             </div>
 
-            <p className="max-w-md text-base leading-8 text-[var(--text)]">
-              디자인 역량과 사업 수행 체계를 공식적인 인증 절차를 통해
-              갖추고 있습니다.
+            <p className="max-w-md leading-8 text-[var(--text)]">
+              디자인 역량과 사업 수행 체계를 공식적인 인증 절차를 통해 갖추고
+              있습니다.
             </p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-2">
-            {certifications.map((certification) => (
-              <article
-                key={certification.title}
-                className="rounded-[28px] border border-black/5 bg-white/65 p-8 shadow-[0_20px_60px_rgba(0,0,0,0.035)] backdrop-blur-xl md:p-10"
+            {certifications.map((item, index) => (
+              <motion.article
+                key={item.title}
+                initial={
+                  reduceMotion
+                    ? false
+                    : {
+                        opacity: 0,
+                        y: 32,
+                      }
+                }
+                whileInView={
+                  reduceMotion
+                    ? undefined
+                    : {
+                        opacity: 1,
+                        y: 0,
+                      }
+                }
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  duration: 0.65,
+                  delay: reduceMotion ? 0 : index * 0.08,
+                  ease,
+                }}
+                whileHover={
+                  reduceMotion
+                    ? undefined
+                    : {
+                        y: -6,
+                      }
+                }
+                className="premium-card rounded-[30px] border border-black/5 bg-white/70 p-10 backdrop-blur-xl"
               >
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <h4 className="text-2xl font-semibold tracking-[-0.04em] text-[var(--text-dark)] md:text-3xl">
-                    {certification.title}
+                <div className="flex items-center justify-between">
+                  <h4 className="text-3xl font-semibold tracking-[-0.04em]">
+                    {item.title}
                   </h4>
 
-                  <span className="rounded-full bg-[var(--green)] px-4 py-2 text-[11px] font-semibold text-[var(--text-dark)]">
-                    {certification.status}
+                  <span className="rounded-full bg-[var(--green)] px-4 py-2 text-xs font-semibold text-[var(--text-dark)]">
+                    {item.status}
                   </span>
                 </div>
 
-                <p className="mt-8 max-w-xl text-sm leading-7 text-[var(--text)] md:text-base">
-                  {certification.description}
+                <p className="mt-8 leading-8 text-[var(--text)]">
+                  {item.description}
                 </p>
-              </article>
+              </motion.article>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

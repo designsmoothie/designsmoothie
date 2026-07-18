@@ -2,39 +2,57 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "motion/react";
+import {
+  motion,
+  useReducedMotion,
+} from "motion/react";
 import { portfolioCategories } from "@/data/portfolio";
 
-const cardTransition = {
-  duration: 0.65,
-  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-};
+const premiumEase = [0.22, 1, 0.36, 1] as [
+  number,
+  number,
+  number,
+  number,
+];
 
 export default function Portfolio() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section
       id="portfolio"
       className="scroll-mt-28 overflow-hidden bg-[#f5f4f0] py-28 md:py-40"
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
-        {/* 섹션 제목 */}
         <div className="flex flex-col justify-between gap-10 md:flex-row md:items-end">
           <motion.div
-            initial={{
-              opacity: 0,
-              y: 32,
-              filter: "blur(8px)",
-            }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-              filter: "blur(0px)",
-            }}
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    opacity: 0,
+                    y: 34,
+                    filter: "blur(9px)",
+                  }
+            }
+            whileInView={
+              reduceMotion
+                ? undefined
+                : {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }
+            }
             viewport={{
               once: true,
               amount: 0.3,
+              margin: "0px 0px -50px 0px",
             }}
-            transition={cardTransition}
+            transition={{
+              duration: 0.85,
+              ease: premiumEase,
+            }}
             className="max-w-4xl"
           >
             <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
@@ -49,21 +67,33 @@ export default function Portfolio() {
           </motion.div>
 
           <motion.div
-            initial={{
-              opacity: 0,
-              y: 26,
-            }}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-            }}
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    opacity: 0,
+                    y: 28,
+                    filter: "blur(7px)",
+                  }
+            }
+            whileInView={
+              reduceMotion
+                ? undefined
+                : {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }
+            }
             viewport={{
               once: true,
               amount: 0.3,
+              margin: "0px 0px -50px 0px",
             }}
             transition={{
-              ...cardTransition,
-              delay: 0.1,
+              duration: 0.78,
+              delay: reduceMotion ? 0 : 0.1,
+              ease: premiumEase,
             }}
             className="max-w-md md:pb-2"
           >
@@ -75,7 +105,7 @@ export default function Portfolio() {
 
             <Link
               href="/portfolio"
-              className="group mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-dark)]"
+              className="group mt-7 inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-dark)] transition-colors duration-300 hover:text-[var(--green)]"
             >
               전체 포트폴리오 보기
 
@@ -86,7 +116,6 @@ export default function Portfolio() {
           </motion.div>
         </div>
 
-        {/* 포트폴리오 카드 */}
         <div className="mt-20 grid gap-8 md:mt-28 md:grid-cols-2">
           {portfolioCategories.map((category, categoryIndex) => {
             const isFeatured = categoryIndex === 0;
@@ -99,26 +128,37 @@ export default function Portfolio() {
             return (
               <motion.div
                 key={category.slug}
-                initial={{
-                  opacity: 0,
-                  y: 44,
-                  scale: 0.985,
-                  filter: "blur(9px)",
-                }}
-                whileInView={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  filter: "blur(0px)",
-                }}
+                initial={
+                  reduceMotion
+                    ? false
+                    : {
+                        opacity: 0,
+                        y: 46,
+                        scale: 0.985,
+                        filter: "blur(10px)",
+                      }
+                }
+                whileInView={
+                  reduceMotion
+                    ? undefined
+                    : {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        filter: "blur(0px)",
+                      }
+                }
                 viewport={{
                   once: true,
                   amount: 0.12,
-                  margin: "0px 0px -40px 0px",
+                  margin: "0px 0px -50px 0px",
                 }}
                 transition={{
-                  ...cardTransition,
-                  delay: Math.min(categoryIndex * 0.07, 0.28),
+                  duration: 0.75,
+                  delay: reduceMotion
+                    ? 0
+                    : Math.min(categoryIndex * 0.07, 0.28),
+                  ease: premiumEase,
                 }}
                 className={isFeatured ? "md:col-span-2" : ""}
               >
@@ -127,16 +167,26 @@ export default function Portfolio() {
                   className="group block h-full"
                 >
                   <motion.article
-                    whileHover={{
-                      y: -9,
-                    }}
+                    whileHover={
+                      reduceMotion
+                        ? undefined
+                        : {
+                            y: -9,
+                          }
+                    }
+                    whileTap={
+                      reduceMotion
+                        ? undefined
+                        : {
+                            scale: 0.992,
+                          }
+                    }
                     transition={{
                       duration: 0.42,
-                      ease: [0.22, 1, 0.36, 1],
+                      ease: premiumEase,
                     }}
-                    className="relative h-full overflow-hidden rounded-[32px] border border-black/5 bg-white shadow-[0_20px_70px_rgba(57,48,40,0.055)] transition-shadow duration-500 group-hover:shadow-[0_38px_100px_rgba(57,48,40,0.13)] md:rounded-[42px]"
+                    className="relative h-full overflow-hidden rounded-[32px] border border-black/5 bg-white shadow-[0_20px_70px_rgba(57,48,40,0.055)] transition-[box-shadow,border-color] duration-500 group-hover:border-black/10 group-hover:shadow-[0_38px_100px_rgba(57,48,40,0.13)] md:rounded-[42px]"
                   >
-                    {/* 이미지 영역 */}
                     <div
                       className={`relative overflow-hidden bg-[#dedbd3] ${
                         isFeatured
@@ -176,11 +226,7 @@ export default function Portfolio() {
                                     ? "(max-width: 768px) 100vw, 1400px"
                                     : "(max-width: 768px) 100vw, 700px"
                                 }
-                                className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045] ${
-                                  isBanner
-                                    ? "object-cover"
-                                    : "object-cover"
-                                }`}
+                                className="premium-image object-cover"
                               />
                             </div>
                           ))}
@@ -195,17 +241,14 @@ export default function Portfolio() {
                         </div>
                       )}
 
-                      {/* 이미지 오버레이 */}
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-90" />
 
-                      {/* 번호 */}
                       <div className="absolute left-5 top-5 md:left-7 md:top-7">
                         <span className="inline-flex items-center rounded-full border border-white/30 bg-black/15 px-4 py-2 text-[10px] font-semibold tracking-[0.2em] text-white backdrop-blur-md">
                           {category.number}
                         </span>
                       </div>
 
-                      {/* 이미지 위 하단 정보 */}
                       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-5 p-6 text-white md:p-9">
                         <div>
                           <p className="text-[10px] font-semibold tracking-[0.2em] text-white/65 md:text-xs">
@@ -223,19 +266,18 @@ export default function Portfolio() {
                           </h3>
                         </div>
 
-                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-lg text-white backdrop-blur-md transition-all duration-500 group-hover:translate-x-1.5 group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:h-14 md:w-14">
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-lg text-white backdrop-blur-md transition-all duration-500 group-hover:translate-x-1.5 group-hover:scale-105 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:h-14 md:w-14">
                           →
                         </span>
                       </div>
                     </div>
 
-                    {/* 카드 설명 영역 */}
                     <div className="flex items-start justify-between gap-6 p-7 md:p-9">
                       <p className="max-w-2xl text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
                         {category.description}
                       </p>
 
-                      <span className="hidden shrink-0 text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] sm:block">
+                      <span className="hidden shrink-0 text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--text-dark)] sm:block">
                         VIEW PROJECT
                       </span>
                     </div>
@@ -245,6 +287,35 @@ export default function Portfolio() {
             );
           })}
         </div>
+
+        <motion.div
+          initial={
+            reduceMotion
+              ? false
+              : {
+                  opacity: 0,
+                  scaleX: 0,
+                }
+          }
+          whileInView={
+            reduceMotion
+              ? undefined
+              : {
+                  opacity: 1,
+                  scaleX: 1,
+                }
+          }
+          viewport={{
+            once: true,
+            amount: 0.8,
+          }}
+          transition={{
+            duration: 0.9,
+            delay: reduceMotion ? 0 : 0.15,
+            ease: premiumEase,
+          }}
+          className="mt-20 h-px origin-left bg-[var(--line)] md:mt-28"
+        />
       </div>
     </section>
   );

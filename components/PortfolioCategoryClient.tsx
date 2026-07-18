@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
+import { useEffect, useMemo, useState } from "react";
 import type { PortfolioProject } from "@/data/projects";
 
 type PortfolioCategory = {
@@ -27,6 +28,12 @@ type PortfolioCategoryClientProps = {
   projects: PortfolioProject[];
 };
 
+type ProjectHoverPreviewProps = {
+  project: PortfolioProject;
+  isWideCard: boolean;
+  priority: boolean;
+};
+
 const cardTransition = {
   duration: 0.65,
   ease: [0.22, 1, 0.36, 1] as [
@@ -37,32 +44,35 @@ const cardTransition = {
   ],
 };
 
-function getPreviewImages(project: PortfolioProject) {
-  const sourceImages =
-    project.images.length > 0
-      ? project.images
-      : [project.thumbnail];
+function getProjectImages(project: PortfolioProject) {
+  if (project.images && project.images.length > 0) {
+    return project.images;
+  }
 
-  return sourceImages.slice(0, 3);
+  return [project.thumbnail];
 }
 
 function getImageLabel(count: number) {
   return `${count} ${count === 1 ? "IMAGE" : "IMAGES"}`;
 }
 
-type ProjectPreviewProps = {
-  project: PortfolioProject;
-  isWideCard: boolean;
-  priority: boolean;
-};
-
-function ProjectPreview({
+function ProjectHoverPreview({
   project,
   isWideCard,
   priority,
-}: ProjectPreviewProps) {
-  const previewImages = getPreviewImages(project);
-  const imageCount = project.images.length || 1;
+}: ProjectHoverPreviewProps) {
+  const images = useMemo(
+    () => getProjectImages(project),
+    [project],
+  );
+
+  const previewImages = images.slice(0, 3);
+  const hoverImages = images.slice(0, 6);
+
+  const [isHovering, setIsHovering] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const imageCount = images.length;
   const remainingCount = Math.max(imageCount - 3, 0);
   const isBannerProject = project.category === "banner";
 
@@ -70,124 +80,175 @@ function ProjectPreview({
     ? "(max-width: 768px) 100vw, 1400px"
     : "(max-width: 768px) 100vw, 700px";
 
-  /*
-   * 이미지 1장
-   */
-  if (previewImages.length === 1) {
-    return (
-      <div
-        className={`relative overflow-hidden bg-[#e5e1da] ${
-          isBannerProject
-            ? "aspect-[2.96/4]"
-            : isWideCard
-              ? "aspect-[4/3] md:aspect-[16/9]"
-              : "aspect-[4/3]"
-        }`}
-      >
-        <Image
-          src={previewImages[0]}
-          alt={`${project.title} 프로젝트 미리보기`}
-          fill
-          priority={priority}
-          sizes={imageSizes}
-          className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035] ${
-            isBannerProject ? "object-cover" : "object-cover"
-          }`}
-        />
-      </div>
-    );
-  }
+  const previewAspectClass = isBannerProject
+    ? "aspect-[16/10]"
+    : isWideCard
+      ? "aspect-[4/3] md:aspect-[16/9]"
+      : "aspect-[4/3]";
 
-  /*
-   * 이미지 2장
-   */
-  if (previewImages.length === 2) {
-    return (
-      <div
-        className={`grid overflow-hidden bg-[#e5e1da] ${
-          isBannerProject
-            ? "aspect-[16/10] grid-cols-2"
-            : isWideCard
-              ? "aspect-[4/3] grid-cols-2 md:aspect-[16/9]"
-              : "aspect-[4/3] grid-cols-2"
-        }`}
-      >
-        {previewImages.map((image, index) => (
-          <div
-            key={`${project.slug}-preview-${image}-${index}`}
-            className="relative overflow-hidden border-r border-white/25 last:border-r-0"
-          >
-            <Image
-              src={image}
-              alt={`${project.title} 프로젝트 미리보기 ${index + 1}`}
-              fill
-              priority={priority && index === 0}
-              sizes={imageSizes}
-              className={`transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045] ${
-                isBannerProject ? "object-cover" : "object-cover"
-              }`}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!isHovering || hoverImages.length <= 1) {
+      setActiveIndex(0);
+      return;
+    }
 
-  /*
-   * 이미지 3장 이상
-   * 큰 이미지 1장 + 우측 작은 이미지 2장
-   */
+    const intervalId = window.setInterval(() => {
+      setActiveIndex(
+        (currentIndex) =>
+          (currentIndex + 1) % hoverImages.length,
+      );
+    }, 1250);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [hoverImages.length, isHovering]);
+
   return (
     <div
-      className={`grid overflow-hidden bg-[#e5e1da] ${
-        isBannerProject
-          ? "aspect-[16/10] grid-cols-[1.15fr_0.85fr]"
-          : isWideCard
-            ? "aspect-[4/3] grid-cols-[1.3fr_0.7fr] md:aspect-[16/9]"
-            : "aspect-[4/3] grid-cols-[1.15fr_0.85fr]"
-      }`}
+      className={`relative overflow-hidden bg-[#e5e1da] ${previewAspectClass}`}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
-      <div className="relative overflow-hidden border-r border-white/25">
-        <Image
-          src={previewImages[0]}
-          alt={`${project.title} 프로젝트 대표 미리보기`}
-          fill
-          priority={priority}
-          sizes={imageSizes}
-          className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-        />
-      </div>
+      {/* 기본 미리보기: 이미지 1장 */}
+      {previewImages.length === 1 && (
+        <div className="absolute inset-0">
+          <Image
+            src={previewImages[0]}
+            alt={`${project.title} 프로젝트 미리보기`}
+            fill
+            priority={priority}
+            sizes={imageSizes}
+            className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
+          />
+        </div>
+      )}
 
-      <div className="grid grid-rows-2">
-        {previewImages.slice(1, 3).map((image, index) => {
-          const isLastPreview = index === 1;
-
-          return (
+      {/* 기본 미리보기: 이미지 2장 */}
+      {previewImages.length === 2 && (
+        <div className="absolute inset-0 grid grid-cols-2">
+          {previewImages.map((image, index) => (
             <div
-              key={`${project.slug}-preview-${image}-${index}`}
-              className="relative overflow-hidden border-b border-white/25 last:border-b-0"
+              key={`${project.slug}-base-${index}`}
+              className="relative overflow-hidden border-r border-white/25 last:border-r-0"
             >
               <Image
                 src={image}
-                alt={`${project.title} 프로젝트 추가 미리보기 ${
-                  index + 2
+                alt={`${project.title} 프로젝트 미리보기 ${
+                  index + 1
+                }`}
+                fill
+                priority={priority && index === 0}
+                sizes={imageSizes}
+                className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.045]"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 기본 미리보기: 이미지 3장 이상 */}
+      {previewImages.length >= 3 && (
+        <div
+          className={`absolute inset-0 grid ${
+            isWideCard
+              ? "grid-cols-[1.3fr_0.7fr]"
+              : "grid-cols-[1.15fr_0.85fr]"
+          }`}
+        >
+          <div className="relative overflow-hidden border-r border-white/25">
+            <Image
+              src={previewImages[0]}
+              alt={`${project.title} 프로젝트 대표 미리보기`}
+              fill
+              priority={priority}
+              sizes={imageSizes}
+              className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            />
+          </div>
+
+          <div className="grid grid-rows-2">
+            {previewImages.slice(1, 3).map((image, index) => (
+              <div
+                key={`${project.slug}-side-${index}`}
+                className="relative overflow-hidden border-b border-white/25 last:border-b-0"
+              >
+                <Image
+                  src={image}
+                  alt={`${project.title} 프로젝트 추가 미리보기 ${
+                    index + 2
+                  }`}
+                  fill
+                  sizes={imageSizes}
+                  className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                />
+
+                {index === 1 &&
+                  remainingCount > 0 &&
+                  !isHovering && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
+                      <span className="text-2xl font-semibold tracking-[-0.04em] text-white md:text-4xl">
+                        +{remainingCount}
+                      </span>
+                    </div>
+                  )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 데스크톱 호버 자동 프리뷰 */}
+      {hoverImages.length > 1 && (
+        <div
+          className={`pointer-events-none absolute inset-0 z-10 bg-[#e5e1da] transition-opacity duration-500 ${
+            isHovering ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {hoverImages.map((image, index) => (
+            <div
+              key={`${project.slug}-hover-${index}`}
+              className={`absolute inset-0 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                activeIndex === index
+                  ? "scale-100 opacity-100"
+                  : "scale-[1.035] opacity-0"
+              }`}
+            >
+              <Image
+                src={image}
+                alt={`${project.title} 호버 미리보기 ${
+                  index + 1
                 }`}
                 fill
                 sizes={imageSizes}
-                className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                className="object-cover"
               />
-
-              {isLastPreview && remainingCount > 0 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
-                  <span className="text-2xl font-semibold tracking-[-0.04em] text-white md:text-4xl">
-                    +{remainingCount}
-                  </span>
-                </div>
-              )}
             </div>
-          );
-        })}
-      </div>
+          ))}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/5 to-black/10" />
+
+          <div className="absolute right-5 top-5 rounded-full border border-white/35 bg-black/20 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md md:right-7 md:top-7">
+            {String(activeIndex + 1).padStart(2, "0")} /{" "}
+            {String(hoverImages.length).padStart(2, "0")}
+          </div>
+
+          <div className="absolute bottom-5 left-5 right-5 flex gap-1.5 md:bottom-7 md:left-7 md:right-7">
+            {hoverImages.map((_, index) => (
+              <span
+                key={`${project.slug}-progress-${index}`}
+                className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/35"
+              >
+                <span
+                  className={`absolute inset-y-0 left-0 bg-white transition-all duration-500 ${
+                    activeIndex === index ? "w-full" : "w-0"
+                  }`}
+                />
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -197,7 +258,9 @@ export default function PortfolioCategoryClient({
   nextCategory,
   projects,
 }: PortfolioCategoryClientProps) {
-  const isBannerCategory = currentCategory.slug === "banner";
+  const isBannerCategory =
+    currentCategory.slug === "banner";
+
   const hasProjects = projects.length > 0;
 
   return (
@@ -288,18 +351,10 @@ export default function PortfolioCategoryClient({
         {hasProjects ? (
           <div className="mt-16 grid items-start gap-7 md:mt-24 md:grid-cols-2 md:gap-9">
             {projects.map((project, index) => {
-              /*
-               * 0, 4, 8번째 프로젝트는 넓은 카드
-               * 프로젝트가 1개뿐인 카테고리도 전체 너비 사용
-               */
               const isOnlyProject = projects.length === 1;
               const isWideCard =
                 isOnlyProject || index % 4 === 0;
 
-              /*
-               * 일반 프로젝트는 카드마다 미세하게 높이를 엇갈리게 배치
-               * 넓은 카드는 오프셋을 적용하지 않음
-               */
               const cardOffset =
                 !isWideCard && index % 4 === 2
                   ? "md:mt-16"
@@ -307,7 +362,11 @@ export default function PortfolioCategoryClient({
                     ? "md:mt-8"
                     : "";
 
-              const imageCount = project.images.length || 1;
+              const imageCount =
+                project.images &&
+                project.images.length > 0
+                  ? project.images.length
+                  : 1;
 
               return (
                 <motion.div
@@ -355,33 +414,36 @@ export default function PortfolioCategoryClient({
                       }}
                       className="h-full overflow-hidden rounded-[28px] border border-black/5 bg-white/70 shadow-[0_18px_60px_rgba(57,48,40,0.05)] backdrop-blur-xl transition-shadow duration-500 group-hover:shadow-[0_36px_100px_rgba(57,48,40,0.14)] md:rounded-[38px]"
                     >
-                      {/* 다중 이미지 미리보기 */}
+                      {/* 프로젝트 이미지 */}
                       <div className="relative">
-                        <ProjectPreview
+                        <ProjectHoverPreview
                           project={project}
                           isWideCard={isWideCard}
                           priority={index < 2}
                         />
 
-                        {/* 어두운 하단 오버레이 */}
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent opacity-45 transition-opacity duration-500 group-hover:opacity-65" />
+                        {/* 하단 텍스트 가독성 오버레이 */}
+                        <div className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/65 via-black/5 to-transparent opacity-55 transition-opacity duration-500 group-hover:opacity-75" />
 
                         {/* 프로젝트 순번 */}
-                        <div className="absolute left-5 top-5 md:left-7 md:top-7">
+                        <div className="absolute left-5 top-5 z-30 md:left-7 md:top-7">
                           <span className="inline-flex rounded-full border border-white/35 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
-                            {String(index + 1).padStart(2, "0")}
+                            {String(index + 1).padStart(
+                              2,
+                              "0",
+                            )}
                           </span>
                         </div>
 
                         {/* 이미지 수 */}
-                        <div className="absolute right-5 top-5 md:right-7 md:top-7">
+                        <div className="absolute right-5 top-5 z-30 transition-opacity duration-300 group-hover:opacity-0 md:right-7 md:top-7">
                           <span className="inline-flex rounded-full border border-white/35 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md">
                             {getImageLabel(imageCount)}
                           </span>
                         </div>
 
-                        {/* 이미지 위 프로젝트명 */}
-                        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-5 p-6 text-white md:p-9">
+                        {/* 프로젝트 제목 */}
+                        <div className="absolute inset-x-0 bottom-0 z-30 flex items-end justify-between gap-5 p-6 text-white md:p-9">
                           <div>
                             <p className="text-[10px] font-semibold tracking-[0.2em] text-white/70 md:text-xs">
                               {project.subtitle}
@@ -448,10 +510,7 @@ export default function PortfolioCategoryClient({
             })}
           </div>
         ) : currentCategory.images.length > 0 ? (
-          /*
-           * 기존 레거시 이미지
-           * projects.ts로 옮기지 않은 카테고리가 있을 경우에만 표시
-           */
+          /* 레거시 이미지 */
           <div
             className={`mt-16 grid gap-6 md:mt-24 ${
               isBannerCategory
@@ -465,7 +524,7 @@ export default function PortfolioCategoryClient({
 
               return (
                 <motion.article
-                  key={image}
+                  key={`${image}-${index}`}
                   initial={{
                     opacity: 0,
                     y: 42,
@@ -517,7 +576,10 @@ export default function PortfolioCategoryClient({
 
                     <div className="absolute left-5 top-5">
                       <span className="rounded-full border border-white/35 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
-                        {String(index + 1).padStart(2, "0")}
+                        {String(index + 1).padStart(
+                          2,
+                          "0",
+                        )}
                       </span>
                     </div>
                   </div>
@@ -561,8 +623,8 @@ export default function PortfolioCategoryClient({
             </h2>
 
             <p className="mx-auto mt-6 max-w-xl text-base leading-8 text-[var(--text)]">
-              새로운 프로젝트와 함께 카테고리별 작업물을 순차적으로
-              업데이트할 예정입니다.
+              새로운 프로젝트와 함께 카테고리별 작업물을
+              순차적으로 업데이트할 예정입니다.
             </p>
           </motion.div>
         )}
@@ -593,7 +655,10 @@ export default function PortfolioCategoryClient({
             NEXT CATEGORY
           </p>
 
-          <Link href={nextCategory.href} className="group mt-6 block">
+          <Link
+            href={nextCategory.href}
+            className="group mt-6 block"
+          >
             <motion.div
               whileHover={{
                 y: -6,
@@ -609,7 +674,8 @@ export default function PortfolioCategoryClient({
             >
               <div>
                 <p className="text-xs font-semibold tracking-[0.2em] text-white/50">
-                  {nextCategory.number} · {nextCategory.subtitle}
+                  {nextCategory.number} ·{" "}
+                  {nextCategory.subtitle}
                 </p>
 
                 <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white md:text-6xl">

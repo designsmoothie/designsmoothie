@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { motion, useReducedMotion } from "motion/react";
 
 const process = [
   {
@@ -28,7 +31,16 @@ const process = [
   },
 ];
 
+const ease = [0.22, 1, 0.36, 1] as [
+  number,
+  number,
+  number,
+  number,
+];
+
 export default function Process() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section
       id="process"
@@ -36,7 +48,34 @@ export default function Process() {
     >
       <div className="mx-auto max-w-[1440px] px-6 md:px-12">
         <div className="grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-24">
-          <div>
+          <motion.div
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    opacity: 0,
+                    y: 36,
+                    filter: "blur(8px)",
+                  }
+            }
+            whileInView={
+              reduceMotion
+                ? undefined
+                : {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                  }
+            }
+            viewport={{
+              once: true,
+              amount: 0.25,
+            }}
+            transition={{
+              duration: 0.85,
+              ease,
+            }}
+          >
             <p className="text-xs font-semibold tracking-[0.28em] text-[var(--muted)]">
               OUR PROCESS
             </p>
@@ -48,47 +87,73 @@ export default function Process() {
             </h2>
 
             <p className="mt-8 max-w-lg text-base leading-8 text-[var(--text)] md:text-lg">
-              필요한 내용을 명확하게 정리하고, 각 단계마다 진행 상황을
-              공유합니다. 처음 디자인을 의뢰하는 경우에도 어렵지 않게
-              진행할 수 있습니다.
+              필요한 내용을 명확하게 정리하고,
+              각 단계마다 진행 상황을 공유합니다.
+              처음 디자인을 의뢰하는 경우에도
+              어렵지 않게 진행할 수 있습니다.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#cbe96a]"
+                className="premium-button inline-flex items-center rounded-full bg-[var(--green)] px-7 py-3.5 text-sm font-semibold text-[var(--text-dark)] hover:bg-[var(--green-hover)]"
               >
                 프로젝트 문의하기
-                <span className="ml-2">→</span>
               </Link>
 
               <Link
                 href="/guide"
-                className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/55 px-7 py-3.5 text-sm font-semibold text-[var(--text)] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-[var(--text-dark)] hover:text-[var(--text-dark)]"
+                className="premium-button inline-flex items-center rounded-full border border-black/10 bg-white/60 px-7 py-3.5 text-sm font-semibold backdrop-blur-sm hover:border-[var(--text-dark)]"
               >
                 의뢰 안내 보기
-                <span className="ml-2">→</span>
               </Link>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="overflow-hidden rounded-[32px] border border-black/5 bg-white/70 shadow-[0_24px_80px_rgba(0,0,0,0.05)] backdrop-blur-xl md:rounded-[44px]">
+          <div className="overflow-hidden rounded-[40px] border border-black/5 bg-white/70 shadow-[0_24px_80px_rgba(0,0,0,.05)] backdrop-blur-xl">
             {process.map((item, index) => (
-              <article
+              <motion.article
                 key={item.number}
-                className={`group grid gap-6 p-7 transition-colors duration-300 hover:bg-white/80 md:grid-cols-[82px_0.55fr_1fr] md:items-center md:gap-8 md:p-10 ${
+                initial={
+                  reduceMotion
+                    ? false
+                    : {
+                        opacity: 0,
+                        x: 30,
+                      }
+                }
+                whileInView={
+                  reduceMotion
+                    ? undefined
+                    : {
+                        opacity: 1,
+                        x: 0,
+                      }
+                }
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  duration: 0.6,
+                  delay: reduceMotion ? 0 : index * 0.07,
+                  ease,
+                }}
+                whileHover={
+                  reduceMotion
+                    ? undefined
+                    : {
+                        x: 6,
+                      }
+                }
+                className={`group grid gap-6 p-8 transition-colors duration-300 hover:bg-white/85 md:grid-cols-[90px_0.55fr_1fr] md:items-center md:p-10 ${
                   index !== process.length - 1
                     ? "border-b border-black/5"
                     : ""
                 }`}
               >
-                <div className="flex items-center justify-between md:block">
+                <div className="flex justify-between md:block">
                   <span className="text-sm font-semibold tracking-[0.18em] text-[var(--green)]">
                     {item.number}
-                  </span>
-
-                  <span className="text-sm text-[var(--muted)] md:hidden">
-                    {index !== process.length - 1 ? "↓" : "✓"}
                   </span>
                 </div>
 
@@ -101,16 +166,39 @@ export default function Process() {
                     {item.text}
                   </p>
 
-                  <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/8 text-sm text-[var(--muted)] transition duration-300 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:flex">
+                  <span className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-black/10 text-sm transition-all duration-300 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] group-hover:text-[var(--text-dark)] md:flex">
                     {index !== process.length - 1 ? "↓" : "✓"}
                   </span>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
 
-        <div className="mt-20 flex flex-col justify-between gap-8 border-t border-[var(--line)] pt-10 md:mt-28 md:flex-row md:items-center md:pt-12">
+        <motion.div
+          initial={
+            reduceMotion
+              ? false
+              : {
+                  opacity: 0,
+                }
+          }
+          whileInView={
+            reduceMotion
+              ? undefined
+              : {
+                  opacity: 1,
+                }
+          }
+          viewport={{
+            once: true,
+          }}
+          transition={{
+            duration: 0.8,
+            delay: 0.25,
+          }}
+          className="mt-20 flex flex-col justify-between gap-8 border-t border-[var(--line)] pt-10 md:mt-28 md:flex-row md:items-center md:pt-12"
+        >
           <p className="text-sm leading-7 text-[var(--muted)]">
             프로젝트의 범위와 제작 방식에 따라
             <br className="hidden sm:block" />
@@ -120,7 +208,7 @@ export default function Process() {
           <p className="text-xs font-semibold tracking-[0.2em] text-[var(--muted)]">
             CLEAR PROCESS · SMOOTH COMMUNICATION
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
