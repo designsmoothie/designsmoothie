@@ -7,11 +7,17 @@ import Hero from "@/components/Hero";
 import Header from "@/components/Header";
 import Process from "@/components/Process";
 import Reveal from "@/components/Reveal";
+import AdminAccessButton from "@/components/AdminAccessButton";
 
-export default function Home() {
+import { getCmsProjects } from "@/lib/portfolio-data";
+
+export default async function Home() {
+  const cmsProjects = await getCmsProjects();
+
   return (
     <>
       <Header />
+      <AdminAccessButton />
 
       <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
         <Hero />
@@ -21,7 +27,7 @@ export default function Home() {
         </Reveal>
 
         <Reveal>
-          <Portfolio />
+          <Portfolio cmsProjects={cmsProjects} />
         </Reveal>
 
         <Reveal>

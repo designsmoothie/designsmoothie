@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import type { PortfolioProject } from "@/data/projects";
+import type { CmsPortfolioProject } from "@/lib/portfolio";
 
 type PortfolioCategory = {
   number: string;
@@ -25,11 +25,11 @@ type PortfolioCategory = {
 type PortfolioCategoryClientProps = {
   currentCategory: PortfolioCategory;
   nextCategory: PortfolioCategory;
-  projects: PortfolioProject[];
+  projects: CmsPortfolioProject[];
 };
 
 type ProjectImagePreviewProps = {
-  project: PortfolioProject;
+  project: CmsPortfolioProject;
   isWide: boolean;
   priority: boolean;
   projectIndex: number;
@@ -45,7 +45,7 @@ const revealTransition = {
   ],
 };
 
-function getProjectImages(project: PortfolioProject) {
+function getProjectImages(project: CmsPortfolioProject) {
   if (project.images && project.images.length > 0) {
     return project.images;
   }

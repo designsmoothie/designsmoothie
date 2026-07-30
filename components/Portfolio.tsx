@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import { portfolioCategories } from "@/data/portfolio";
+import type { CmsPortfolioProject } from "@/lib/portfolio-data";
 
 const premiumEase = [0.22, 1, 0.36, 1] as [
   number,
@@ -11,6 +12,10 @@ const premiumEase = [0.22, 1, 0.36, 1] as [
   number,
   number,
 ];
+
+type PortfolioProps = {
+  cmsProjects: CmsPortfolioProject[];
+};
 
 type CategoryLayout = {
   wrapper: string;
@@ -99,7 +104,9 @@ function getCategoryLayout(index: number): CategoryLayout {
   };
 }
 
-export default function Portfolio() {
+export default function Portfolio({
+  cmsProjects,
+}: PortfolioProps) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -210,9 +217,20 @@ export default function Portfolio() {
               const isBanner =
                 category.slug === "banner";
 
-              const previewImages = isBanner
-                ? category.images.slice(0, 3)
-                : category.images.slice(0, 4);
+              const previewLimit = isBanner ? 3 : 4;
+
+const previewImages = cmsProjects
+  .filter(
+    (project) =>
+      project.category === category.slug &&
+      Boolean(project.thumbnail),
+  )
+  .sort(
+    (a, b) =>
+      a.displayOrder - b.displayOrder,
+  )
+  .slice(0, previewLimit)
+  .map((project) => project.thumbnail);
 
               const hasImages =
                 previewImages.length > 0;

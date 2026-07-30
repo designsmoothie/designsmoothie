@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import type { PortfolioProject } from "@/data/projects";
+
+import type { CmsPortfolioProject } from "@/lib/portfolio";
 
 type ProjectHoverPreviewProps = {
-  project: PortfolioProject;
+  project: CmsPortfolioProject;
   isWideCard: boolean;
   priority?: boolean;
 };
