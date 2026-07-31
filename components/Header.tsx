@@ -24,6 +24,14 @@ const menuItems = [
     href: "/#portfolio",
     sectionId: "portfolio",
   },
+
+  {
+  label: "BLOG",
+  description: "Latest Journal",
+  href: "/blog",
+  sectionId: "journal",
+},
+
   {
     label: "ABOUT",
     description: "Design Smoothie",
@@ -93,6 +101,11 @@ export default function Header() {
       setActiveMenu("PORTFOLIO");
       return;
     }
+
+    if (pathname.startsWith("/blog")) {
+  setActiveMenu("BLOG");
+  return;
+}
 
     if (pathname.startsWith("/contact")) {
       setActiveMenu("CONTACT");

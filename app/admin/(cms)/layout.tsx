@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import type {
+  ReactNode,
+} from "react";
 import Link from "next/link";
 
 import AdminLogoutButton from "@/components/AdminLogoutButton";
@@ -6,6 +8,37 @@ import AdminLogoutButton from "@/components/AdminLogoutButton";
 type CmsLayoutProps = {
   children: ReactNode;
 };
+
+const adminLinks = [
+  {
+    href: "/admin/dashboard",
+    label: "대시보드",
+  },
+  {
+    href: "/admin/projects",
+    label: "프로젝트",
+  },
+  {
+    href: "/admin/categories",
+    label: "카테고리",
+  },
+  {
+    href: "/admin/blog",
+    label: "블로그",
+  },
+  {
+    href: "/admin/inquiries",
+    label: "문의관리",
+  },
+  {
+    href: "/admin/seo",
+    label: "SEO",
+  },
+  {
+    href: "/admin/settings",
+    label: "설정",
+  },
+];
 
 export default function CmsLayout({
   children,
@@ -22,27 +55,16 @@ export default function CmsLayout({
               Design Smoothie CMS
             </Link>
 
-            <nav className="hidden items-center gap-1 md:flex">
-              <Link
-                href="/admin/dashboard"
-                className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
-              >
-                대시보드
-              </Link>
-
-              <Link
-                href="/admin/projects"
-                className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
-              >
-                프로젝트
-              </Link>
-
-              <Link
-                href="/admin/categories"
-                className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
-              >
-                카테고리
-              </Link>
+            <nav className="hidden items-center gap-1 lg:flex">
+              {adminLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
 
@@ -54,6 +76,7 @@ export default function CmsLayout({
               className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-black/10 bg-white px-4 text-xs font-semibold text-neutral-700 transition hover:border-[#94b63f] hover:bg-[#94b63f]/10 hover:text-[#587019]"
             >
               홈페이지 보기
+
               <span aria-hidden="true">
                 ↗
               </span>
@@ -63,27 +86,16 @@ export default function CmsLayout({
           </div>
         </div>
 
-        <nav className="flex items-center gap-1 overflow-x-auto border-t border-black/5 px-4 py-2 md:hidden">
-          <Link
-            href="/admin/dashboard"
-            className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
-          >
-            대시보드
-          </Link>
-
-          <Link
-            href="/admin/projects"
-            className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
-          >
-            프로젝트
-          </Link>
-
-          <Link
-            href="/admin/categories"
-            className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
-          >
-            카테고리
-          </Link>
+        <nav className="flex items-center gap-1 overflow-x-auto border-t border-black/5 px-4 py-2 lg:hidden">
+          {adminLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="shrink-0 rounded-lg px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:bg-neutral-100 hover:text-neutral-950"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
       </header>
 

@@ -10,6 +10,7 @@ import Reveal from "@/components/Reveal";
 import AdminAccessButton from "@/components/AdminAccessButton";
 
 import { getCmsProjects } from "@/lib/portfolio-data";
+import LatestJournal from "@/components/LatestJournal";
 
 export default async function Home() {
   const cmsProjects = await getCmsProjects();
@@ -27,12 +28,16 @@ export default async function Home() {
         </Reveal>
 
         <Reveal>
-          <Portfolio cmsProjects={cmsProjects} />
-        </Reveal>
+  <Portfolio cmsProjects={cmsProjects} />
+</Reveal>
 
-        <Reveal>
-          <About />
-        </Reveal>
+<Reveal>
+  <LatestJournal />
+</Reveal>
+
+<Reveal>
+  <About />
+</Reveal>
 
         <Reveal>
           <Process />
