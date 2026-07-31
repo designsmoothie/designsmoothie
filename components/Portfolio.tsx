@@ -82,13 +82,13 @@ type CategoryShowcaseProps = {
 function getPreviewAspectClass(
   previewRatio: PreviewRatio,
 ) {
-  if (previewRatio === "banner") {
-    return [
-      "aspect-[4/3]",
-      "sm:aspect-[3/2]",
-      "lg:aspect-[1.2/1]",
-    ].join(" ");
-  }
+ if (previewRatio === "banner") {
+  return [
+    "aspect-[4/3]",
+    "sm:aspect-[1.35/1]",
+    "lg:aspect-[1.05/1]",
+  ].join(" ");
+}
 
   if (previewRatio === "tall") {
     return [
@@ -412,7 +412,11 @@ function CategoryShowcase({
                       slideIndex === 0
                     }
                     sizes="(max-width: 1024px) 100vw, 66vw"
-                    className={`object-cover will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[7600ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${imageState}`}
+                    className={`will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[7600ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
+  currentSlide.previewRatio === "banner"
+    ? "object-contain bg-[#f5f4f0]"
+    : "object-cover"
+} ${imageState}`}
                   />
                 );
               },
