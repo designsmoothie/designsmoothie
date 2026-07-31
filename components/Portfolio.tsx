@@ -13,7 +13,10 @@ import {
 } from "motion/react";
 
 import { portfolioCategories } from "@/data/portfolio";
-import type { CmsPortfolioProject } from "@/lib/portfolio-data";
+import type {
+  CmsPortfolioProject,
+  PreviewRatio,
+} from "@/lib/portfolio-data";
 
 const premiumEase = [0.22, 1, 0.36, 1] as [
   number,
@@ -29,19 +32,20 @@ const HOLD_DURATION = 1200;
 
 /**
  * 이전 이미지와 다음 이미지가
- * 겹쳐서 전환되는 시간
+ * 서로 겹치며 전환되는 시간
  */
-const TRANSITION_DURATION = 5600;
+const TRANSITION_DURATION = 7600;
 
 /**
- * 첫 전환 이후 다음 이미지가 시작되는 전체 주기
+ * 다음 슬라이드 전환 시작 간격
+ *
+ * 7.6초 전환 + 1.2초 정지
  */
 const SLIDE_CYCLE =
-  HOLD_DURATION + TRANSITION_DURATION;
+  TRANSITION_DURATION + HOLD_DURATION;
 
 /**
- * 메인 페이지 성능을 위해
- * 카테고리별 최대 노출 이미지 수를 제한합니다.
+ * 카테고리별 메인 노출 이미지 수
  */
 const MAX_SLIDES_PER_CATEGORY = 12;
 
@@ -55,13 +59,17 @@ type PortfolioCategory =
 type ProjectSlide = {
   key: string;
   image: string;
+
   projectId: string;
   projectSlug: string;
   projectTitle: string;
+
   summary: string;
   client: string;
   year: string;
   location: string;
+
+  previewRatio: PreviewRatio;
 };
 
 type CategoryShowcaseProps = {
@@ -70,6 +78,40 @@ type CategoryShowcaseProps = {
   slides: ProjectSlide[];
   reduceMotion: boolean;
 };
+
+function getPreviewAspectClass(
+  previewRatio: PreviewRatio,
+) {
+  if (previewRatio === "banner") {
+    return [
+      "aspect-[4/3]",
+      "sm:aspect-[3/2]",
+      "lg:aspect-[1.2/1]",
+    ].join(" ");
+  }
+
+  if (previewRatio === "tall") {
+    return [
+      "aspect-[4/3]",
+      "sm:aspect-[3/2]",
+      "lg:aspect-[1.38/1]",
+    ].join(" ");
+  }
+
+  if (previewRatio === "standard") {
+    return [
+      "aspect-[4/3]",
+      "sm:aspect-[16/10]",
+      "lg:aspect-[1.55/1]",
+    ].join(" ");
+  }
+
+  return [
+    "aspect-[4/3]",
+    "sm:aspect-[16/10]",
+    "lg:aspect-[1.72/1]",
+  ].join(" ");
+}
 
 function createCategorySlides(
   projects: CmsPortfolioProject[],
@@ -104,13 +146,18 @@ function createCategorySlides(
       slides.push({
         key: `${project.id}-${imageIndex}`,
         image,
+
         projectId: project.id,
         projectSlug: project.slug,
         projectTitle: project.title,
+
         summary: project.summary,
         client: project.client,
         year: project.year,
         location: project.location,
+
+        previewRatio:
+          project.categoryPreviewRatio,
       });
 
       if (
@@ -148,12 +195,12 @@ function CategoryShowcase({
     useState(false);
 
   useEffect(() => {
-    setCurrentIndex(
+    const nextInitialIndex =
       slides.length > 0
         ? categoryIndex % slides.length
-        : 0,
-    );
+        : 0;
 
+    setCurrentIndex(nextInitialIndex);
     setPreviousIndex(null);
     setHasStarted(false);
   }, [categoryIndex, slides]);
@@ -167,12 +214,12 @@ function CategoryShowcase({
     }
 
     /*
-     * 처음 화면에서는 2.8초 머문 뒤 전환합니다.
+     * 첫 이미지는 1.2초 정지한 뒤 전환을 시작합니다.
      *
-     * 이후에는:
+     * 그다음부터는:
      * 7.6초 전환
-     * + 2.8초 머무름
-     * = 10.4초마다 다음 이미지가 시작됩니다.
+     * + 1.2초 정지
+     * = 8.8초마다 다음 전환 시작
      */
     const delay = hasStarted
       ? SLIDE_CYCLE
@@ -204,23 +251,29 @@ function CategoryShowcase({
   if (slides.length === 0) {
     return (
       <article className="border-t border-[var(--line)] py-14 md:py-20 lg:py-[6vw]">
-        <div className="grid gap-8 lg:grid-cols-[minmax(260px,0.34fr)_minmax(0,0.66fr)] lg:items-center">
-          <CategoryInformation
-            category={category}
-            projectTitle=""
-            summary=""
-            slideNumber={0}
-            slideCount={0}
-          />
+        <div className="grid gap-9 lg:grid-cols-12 lg:items-center lg:gap-[4vw]">
+          <div className="lg:col-span-4">
+            <CategoryInformation
+              category={category}
+              projectTitle=""
+              summary=""
+              slideNumber={0}
+              slideCount={0}
+            />
+          </div>
 
-          <Link
-            href={category.href}
-            className={`flex aspect-[16/10] items-center justify-center overflow-hidden ${category.color}`}
-          >
-            <span className="section-label">
-              DESIGN SMOOTHIE
-            </span>
-          </Link>
+          <div className="lg:col-span-8">
+            <Link
+              href={category.href}
+              className={`flex items-center justify-center overflow-hidden bg-[#dedbd3] ${getPreviewAspectClass(
+                "wide",
+              )} ${category.color}`}
+            >
+              <span className="section-label">
+                DESIGN SMOOTHIE
+              </span>
+            </Link>
+          </div>
         </div>
       </article>
     );
@@ -234,6 +287,11 @@ function CategoryShowcase({
 
   const projectHref =
     `/portfolio/project/${currentSlide.projectSlug}`;
+
+  const imageAspectClass =
+    getPreviewAspectClass(
+      currentSlide.previewRatio,
+    );
 
   return (
     <motion.article
@@ -302,7 +360,7 @@ function CategoryShowcase({
         >
           <Link
             href={projectHref}
-            className="group relative block aspect-[4/3] overflow-hidden bg-[#dedbd3] sm:aspect-[16/10] lg:aspect-[1.72/1]"
+            className={`group relative block overflow-hidden bg-[#dedbd3] transition-[aspect-ratio] duration-700 ${imageAspectClass}`}
             aria-label={`${currentSlide.projectTitle} 프로젝트 상세 보기`}
           >
             {slides.map(
@@ -315,14 +373,32 @@ function CategoryShowcase({
                   previousIndex;
 
                 let imageState =
-                  "pointer-events-none z-0 translate-y-[2.5%] scale-[1.012] opacity-0 blur-[2px]";
+                  [
+                    "pointer-events-none",
+                    "z-0",
+                    "translate-y-[2%]",
+                    "scale-[1.012]",
+                    "opacity-0",
+                    "blur-[2px]",
+                  ].join(" ");
 
                 if (isActive) {
-                  imageState =
-                    "z-[2] translate-y-0 scale-100 opacity-100 blur-0";
+                  imageState = [
+                    "z-[2]",
+                    "translate-y-0",
+                    "scale-100",
+                    "opacity-100",
+                    "blur-0",
+                  ].join(" ");
                 } else if (isPrevious) {
-                  imageState =
-                    "pointer-events-none z-[1] -translate-y-[2.5%] scale-[1.006] opacity-0 blur-[1.5px]";
+                  imageState = [
+                    "pointer-events-none",
+                    "z-[1]",
+                    "-translate-y-[2%]",
+                    "scale-[1.006]",
+                    "opacity-0",
+                    "blur-[1.5px]",
+                  ].join(" ");
                 }
 
                 return (
@@ -342,7 +418,6 @@ function CategoryShowcase({
               },
             )}
 
-            {/* 이미지가 겹쳐지는 동안 톤을 자연스럽게 연결 */}
             <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-b from-black/[0.015] via-transparent to-black/[0.07]" />
 
             <div className="pointer-events-none absolute left-5 top-5 z-10 sm:left-7 sm:top-7">
@@ -363,7 +438,7 @@ function CategoryShowcase({
                   ).padStart(2, "0")}
                 </span>
 
-                <div className="h-px w-12 bg-white/40">
+                <div className="h-px w-12 overflow-hidden bg-white/40">
                   <motion.div
                     key={`${category.slug}-${currentIndex}`}
                     initial={{
@@ -510,6 +585,7 @@ export default function Portfolio({
       portfolioCategories.map(
         (category) => ({
           category,
+
           slides: createCategorySlides(
             cmsProjects,
             category.slug,
@@ -624,7 +700,10 @@ export default function Portfolio({
         <div className="mt-10 md:mt-16 lg:mt-[4vw]">
           {categorySlides.map(
             (
-              { category, slides },
+              {
+                category,
+                slides,
+              },
               categoryIndex,
             ) => (
               <CategoryShowcase

@@ -11,6 +11,16 @@ import {
   createClient,
 } from "@/lib/supabase/server";
 
+const previewRatioValues = [
+  "wide",
+  "standard",
+  "tall",
+  "banner",
+] as const;
+
+type PreviewRatio =
+  (typeof previewRatioValues)[number];
+
 function createSlug(value: string) {
   return value
     .trim()
@@ -19,6 +29,45 @@ function createSlug(value: string) {
     .replace(/[^a-z0-9가-힣-]/g, "")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function getPreviewRatio(
+  formData: FormData,
+): PreviewRatio {
+  const value = String(
+    formData.get("previewRatio") ?? "wide",
+  ).trim();
+
+  if (
+    previewRatioValues.includes(
+      value as PreviewRatio,
+    )
+  ) {
+    return value as PreviewRatio;
+  }
+
+  return "wide";
+}
+
+function revalidateCategoryPages() {
+  revalidatePath("/");
+
+  revalidatePath(
+    "/admin/categories",
+  );
+
+  revalidatePath(
+    "/admin/dashboard",
+  );
+
+  revalidatePath(
+    "/portfolio",
+  );
+
+  revalidatePath(
+    "/portfolio/category",
+    "layout",
+  );
 }
 
 export async function createCategory(
@@ -42,6 +91,9 @@ export async function createCategory(
     formData.get("color") ?? "#94b63f",
   ).trim();
 
+  const previewRatio =
+    getPreviewRatio(formData);
+
   if (!name) {
     redirect(
       "/admin/categories?error=name-required",
@@ -59,6 +111,7 @@ export async function createCategory(
 
   const {
     data: lastCategory,
+    error: orderError,
   } = await supabase
     .from("categories")
     .select("display_order")
@@ -68,8 +121,22 @@ export async function createCategory(
     .limit(1)
     .maybeSingle();
 
+  if (orderError) {
+    console.error(
+      "카테고리 순서 조회 오류:",
+      orderError,
+    );
+
+    redirect(
+      `/admin/categories?error=${encodeURIComponent(
+        orderError.message,
+      )}`,
+    );
+  }
+
   const nextDisplayOrder =
-    (lastCategory?.display_order ?? 0) + 1;
+    (lastCategory?.display_order ?? 0) +
+    1;
 
   const {
     error,
@@ -78,9 +145,16 @@ export async function createCategory(
     .insert({
       name,
       slug,
+
       description:
         description || null,
-      color: color || "#94b63f",
+
+      color:
+        color || "#94b63f",
+
+      preview_ratio:
+        previewRatio,
+
       display_order:
         nextDisplayOrder,
     });
@@ -98,18 +172,7 @@ export async function createCategory(
     );
   }
 
-  revalidatePath(
-    "/admin/categories",
-  );
-
-  revalidatePath(
-    "/portfolio",
-  );
-
-  revalidatePath(
-    "/portfolio/category",
-    "layout",
-  );
+  revalidateCategoryPages();
 
   redirect(
     "/admin/categories?success=created",
@@ -137,6 +200,9 @@ export async function updateCategory(
   const color = String(
     formData.get("color") ?? "#94b63f",
   ).trim();
+
+  const previewRatio =
+    getPreviewRatio(formData);
 
   if (!categoryId) {
     redirect(
@@ -166,14 +232,24 @@ export async function updateCategory(
     .update({
       name,
       slug,
+
       description:
         description || null,
+
       color:
         color || "#94b63f",
+
+      preview_ratio:
+        previewRatio,
     })
     .eq("id", categoryId);
 
   if (error) {
+    console.error(
+      "카테고리 수정 오류:",
+      error,
+    );
+
     redirect(
       `/admin/categories?error=${encodeURIComponent(
         error.message,
@@ -181,28 +257,12 @@ export async function updateCategory(
     );
   }
 
-  revalidatePath(
-    "/admin/categories",
-  );
-
-  revalidatePath(
-    "/admin/dashboard",
-  );
-
-  revalidatePath(
-    "/portfolio",
-  );
-
-  revalidatePath(
-    "/portfolio/category",
-    "layout",
-  );
+  revalidateCategoryPages();
 
   redirect(
     "/admin/categories?success=updated",
   );
 }
-
 
 export async function updateCategoryOrder(
   categories: {
@@ -238,22 +298,7 @@ export async function updateCategoryOrder(
     );
   }
 
-  revalidatePath(
-    "/admin/categories",
-  );
-
-  revalidatePath(
-    "/admin/dashboard",
-  );
-
-  revalidatePath(
-    "/portfolio",
-  );
-
-  revalidatePath(
-    "/portfolio/category",
-    "layout",
-  );
+  revalidateCategoryPages();
 }
 
 export async function deleteCategory(
@@ -286,7 +331,9 @@ export async function deleteCategory(
     );
   }
 
-  if ((connectedProjectCount ?? 0) > 0) {
+  if (
+    (connectedProjectCount ?? 0) > 0
+  ) {
     redirect(
       "/admin/categories?error=category-in-use",
     );
@@ -307,22 +354,7 @@ export async function deleteCategory(
     );
   }
 
-  revalidatePath(
-    "/admin/categories",
-  );
-
-  revalidatePath(
-    "/admin/dashboard",
-  );
-
-  revalidatePath(
-    "/portfolio",
-  );
-
-  revalidatePath(
-    "/portfolio/category",
-    "layout",
-  );
+  revalidateCategoryPages();
 
   redirect(
     "/admin/categories?success=deleted",

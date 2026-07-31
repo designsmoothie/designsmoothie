@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 
+export type PreviewRatio =
+  | "wide"
+  | "standard"
+  | "tall"
+  | "banner";
+
 export type CmsPortfolioProject = {
   id: string;
   slug: string;
@@ -7,6 +13,7 @@ export type CmsPortfolioProject = {
 
   category: string;
   categoryTitle: string;
+  categoryPreviewRatio: PreviewRatio;
   subtitle: string;
 
   client: string;
@@ -40,15 +47,15 @@ type ProjectImageRow = {
   is_thumbnail: boolean;
 };
 
+type CategoryItem = {
+  name: string;
+  slug: string;
+  preview_ratio: PreviewRatio | null;
+};
+
 type CategoryRelation =
-  | {
-      name: string;
-      slug: string;
-    }
-  | {
-      name: string;
-      slug: string;
-    }[]
+  | CategoryItem
+  | CategoryItem[]
   | null;
 
 type ProjectRow = {
@@ -94,6 +101,21 @@ function normalizeCategory(
   return relation;
 }
 
+function normalizePreviewRatio(
+  value: string | null | undefined,
+): PreviewRatio {
+  if (
+    value === "wide" ||
+    value === "standard" ||
+    value === "tall" ||
+    value === "banner"
+  ) {
+    return value;
+  }
+
+  return "wide";
+}
+
 function normalizeProject(
   project: ProjectRow,
 ): CmsPortfolioProject {
@@ -124,6 +146,12 @@ function normalizeProject(
 
     category: category?.slug ?? "",
     categoryTitle: category?.name ?? "",
+
+    categoryPreviewRatio:
+      normalizePreviewRatio(
+        category?.preview_ratio,
+      ),
+
     subtitle: project.subtitle ?? "",
 
     client: project.client ?? "",
@@ -134,20 +162,30 @@ function normalizeProject(
     services: project.services ?? [],
 
     summary: project.summary ?? "",
+
     overviewTitle:
       project.overview_title ?? "",
+
     overview: project.overview ?? "",
 
-    challenge: project.challenge ?? undefined,
-    solution: project.solution ?? undefined,
-    result: project.result ?? undefined,
+    challenge:
+      project.challenge ?? undefined,
+
+    solution:
+      project.solution ?? undefined,
+
+    result:
+      project.result ?? undefined,
 
     thumbnail,
+
     images: sortedImages.map(
       (image) => image.public_url,
     ),
 
-    featured: project.featured ?? false,
+    featured:
+      project.featured ?? false,
+
     displayOrder:
       project.display_order ?? 0,
 
@@ -155,7 +193,8 @@ function normalizeProject(
       project.seo_title ?? undefined,
 
     seoDescription:
-      project.seo_description ?? undefined,
+      project.seo_description ??
+      undefined,
   };
 }
 
@@ -187,7 +226,8 @@ export async function getCmsProjects() {
       seo_description,
       categories (
         name,
-        slug
+        slug,
+        preview_ratio
       ),
       project_images (
         public_url,
