@@ -1,20 +1,13 @@
 import Link from "next/link";
 
-import {
-  createClient,
-} from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import ProjectSortableList from "./ProjectSortableList";
-import type {
-  AdminProject,
-} from "./SortableProjectRow";
+import type { AdminProject } from "./SortableProjectRow";
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
 
-  const {
-    data: projects,
-    error,
-  } = await supabase
+  const { data: projects, error } = await supabase
     .from("projects")
     .select(`
       id,
@@ -95,30 +88,32 @@ export default async function ProjectsPage() {
 
         <Link
           href="/admin/projects/new"
-          className="rounded-xl bg-neutral-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+          className="inline-flex items-center justify-center rounded-xl bg-neutral-950 px-5 py-3 text-sm font-semibold !text-white transition hover:bg-neutral-800 hover:!text-white"
         >
           새 프로젝트
         </Link>
       </div>
 
       {normalizedProjects.length === 0 ? (
-        <section className="mt-8 flex min-h-72 flex-col items-center justify-center rounded-2xl bg-white px-6 text-center shadow-sm">
+        <section className="mt-8 flex min-h-72 flex-col items-center justify-center rounded-2xl border border-black/5 bg-white px-6 text-center shadow-sm">
           <p className="text-lg font-semibold">
             등록된 프로젝트가 없습니다.
           </p>
 
+          <p className="mt-2 text-sm text-neutral-500">
+            첫 번째 포트폴리오 프로젝트를 등록해보세요.
+          </p>
+
           <Link
             href="/admin/projects/new"
-            className="mt-6 rounded-xl border border-black/10 px-5 py-3 text-sm font-semibold"
+            className="mt-6 inline-flex items-center justify-center rounded-xl border border-black/10 bg-white px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-50"
           >
             첫 프로젝트 등록하기
           </Link>
         </section>
       ) : (
         <ProjectSortableList
-          initialProjects={
-            normalizedProjects
-          }
+          initialProjects={normalizedProjects}
         />
       )}
     </main>

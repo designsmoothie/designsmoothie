@@ -698,3 +698,55 @@ export async function updateProjectImageOrder(
     `/admin/projects/${projectId}/edit`,
   );
 }
+
+export async function updateCategoryOrder(
+  categories: {
+    id: string;
+    display_order: number;
+  }[],
+) {
+  const supabase = await createClient();
+
+  if (!categories.length) {
+    return;
+  }
+
+  const results = await Promise.all(
+    categories.map((category) =>
+      supabase
+        .from("categories")
+        .update({
+          display_order:
+            category.display_order,
+        })
+        .eq("id", category.id),
+    ),
+  );
+
+  const failedResult = results.find(
+    (result) => result.error,
+  );
+
+  if (failedResult?.error) {
+    throw new Error(
+      failedResult.error.message,
+    );
+  }
+
+  revalidatePath(
+    "/admin/categories",
+  );
+
+  revalidatePath(
+    "/admin/dashboard",
+  );
+
+  revalidatePath(
+    "/portfolio",
+  );
+
+  revalidatePath(
+    "/portfolio/category",
+    "layout",
+  );
+}

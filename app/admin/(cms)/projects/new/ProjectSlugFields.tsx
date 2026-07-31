@@ -54,7 +54,7 @@ export default function ProjectSlugFields({
           required
           value={title}
           onChange={handleTitleChange}
-          placeholder="예: Kyuzen"
+          placeholder="프로젝트명 기재"
           className={inputClass}
         />
       </label>
@@ -66,7 +66,7 @@ export default function ProjectSlugFields({
           required
           value={slug}
           onChange={handleSlugChange}
-          placeholder="예: kyuzen"
+          placeholder="홈페이지 주소(영문기재)"
           pattern="[a-z0-9-]+"
           className={inputClass}
         />
