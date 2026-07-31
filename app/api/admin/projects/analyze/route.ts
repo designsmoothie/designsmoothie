@@ -3,10 +3,12 @@ import { NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
 import { createClient } from "@/lib/supabase/server";
 
+export const runtime = "nodejs";
+
 const MAX_IMAGE_COUNT = 4;
 const MAX_IMAGE_SIZE = 6 * 1024 * 1024;
 
-type ImageContent = {
+type ImageInput = {
   type: "input_image";
   image_url: string;
   detail: "high";
@@ -108,7 +110,7 @@ export async function POST(
       return NextResponse.json(
         {
           message:
-            "분석할 이미지가 없습니다.",
+            "분석할 사진을 먼저 선택해주세요.",
         },
         {
           status: 400,
@@ -142,7 +144,7 @@ export async function POST(
       }
     }
 
-    const imageContents: ImageContent[] =
+    const imageInputs: ImageInput[] =
       await Promise.all(
         imageFiles.map(
           async (file) => ({
@@ -176,22 +178,23 @@ export async function POST(
             role: "system",
             content: `
 당신은 대한민국의 브랜딩, 사이니지, 공간 그래픽 디자인 전문 스튜디오
-'디자인스무디(Design SMOOTHIE)'의 포트폴리오 분석가입니다.
+'디자인스무디(Design SMOOTHIE)'의 이미지 분석가입니다.
 
-반드시 제공된 프로젝트 사진과 기본 정보만 근거로 분석하세요.
+이번 단계에서는 프로젝트 글을 작성하지 말고,
+사진에 실제로 보이는 디자인 요소만 분석하세요.
 
-중요 원칙:
+분석 원칙:
 
-1. 사진에서 확인되지 않는 사실은 지어내지 않습니다.
-2. 시공 방식, 재질, 조명 방식이 불확실하면 단정하지 않습니다.
-3. 불확실한 재질이나 간판 종류는 "추정" 또는 "확인 필요"라고 표현합니다.
-4. 매출 증가, 고객 반응, 의뢰 목적처럼 사진으로 확인할 수 없는 내용은 만들지 않습니다.
-5. 사진에 실제로 보이는 색상, 형태, 공간, 그래픽, 간판 요소를 중심으로 설명합니다.
-6. 입력된 프로젝트명, 카테고리, 클라이언트, 지역은 참고하되 사진과 충돌하면 억지로 맞추지 않습니다.
-7. 전문적이지만 일반 고객이 이해하기 쉬운 자연스러운 한국어를 사용합니다.
-8. SEO 키워드를 반복하거나 과장된 광고 문구를 사용하지 않습니다.
-9. Result에는 확인되지 않은 성과를 쓰지 말고 완성된 디자인에서 보이는 결과만 설명합니다.
-10. 사진만으로 작업 배경을 알 수 없으면 확인 가능한 디자인 과제를 중심으로 작성합니다.
+1. 사진에서 확인되지 않는 사실은 만들지 않습니다.
+2. 재질과 조명 방식이 불분명하면 "추정" 또는 "확인 필요"라고 표시합니다.
+3. 프로젝트의 의뢰 배경, 고객 요구, 매출, 반응, 성과는 추측하지 않습니다.
+4. 이미지에 보이는 색상, 형태, 그래픽, 공간, 간판, 조명, 마감 요소를 분석합니다.
+5. 여러 사진이 같은 프로젝트라면 전체 사진을 종합하여 분석합니다.
+6. 브랜드명이나 프로젝트명은 이미지와 기본 정보에서 확인되는 범위만 사용합니다.
+7. 전문가가 검토하기 쉽게 짧고 명확한 한국어로 작성합니다.
+8. 재질이나 간판 종류를 확신할 수 없으면 단정하지 않습니다.
+9. 신뢰도는 0부터 100 사이의 정수로 작성합니다.
+10. 디자인 피드백은 비난이 아니라 내부 검토용 전문 의견으로 작성합니다.
             `.trim(),
           },
 
@@ -201,30 +204,31 @@ export async function POST(
               {
                 type: "input_text",
                 text: `
-아래 프로젝트 정보와 첨부 이미지를 함께 분석해주세요.
+다음 프로젝트 정보와 이미지를 분석해주세요.
 
 ${projectInformation}
 
-분석 후 다음 항목을 작성하세요.
+아래 내용을 분석하세요.
 
 - 업종
+- 상위 업종 분류
 - 주요 색상
-- 확인되거나 합리적으로 추정 가능한 재질
+- 보조 색상
+- 재질
 - 간판 또는 디자인 종류
-- 핵심 디자인 특징
-- 프로젝트 요약
-- 작업 배경 또는 사진에서 확인 가능한 디자인 과제
-- Challenge
-- Solution
-- Result
-- SEO 제목
-- SEO 설명
+- 조명 방식
+- 디자인 스타일
+- 디자인 특징
+- 사진에서 확인되는 핵심 포인트
+- 추천 검색 키워드
+- 내부 검토용 디자인 피드백
+- 각 주요 판단의 신뢰도
 
-확인되지 않는 사실은 절대 만들어내지 마세요.
+이번 요청에서는 프로젝트 소개글이나 SEO 문장을 작성하지 마세요.
                 `.trim(),
               },
 
-              ...imageContents,
+              ...imageInputs,
             ],
           },
         ],
@@ -232,107 +236,149 @@ ${projectInformation}
         text: {
           format: {
             type: "json_schema",
-            name: "project_image_analysis",
+            name: "project_visual_analysis",
             strict: true,
             schema: {
               type: "object",
               additionalProperties: false,
+
               properties: {
-                analysis: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    industry: {
-                      type: "string",
-                    },
-                    colors: {
-                      type: "array",
-                      items: {
-                        type: "string",
-                      },
-                    },
-                    materials: {
-                      type: "array",
-                      items: {
-                        type: "string",
-                      },
-                    },
-                    signTypes: {
-                      type: "array",
-                      items: {
-                        type: "string",
-                      },
-                    },
-                    designFeatures: {
-                      type: "array",
-                      items: {
-                        type: "string",
-                      },
-                    },
-                  },
-                  required: [
-                    "industry",
-                    "colors",
-                    "materials",
-                    "signTypes",
-                    "designFeatures",
-                  ],
+                industry: {
+                  type: "string",
                 },
 
-                content: {
+                businessType: {
+                  type: "string",
+                },
+
+                mainColors: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                subColors: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                materials: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                signTypes: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                lighting: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                styles: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                designFeatures: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                visualPoints: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                keywords: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+
+                designerMemo: {
+                  type: "string",
+                },
+
+                confidence: {
                   type: "object",
                   additionalProperties: false,
+
                   properties: {
-                    summary: {
-                      type: "string",
+                    industry: {
+                      type: "integer",
                     },
-                    overview: {
-                      type: "string",
+
+                    materials: {
+                      type: "integer",
                     },
-                    challenge: {
-                      type: "string",
+
+                    signTypes: {
+                      type: "integer",
                     },
-                    solution: {
-                      type: "string",
+
+                    lighting: {
+                      type: "integer",
                     },
-                    result: {
-                      type: "string",
-                    },
-                    seoTitle: {
-                      type: "string",
-                    },
-                    seoDescription: {
-                      type: "string",
+
+                    overall: {
+                      type: "integer",
                     },
                   },
+
                   required: [
-                    "summary",
-                    "overview",
-                    "challenge",
-                    "solution",
-                    "result",
-                    "seoTitle",
-                    "seoDescription",
+                    "industry",
+                    "materials",
+                    "signTypes",
+                    "lighting",
+                    "overall",
                   ],
                 },
               },
+
               required: [
-                "analysis",
-                "content",
+                "industry",
+                "businessType",
+                "mainColors",
+                "subColors",
+                "materials",
+                "signTypes",
+                "lighting",
+                "styles",
+                "designFeatures",
+                "visualPoints",
+                "keywords",
+                "designerMemo",
+                "confidence",
               ],
             },
           },
         },
       });
 
-    const outputText =
-      response.output_text;
-
-    if (!outputText) {
+    if (!response.output_text) {
       return NextResponse.json(
         {
           message:
-            "AI가 분석 결과를 반환하지 못했습니다.",
+            "AI가 사진 분석 결과를 반환하지 못했습니다.",
         },
         {
           status: 500,
@@ -341,30 +387,13 @@ ${projectInformation}
     }
 
     const result = JSON.parse(
-      outputText,
-    ) as {
-      analysis: {
-        industry: string;
-        colors: string[];
-        materials: string[];
-        signTypes: string[];
-        designFeatures: string[];
-      };
-      content: {
-        summary: string;
-        overview: string;
-        challenge: string;
-        solution: string;
-        result: string;
-        seoTitle: string;
-        seoDescription: string;
-      };
-    };
+      response.output_text,
+    );
 
     return NextResponse.json(result);
   } catch (error) {
     console.error(
-      "프로젝트 이미지 AI 분석 실패:",
+      "프로젝트 사진 분석 실패:",
       error,
     );
 
@@ -373,7 +402,7 @@ ${projectInformation}
         message:
           error instanceof Error
             ? error.message
-            : "AI 이미지 분석 중 오류가 발생했습니다.",
+            : "사진 분석 중 오류가 발생했습니다.",
       },
       {
         status: 500,

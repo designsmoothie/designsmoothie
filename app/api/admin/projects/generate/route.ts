@@ -3,23 +3,42 @@ import { NextResponse } from "next/server";
 import { openai } from "@/lib/openai";
 import { createClient } from "@/lib/supabase/server";
 
-type GenerateProjectRequest = {
+export const runtime = "nodejs";
+
+type GenerateProjectBody = {
   title?: string;
-  subtitle?: string;
+  category?: string;
   client?: string;
-  year?: string;
   location?: string;
   industry?: string;
-  category?: string;
+  businessType?: string;
+  mainColors?: string;
+  subColors?: string;
+  materials?: string;
+  signTypes?: string;
+  lighting?: string;
+  styles?: string;
+  designFeatures?: string;
+  visualPoints?: string;
+  keywords?: string;
+  designerMemo?: string;
 };
 
 type GeneratedProjectContent = {
   summary: string;
-  background: string;
-  designPoints: string;
+  overview: string;
+  challenge: string;
+  solution: string;
+  result: string;
   seoTitle: string;
   seoDescription: string;
 };
+
+function cleanText(value: unknown) {
+  return typeof value === "string"
+    ? value.trim()
+    : "";
+}
 
 export async function POST(request: Request) {
   try {
@@ -40,15 +59,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as GenerateProjectRequest;
+    const body =
+      (await request.json()) as GenerateProjectBody;
 
-    const title = body.title?.trim() ?? "";
-    const subtitle = body.subtitle?.trim() ?? "";
-    const client = body.client?.trim() ?? "";
-    const year = body.year?.trim() ?? "";
-    const location = body.location?.trim() ?? "";
-    const industry = body.industry?.trim() ?? "";
-    const category = body.category?.trim() ?? "";
+    const title = cleanText(body.title);
 
     if (!title) {
       return NextResponse.json(
@@ -61,75 +75,123 @@ export async function POST(request: Request) {
       );
     }
 
-    const projectInformation = [
+    const visualAnalysis = [
       `프로젝트명: ${title}`,
-      `부제목: ${subtitle || "미입력"}`,
-      `클라이언트: ${client || "미입력"}`,
-      `제작 연도: ${year || "미입력"}`,
-      `지역: ${location || "미입력"}`,
-      `업종: ${industry || "미입력"}`,
-      `카테고리: ${category || "미입력"}`,
+      `카테고리: ${cleanText(body.category) || "미입력"}`,
+      `클라이언트: ${cleanText(body.client) || "미입력"}`,
+      `지역: ${cleanText(body.location) || "미입력"}`,
+      `업종: ${cleanText(body.industry) || "미입력"}`,
+      `상위 업종: ${cleanText(body.businessType) || "미입력"}`,
+      `주요 색상: ${cleanText(body.mainColors) || "확인되지 않음"}`,
+      `보조 색상: ${cleanText(body.subColors) || "확인되지 않음"}`,
+      `재질: ${cleanText(body.materials) || "확인되지 않음"}`,
+      `간판·디자인 종류: ${cleanText(body.signTypes) || "확인되지 않음"}`,
+      `조명 방식: ${cleanText(body.lighting) || "확인되지 않음"}`,
+      `디자인 스타일: ${cleanText(body.styles) || "확인되지 않음"}`,
+      `디자인 특징: ${cleanText(body.designFeatures) || "확인되지 않음"}`,
+      `핵심 시각 요소: ${cleanText(body.visualPoints) || "확인되지 않음"}`,
+      `추천 키워드: ${cleanText(body.keywords) || "미입력"}`,
+      `내부 디자이너 메모: ${cleanText(body.designerMemo) || "없음"}`,
     ].join("\n");
 
-    const completion = await openai.chat.completions.create({
+    const response = await openai.responses.create({
       model:
         process.env.OPENAI_TEXT_MODEL ??
         "gpt-4.1-mini",
-      response_format: {
-        type: "json_object",
-      },
-      temperature: 0.6,
-      messages: [
+
+      input: [
         {
           role: "system",
           content: `
 당신은 대한민국의 브랜딩, 사이니지, 공간 그래픽 디자인 전문 스튜디오
 '디자인스무디(Design SMOOTHIE)'의 포트폴리오 에디터입니다.
 
-사용자가 제공한 프로젝트 정보를 바탕으로
-실제 디자인 스튜디오 홈페이지에 게시할 수 있는 글을 작성하세요.
+이미 사진 분석이 끝난 프로젝트입니다.
+반드시 제공된 분석 정보만 바탕으로 포트폴리오 글을 작성하세요.
 
 작성 원칙:
 
 1. 제공되지 않은 사실은 지어내지 않습니다.
-2. 시공 여부, 매출 증가, 고객 반응 등 확인되지 않은 성과를 만들지 않습니다.
-3. 지나치게 감성적이거나 과장된 광고 문구를 피합니다.
-4. 전문적이지만 일반 고객이 쉽게 이해할 수 있는 한국어를 사용합니다.
-5. 모든 문장은 자연스러운 서술형으로 작성합니다.
-6. 같은 표현과 내용을 반복하지 않습니다.
-7. 디자인스무디의 작업 역량과 디자인 의도가 자연스럽게 드러나야 합니다.
-8. 검색 키워드를 억지로 반복하지 않습니다.
-9. 프로젝트명과 업종이 불분명한 경우 입력된 정보 안에서만 작성합니다.
-
-반드시 아래 JSON 구조만 출력하세요.
-
-{
-  "summary": "프로젝트 전체를 소개하는 2~3문장",
-  "background": "의뢰 또는 작업이 시작된 배경을 설명하는 2~3문장",
-  "designPoints": "색상, 형태, 가독성, 브랜드 인상 등 디자인의 핵심을 설명하는 2~4문장",
-  "seoTitle": "검색 결과에 사용할 35~55자 이내 제목",
-  "seoDescription": "검색 결과에 사용할 80~150자 이내 설명"
-}
+2. 의뢰인의 요구, 매출 증가, 고객 반응, 시공 성과를 추측하지 않습니다.
+3. 재질이나 조명 방식에 "추정" 또는 "확인 필요"가 포함되어 있다면 단정적으로 쓰지 않습니다.
+4. 디자인 결과물에서 확인 가능한 색상, 형태, 재질, 가독성, 분위기를 중심으로 작성합니다.
+5. 전문적이지만 일반 고객이 쉽게 이해할 수 있는 한국어를 사용합니다.
+6. 같은 내용을 여러 항목에서 반복하지 않습니다.
+7. 과장된 광고 문구와 감성적인 수사를 피합니다.
+8. Challenge는 사진과 분석에서 확인되는 디자인 과제를 설명합니다.
+9. Solution은 실제로 적용된 시각적 해결 방식을 설명합니다.
+10. Result는 확인되지 않은 성과가 아니라 완성된 디자인에서 보이는 결과를 설명합니다.
+11. SEO 문장에는 지역, 업종, 디자인 종류를 자연스럽게 사용하되 키워드를 반복하지 않습니다.
           `.trim(),
         },
         {
           role: "user",
           content: `
-다음 프로젝트 정보를 바탕으로 포트폴리오 콘텐츠를 작성해주세요.
+아래 프로젝트 정보와 이미지 분석 결과를 바탕으로 포트폴리오 콘텐츠를 작성해주세요.
 
-${projectInformation}
+${visualAnalysis}
           `.trim(),
         },
       ],
+
+      text: {
+        format: {
+          type: "json_schema",
+          name: "generated_project_content",
+          strict: true,
+          schema: {
+            type: "object",
+            additionalProperties: false,
+
+            properties: {
+              summary: {
+                type: "string",
+              },
+
+              overview: {
+                type: "string",
+              },
+
+              challenge: {
+                type: "string",
+              },
+
+              solution: {
+                type: "string",
+              },
+
+              result: {
+                type: "string",
+              },
+
+              seoTitle: {
+                type: "string",
+              },
+
+              seoDescription: {
+                type: "string",
+              },
+            },
+
+            required: [
+              "summary",
+              "overview",
+              "challenge",
+              "solution",
+              "result",
+              "seoTitle",
+              "seoDescription",
+            ],
+          },
+        },
+      },
     });
 
-    const rawContent =
-      completion.choices[0]?.message?.content;
-
-    if (!rawContent) {
+    if (!response.output_text) {
       return NextResponse.json(
         {
-          message: "AI가 내용을 생성하지 못했습니다.",
+          message:
+            "AI가 프로젝트 글을 반환하지 못했습니다.",
         },
         {
           status: 500,
@@ -137,31 +199,23 @@ ${projectInformation}
       );
     }
 
-    const parsed = JSON.parse(
-      rawContent,
-    ) as Partial<GeneratedProjectContent>;
-
-    const result: GeneratedProjectContent = {
-      summary: parsed.summary?.trim() ?? "",
-      background: parsed.background?.trim() ?? "",
-      designPoints:
-        parsed.designPoints?.trim() ?? "",
-      seoTitle: parsed.seoTitle?.trim() ?? "",
-      seoDescription:
-        parsed.seoDescription?.trim() ?? "",
-    };
+    const result = JSON.parse(
+      response.output_text,
+    ) as GeneratedProjectContent;
 
     return NextResponse.json(result);
   } catch (error) {
     console.error(
-      "프로젝트 AI 자동 생성 실패:",
+      "프로젝트 글 생성 실패:",
       error,
     );
 
     return NextResponse.json(
       {
         message:
-          "AI 콘텐츠 생성 중 오류가 발생했습니다.",
+          error instanceof Error
+            ? error.message
+            : "프로젝트 글 작성 중 오류가 발생했습니다.",
       },
       {
         status: 500,
