@@ -1,19 +1,28 @@
 import About from "@/components/About";
-import SiteFooter from "@/components/SiteFooter";
+import AdminAccessButton from "@/components/AdminAccessButton";
 import ContactSection from "@/components/ContactSection";
-import Portfolio from "@/components/Portfolio";
-import Service from "@/components/Service";
-import Hero from "@/components/Hero";
 import Header from "@/components/Header";
+import Hero from "@/components/Hero";
+import LatestJournal from "@/components/LatestJournal";
+import Portfolio from "@/components/Portfolio";
 import Process from "@/components/Process";
 import Reveal from "@/components/Reveal";
-import AdminAccessButton from "@/components/AdminAccessButton";
+import Service from "@/components/Service";
+import SiteFooter from "@/components/SiteFooter";
 
-import { getCmsProjects } from "@/lib/portfolio-data";
-import LatestJournal from "@/components/LatestJournal";
+import {
+  getCmsCategories,
+  getCmsProjects,
+} from "@/lib/portfolio-data";
 
 export default async function Home() {
-  const cmsProjects = await getCmsProjects();
+  const [
+    cmsProjects,
+    cmsCategories,
+  ] = await Promise.all([
+    getCmsProjects(),
+    getCmsCategories(),
+  ]);
 
   return (
     <>
@@ -28,16 +37,19 @@ export default async function Home() {
         </Reveal>
 
         <Reveal>
-  <Portfolio cmsProjects={cmsProjects} />
-</Reveal>
+          <Portfolio
+            cmsProjects={cmsProjects}
+            cmsCategories={cmsCategories}
+          />
+        </Reveal>
 
-<Reveal>
-  <LatestJournal />
-</Reveal>
+        <Reveal>
+          <LatestJournal />
+        </Reveal>
 
-<Reveal>
-  <About />
-</Reveal>
+        <Reveal>
+          <About />
+        </Reveal>
 
         <Reveal>
           <Process />

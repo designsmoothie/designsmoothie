@@ -12,8 +12,8 @@ import {
   useReducedMotion,
 } from "motion/react";
 
-import { portfolioCategories } from "@/data/portfolio";
 import type {
+  CmsPortfolioCategory,
   CmsPortfolioProject,
   PreviewRatio,
 } from "@/lib/portfolio-data";
@@ -51,10 +51,8 @@ const MAX_SLIDES_PER_CATEGORY = 12;
 
 type PortfolioProps = {
   cmsProjects: CmsPortfolioProject[];
+  cmsCategories: CmsPortfolioCategory[];
 };
-
-type PortfolioCategory =
-  (typeof portfolioCategories)[number];
 
 type ProjectSlide = {
   key: string;
@@ -73,7 +71,7 @@ type ProjectSlide = {
 };
 
 type CategoryShowcaseProps = {
-  category: PortfolioCategory;
+  category: CmsPortfolioCategory;
   categoryIndex: number;
   slides: ProjectSlide[];
   reduceMotion: boolean;
@@ -82,13 +80,13 @@ type CategoryShowcaseProps = {
 function getPreviewAspectClass(
   previewRatio: PreviewRatio,
 ) {
- if (previewRatio === "banner") {
-  return [
-    "aspect-[4/3]",
-    "sm:aspect-[1.35/1]",
-    "lg:aspect-[1.05/1]",
-  ].join(" ");
-}
+  if (previewRatio === "banner") {
+    return [
+      "aspect-[4/3]",
+      "sm:aspect-[1.35/1]",
+      "lg:aspect-[1.05/1]",
+    ].join(" ");
+  }
 
   if (previewRatio === "tall") {
     return [
@@ -213,14 +211,6 @@ function CategoryShowcase({
       return;
     }
 
-    /*
-     * 첫 이미지는 1.2초 정지한 뒤 전환을 시작합니다.
-     *
-     * 그다음부터는:
-     * 7.6초 전환
-     * + 1.2초 정지
-     * = 8.8초마다 다음 전환 시작
-     */
     const delay = hasStarted
       ? SLIDE_CYCLE
       : HOLD_DURATION;
@@ -265,9 +255,13 @@ function CategoryShowcase({
           <div className="lg:col-span-8">
             <Link
               href={category.href}
-              className={`flex items-center justify-center overflow-hidden bg-[#dedbd3] ${getPreviewAspectClass(
-                "wide",
-              )} ${category.color}`}
+              style={{
+                backgroundColor:
+                  category.color,
+              }}
+              className={`flex items-center justify-center overflow-hidden ${getPreviewAspectClass(
+                category.previewRatio,
+              )}`}
             >
               <span className="section-label">
                 DESIGN SMOOTHIE
@@ -372,15 +366,14 @@ function CategoryShowcase({
                   slideIndex ===
                   previousIndex;
 
-                let imageState =
-                  [
-                    "pointer-events-none",
-                    "z-0",
-                    "translate-y-[2%]",
-                    "scale-[1.012]",
-                    "opacity-0",
-                    "blur-[2px]",
-                  ].join(" ");
+                let imageState = [
+                  "pointer-events-none",
+                  "z-0",
+                  "translate-y-[2%]",
+                  "scale-[1.012]",
+                  "opacity-0",
+                  "blur-[2px]",
+                ].join(" ");
 
                 if (isActive) {
                   imageState = [
@@ -413,10 +406,11 @@ function CategoryShowcase({
                     }
                     sizes="(max-width: 1024px) 100vw, 66vw"
                     className={`will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[7600ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
-  currentSlide.previewRatio === "banner"
-    ? "object-contain bg-[#f5f4f0]"
-    : "object-cover"
-} ${imageState}`}
+                      currentSlide.previewRatio ===
+                      "banner"
+                        ? "object-contain bg-[#f5f4f0]"
+                        : "object-cover"
+                    } ${imageState}`}
                   />
                 );
               },
@@ -452,11 +446,10 @@ function CategoryShowcase({
                       scaleX: 1,
                     }}
                     transition={{
-                      duration:
-                        hasStarted
-                          ? SLIDE_CYCLE / 1000
-                          : HOLD_DURATION /
-                            1000,
+                      duration: hasStarted
+                        ? SLIDE_CYCLE / 1000
+                        : HOLD_DURATION /
+                          1000,
                       ease: "linear",
                     }}
                     className="h-full origin-left bg-white"
@@ -484,7 +477,7 @@ function CategoryInformation({
   slideNumber,
   slideCount,
 }: {
-  category: PortfolioCategory;
+  category: CmsPortfolioCategory;
   projectTitle: string;
   summary: string;
   slideNumber: number;
@@ -499,6 +492,12 @@ function CategoryInformation({
       <h3 className="mt-4 text-[2.8rem] font-semibold leading-[0.98] tracking-[-0.055em] text-[var(--text-dark)] sm:text-6xl lg:text-[4.8vw]">
         {category.title}
       </h3>
+
+      {category.description && (
+        <p className="body-large mt-7 max-w-md">
+          {category.description}
+        </p>
+      )}
 
       {projectTitle && (
         <motion.div
@@ -526,7 +525,7 @@ function CategoryInformation({
           </p>
 
           {summary && (
-            <p className="mt-4 max-w-md text-sm leading-7 text-[var(--muted)] md:text-base">
+            <p className="mt-4 line-clamp-2 max-w-md text-sm leading-7 text-[var(--muted)] md:text-base">
               {summary}
             </p>
           )}
@@ -547,22 +546,20 @@ function CategoryInformation({
         </motion.div>
       )}
 
-      <p className="body-large mt-8 max-w-md">
-        {category.description}
-      </p>
-
-      <div className="mt-7 flex flex-wrap gap-x-4 gap-y-2">
-        {category.services
-          .slice(0, 4)
-          .map((service) => (
-            <span
-              key={service}
-              className="text-[10px] font-semibold tracking-[0.12em] text-[var(--muted)]"
-            >
-              {service}
-            </span>
-          ))}
-      </div>
+      {category.services.length > 0 && (
+        <div className="mt-7 flex flex-wrap gap-x-4 gap-y-2">
+          {category.services
+            .slice(0, 4)
+            .map((service) => (
+              <span
+                key={service}
+                className="text-[10px] font-semibold tracking-[0.12em] text-[var(--muted)]"
+              >
+                {service}
+              </span>
+            ))}
+        </div>
+      )}
 
       <Link
         href={category.href}
@@ -580,23 +577,28 @@ function CategoryInformation({
 
 export default function Portfolio({
   cmsProjects,
+  cmsCategories,
 }: PortfolioProps) {
   const reduceMotion =
     useReducedMotion();
 
   const categorySlides = useMemo(
     () =>
-      portfolioCategories.map(
-        (category) => ({
+      [...cmsCategories]
+        .sort(
+          (a, b) =>
+            a.displayOrder -
+            b.displayOrder,
+        )
+        .map((category) => ({
           category,
 
           slides: createCategorySlides(
             cmsProjects,
             category.slug,
           ),
-        }),
-      ),
-    [cmsProjects],
+        })),
+    [cmsProjects, cmsCategories],
   );
 
   return (
@@ -711,7 +713,7 @@ export default function Portfolio({
               categoryIndex,
             ) => (
               <CategoryShowcase
-                key={category.slug}
+                key={category.id}
                 category={category}
                 categoryIndex={
                   categoryIndex

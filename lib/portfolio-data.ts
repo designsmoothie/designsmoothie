@@ -6,6 +6,23 @@ export type PreviewRatio =
   | "tall"
   | "banner";
 
+export type CmsPortfolioCategory = {
+  id: string;
+  slug: string;
+  title: string;
+
+  subtitle: string;
+  description: string;
+  services: string[];
+
+  color: string;
+  previewRatio: PreviewRatio;
+
+  displayOrder: number;
+  number: string;
+  href: string;
+};
+
 export type CmsPortfolioProject = {
   id: string;
   slug: string;
@@ -43,20 +60,30 @@ export type CmsPortfolioProject = {
 
 type ProjectImageRow = {
   public_url: string;
-  sort_order: number;
-  is_thumbnail: boolean;
+  sort_order: number | null;
+  is_thumbnail: boolean | null;
 };
 
-type CategoryItem = {
+type ProjectCategoryItem = {
   name: string;
   slug: string;
   preview_ratio: PreviewRatio | null;
 };
 
-type CategoryRelation =
-  | CategoryItem
-  | CategoryItem[]
+type ProjectCategoryRelation =
+  | ProjectCategoryItem
+  | ProjectCategoryItem[]
   | null;
+
+type PortfolioCategoryRow = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string | null;
+  preview_ratio: PreviewRatio | null;
+  display_order: number | null;
+};
 
 type ProjectRow = {
   id: string;
@@ -87,13 +114,13 @@ type ProjectRow = {
   seo_title: string | null;
   seo_description: string | null;
 
-  categories: CategoryRelation;
+  categories: ProjectCategoryRelation;
   project_images: ProjectImageRow[] | null;
 };
 
 function normalizeCategory(
-  relation: CategoryRelation,
-) {
+  relation: ProjectCategoryRelation,
+): ProjectCategoryItem | null {
   if (Array.isArray(relation)) {
     return relation[0] ?? null;
   }
@@ -126,7 +153,9 @@ function normalizeProject(
   const sortedImages = [
     ...(project.project_images ?? []),
   ].sort(
-    (a, b) => a.sort_order - b.sort_order,
+    (a, b) =>
+      (a.sort_order ?? 0) -
+      (b.sort_order ?? 0),
   );
 
   const thumbnailImage = sortedImages.find(
@@ -198,7 +227,73 @@ function normalizeProject(
   };
 }
 
-export async function getCmsProjects() {
+export async function getCmsCategories(): Promise<
+  CmsPortfolioCategory[]
+> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select(`
+      id,
+      name,
+      slug,
+      description,
+      color,
+      preview_ratio,
+      display_order
+    `)
+    .order("display_order", {
+      ascending: true,
+    });
+
+  if (error) {
+    console.error(
+      "홈페이지 카테고리 조회 실패:",
+      error,
+    );
+
+    return [];
+  }
+
+  return (
+    (data ?? []) as PortfolioCategoryRow[]
+  ).map((category, index) => ({
+    id: category.id,
+    slug: category.slug,
+    title: category.name,
+
+    subtitle: "PORTFOLIO CATEGORY",
+
+    description:
+      category.description ?? "",
+
+    services: [],
+
+    color:
+      category.color ?? "#94b63f",
+
+    previewRatio:
+      normalizePreviewRatio(
+        category.preview_ratio,
+      ),
+
+    displayOrder:
+      category.display_order ??
+      index + 1,
+
+    number: String(index + 1).padStart(
+      2,
+      "0",
+    ),
+
+    href: `/portfolio/category/${category.slug}`,
+  }));
+}
+
+export async function getCmsProjects(): Promise<
+  CmsPortfolioProject[]
+> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -224,11 +319,13 @@ export async function getCmsProjects() {
       display_order,
       seo_title,
       seo_description,
+
       categories (
         name,
         slug,
         preview_ratio
       ),
+
       project_images (
         public_url,
         sort_order,
@@ -250,12 +347,17 @@ export async function getCmsProjects() {
   }
 
   return (data ?? []).map((project) =>
-    normalizeProject(project as ProjectRow),
+    normalizeProject(
+      project as ProjectRow,
+    ),
   );
 }
 
-export async function getCmsFeaturedProjects() {
-  const projects = await getCmsProjects();
+export async function getCmsFeaturedProjects(): Promise<
+  CmsPortfolioProject[]
+> {
+  const projects =
+    await getCmsProjects();
 
   return projects.filter(
     (project) => project.featured,
@@ -264,23 +366,45 @@ export async function getCmsFeaturedProjects() {
 
 export async function getCmsProjectsByCategory(
   categorySlug: string,
-) {
-  const projects = await getCmsProjects();
+): Promise<CmsPortfolioProject[]> {
+  const projects =
+    await getCmsProjects();
 
   return projects.filter(
     (project) =>
-      project.category === categorySlug,
+      project.category ===
+      categorySlug,
   );
 }
 
 export async function getCmsProjectBySlug(
   slug: string,
-) {
-  const projects = await getCmsProjects();
+): Promise<CmsPortfolioProject | null> {
+  const projects =
+    await getCmsProjects();
 
   return (
     projects.find(
-      (project) => project.slug === slug,
+      (project) =>
+        project.slug === slug,
     ) ?? null
   );
+}
+
+/**
+ * 기존 페이지들이 이전 함수명을 사용하고 있어도
+ * 깨지지 않도록 호환용으로 유지합니다.
+ */
+export async function getProjectsByCategory(
+  categorySlug: string,
+): Promise<CmsPortfolioProject[]> {
+  return getCmsProjectsByCategory(
+    categorySlug,
+  );
+}
+
+export async function getProjectBySlug(
+  slug: string,
+): Promise<CmsPortfolioProject | null> {
+  return getCmsProjectBySlug(slug);
 }

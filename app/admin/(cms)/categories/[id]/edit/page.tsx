@@ -41,19 +41,16 @@ export default async function CategoryEditPage({
 
   const supabase = await createClient();
 
-  const {
-    data,
-    error,
-  } = await supabase
+  const { data, error } = await supabase
     .from("categories")
     .select(`
-  id,
-  name,
-  slug,
-  description,
-  color,
-  preview_ratio
-`)
+      id,
+      name,
+      slug,
+      description,
+      color,
+      preview_ratio
+    `)
     .eq("id", id)
     .maybeSingle();
 
@@ -77,17 +74,15 @@ export default async function CategoryEditPage({
 
   const category = data as Category;
 
-  const updateAction =
-    updateCategory.bind(
-      null,
-      category.id,
-    );
+  const updateAction = updateCategory.bind(
+    null,
+    category.id,
+  );
 
-  const deleteAction =
-    deleteCategory.bind(
-      null,
-      category.id,
-    );
+  const deleteAction = deleteCategory.bind(
+    null,
+    category.id,
+  );
 
   return (
     <main className="min-h-full bg-[#f7f7f5] px-6 py-8 md:px-10 md:py-10">
@@ -140,39 +135,49 @@ export default async function CategoryEditPage({
                 />
               </div>
 
+              <TextArea
+                label="카테고리 설명"
+                name="description"
+                defaultValue={
+                  category.description ?? ""
+                }
+                placeholder="홈페이지 메인 포트폴리오에 표시할 카테고리 설명을 입력하세요."
+              />
+
               <label className="grid gap-2">
-  <span className="text-sm font-semibold text-black">
-    메인 미리보기 비율
-  </span>
+                <span className="text-sm font-semibold text-black">
+                  메인 미리보기 비율
+                </span>
 
-  <select
-    name="previewRatio"
-    defaultValue={
-      category.preview_ratio ?? "wide"
-    }
-    className="h-12 rounded-xl border border-black/10 bg-white px-4 text-sm text-black outline-none transition focus:border-[#94b63f] focus:ring-4 focus:ring-[#94b63f]/10"
-  >
-    <option value="wide">
-      넓은 가로형
-    </option>
+                <select
+                  name="previewRatio"
+                  defaultValue={
+                    category.preview_ratio ??
+                    "wide"
+                  }
+                  className="h-12 rounded-xl border border-black/10 bg-white px-4 text-sm text-black outline-none transition focus:border-[#94b63f] focus:ring-4 focus:ring-[#94b63f]/10"
+                >
+                  <option value="wide">
+                    넓은 가로형
+                  </option>
 
-    <option value="standard">
-      기본 가로형
-    </option>
+                  <option value="standard">
+                    기본 가로형
+                  </option>
 
-    <option value="tall">
-      세로가 조금 긴 형식
-    </option>
+                  <option value="tall">
+                    세로가 조금 긴 형식
+                  </option>
 
-    <option value="banner">
-      배너 작업용
-    </option>
-  </select>
+                  <option value="banner">
+                    배너 작업용
+                  </option>
+                </select>
 
-  <span className="text-xs leading-5 text-black/40">
-    홈페이지 메인 포트폴리오에서 이 카테고리의 이미지 높이를 결정합니다.
-  </span>
-</label>
+                <span className="text-xs leading-5 text-black/40">
+                  홈페이지 메인 포트폴리오에서 이 카테고리의 이미지 높이를 결정합니다.
+                </span>
+              </label>
 
               <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                 <ColorInput
