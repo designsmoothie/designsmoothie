@@ -3,13 +3,15 @@ import Image from "next/image";
 import Link from "next/link";
 
 import PageTransition from "@/components/PageTransition";
-import { portfolioCategories } from "@/data/portfolio";
-import { getCmsProjects } from "@/lib/portfolio-data";
+import {
+  getCmsCategories,
+  getCmsProjects,
+} from "@/lib/portfolio-data";
 
 export const metadata: Metadata = {
   title: "포트폴리오",
   description:
-    "디자인스무디의 브랜딩, 간판, 파사드, 공간 그래픽, 인쇄물 및 배너 디자인 카테고리를 확인하세요.",
+    "디자인스무디의 브랜딩, 간판 및 파사드, 공간 디자인, 지주간판, 사인 시스템, 홈페이지 디자인 프로젝트를 확인하세요.",
   alternates: {
     canonical: "/portfolio",
   },
@@ -20,10 +22,18 @@ function formatCount(value: number) {
 }
 
 export default async function PortfolioPage() {
-  const projects = await getCmsProjects();
+  const [projects, cmsCategories] =
+    await Promise.all([
+      getCmsProjects(),
+      getCmsCategories(),
+    ]);
 
-  const categories = portfolioCategories.map(
-    (category) => {
+  const categories = [...cmsCategories]
+    .sort(
+      (a, b) =>
+        a.displayOrder - b.displayOrder,
+    )
+    .map((category) => {
       const categoryProjects = projects
         .filter(
           (project) =>
@@ -52,8 +62,7 @@ export default async function PortfolioPage() {
         leadProjectTitle:
           leadProject?.title ?? "",
       };
-    },
-  );
+    });
 
   return (
     <PageTransition>
@@ -126,7 +135,7 @@ export default async function PortfolioPage() {
                 categoryIndex,
               ) => (
                 <article
-                  key={category.slug}
+                  key={category.id}
                   className="group relative border-b border-[var(--line)]"
                 >
                   <Link
@@ -139,8 +148,7 @@ export default async function PortfolioPage() {
                       <span className="text-[10px] font-semibold tabular-nums tracking-[0.2em] text-[var(--muted)] transition-colors duration-300 group-hover:text-[var(--green)] md:text-xs">
                         {category.number ||
                           formatCount(
-                            categoryIndex +
-                              1,
+                            categoryIndex + 1,
                           )}
                       </span>
 
@@ -153,9 +161,7 @@ export default async function PortfolioPage() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                         <p className="text-[10px] font-semibold tracking-[0.18em] text-[var(--muted)] md:text-xs">
-                          {
-                            category.subtitle
-                          }
+                          {category.subtitle}
                         </p>
 
                         <span className="h-px w-5 bg-[var(--line)]" />
@@ -172,64 +178,84 @@ export default async function PortfolioPage() {
                         {category.title}
                       </h2>
 
-                      <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)] md:text-base md:leading-8">
-                        {
-                          category.description
-                        }
-                      </p>
+                      {category.description && (
+                        <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--muted)] md:text-base md:leading-8">
+                          {category.description}
+                        </p>
+                      )}
 
-                      <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
-                        {category.services
-                          .slice(0, 4)
-                          .map(
-                            (service) => (
-                              <span
-                                key={service}
-                                className="text-[9px] font-semibold tracking-[0.13em] text-[var(--muted)]"
-                              >
-                                {service}
-                              </span>
-                            ),
-                          )}
-                      </div>
+                      {category.services.length >
+                        0 && (
+                        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
+                          {category.services
+                            .slice(0, 4)
+                            .map(
+                              (service) => (
+                                <span
+                                  key={
+                                    service
+                                  }
+                                  className="text-[9px] font-semibold tracking-[0.13em] text-[var(--muted)]"
+                                >
+                                  {
+                                    service
+                                  }
+                                </span>
+                              ),
+                            )}
+                        </div>
+                      )}
                     </div>
 
                     {/* 데스크톱 호버 미리보기 */}
-                    {/* 데스크톱 호버 미리보기 */}
-<div className="relative hidden aspect-[4/3] lg:block">
-  {category.previewImage ? (
-    <div className="absolute inset-0 translate-x-7 scale-[0.96] overflow-hidden rounded-[2px] bg-[var(--cream)] opacity-0 shadow-[0_24px_70px_rgba(35,32,25,0)] transition-[opacity,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-[0_24px_70px_rgba(35,32,25,0.14)]">
-      <Image
-        src={category.previewImage}
-        alt={`${category.title} 대표 프로젝트 미리보기`}
-        fill
-        priority={categoryIndex === 0}
-        sizes="280px"
-        className="scale-[1.06] object-cover blur-[8px] transition-[transform,filter] duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:blur-0"
-      />
+                    <div className="relative hidden aspect-[4/3] lg:block">
+                      {category.previewImage ? (
+                        <div className="absolute inset-0 translate-x-7 scale-[0.96] overflow-hidden rounded-[2px] bg-[var(--cream)] opacity-0 shadow-[0_24px_70px_rgba(35,32,25,0)] transition-[opacity,transform,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100 group-hover:shadow-[0_24px_70px_rgba(35,32,25,0.14)]">
+                          <Image
+                            src={
+                              category.previewImage
+                            }
+                            alt={`${category.title} 대표 프로젝트 미리보기`}
+                            fill
+                            priority={
+                              categoryIndex ===
+                              0
+                            }
+                            sizes="280px"
+                            className="scale-[1.06] object-cover blur-[8px] transition-[transform,filter] duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-100 group-hover:blur-0"
+                          />
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/[0.04]" />
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/[0.04]" />
 
-      {category.leadProjectTitle && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-4 px-5 pb-5 pt-12 opacity-0 transition-[opacity,transform] delay-100 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
-          <p className="text-[9px] font-semibold tracking-[0.16em] text-white/70">
-            FEATURED PROJECT
-          </p>
+                          {category.leadProjectTitle && (
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-4 px-5 pb-5 pt-12 opacity-0 transition-[opacity,transform] delay-100 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
+                              <p className="text-[9px] font-semibold tracking-[0.16em] text-white/70">
+                                FEATURED
+                                PROJECT
+                              </p>
 
-          <p className="mt-2 truncate text-xs font-semibold tracking-[-0.01em] text-white">
-            {category.leadProjectTitle}
-          </p>
-        </div>
-      )}
-    </div>
-  ) : (
-    <div className="absolute inset-0 flex translate-x-7 items-center justify-center bg-[var(--cream)] opacity-0 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:opacity-100">
-      <span className="text-[9px] font-semibold tracking-[0.2em] text-[var(--muted)]">
-        DESIGN SMOOTHIE
-      </span>
-    </div>
-  )}
-</div>
+                              <p className="mt-2 truncate text-xs font-semibold tracking-[-0.01em] text-white">
+                                {
+                                  category.leadProjectTitle
+                                }
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            backgroundColor:
+                              category.color,
+                          }}
+                          className="absolute inset-0 flex translate-x-7 items-center justify-center opacity-0 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:opacity-100"
+                        >
+                          <span className="text-[9px] font-semibold tracking-[0.2em] text-[var(--text-dark)]">
+                            DESIGN SMOOTHIE
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* 데스크톱 화살표 */}
                     <div className="hidden items-center justify-end md:flex">
@@ -256,10 +282,10 @@ export default async function PortfolioPage() {
               </p>
 
               <p className="mt-5 max-w-sm text-sm leading-7 text-[var(--muted)] md:text-base md:leading-8">
-                브랜딩부터 사이니지와 공간
-                그래픽까지, 브랜드에 필요한
-                디자인을 하나의 흐름으로
-                연결합니다.
+                브랜딩부터 간판과 파사드,
+                공간 디자인과 홈페이지까지
+                브랜드에 필요한 디자인을
+                하나의 흐름으로 연결합니다.
               </p>
             </div>
 

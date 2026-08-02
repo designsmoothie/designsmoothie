@@ -287,7 +287,7 @@ export async function getCmsCategories(): Promise<
       "0",
     ),
 
-    href: `/portfolio/category/${category.slug}`,
+    href: `/portfolio/${category.slug}`, 
   }));
 }
 
