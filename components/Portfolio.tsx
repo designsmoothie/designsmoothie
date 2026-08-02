@@ -238,28 +238,66 @@ function CategoryShowcase({
     slides.length,
   ]);
 
+  const isReversed =
+    categoryIndex % 2 === 1;
+
+  /*
+   * 프로젝트가 없는 카테고리
+   */
   if (slides.length === 0) {
     return (
-      <article className="border-t border-[var(--line)] py-14 md:py-20 lg:py-[6vw]">
-        <div className="grid gap-9 lg:grid-cols-12 lg:items-center lg:gap-[4vw]">
-          <div className="lg:col-span-4">
-            <CategoryInformation
-              category={category}
-              projectTitle=""
-              summary=""
-              slideNumber={0}
-              slideCount={0}
-            />
-          </div>
-
-          <div className="lg:col-span-8">
+      <motion.article
+        initial={
+          reduceMotion
+            ? false
+            : {
+                opacity: 0,
+                y: 44,
+                filter: "blur(10px)",
+              }
+        }
+        whileInView={
+          reduceMotion
+            ? undefined
+            : {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+              }
+        }
+        viewport={{
+          once: true,
+          amount: 0.08,
+          margin: "0px 0px -60px 0px",
+        }}
+        transition={{
+          duration: 0.88,
+          delay: reduceMotion
+            ? 0
+            : Math.min(
+                categoryIndex * 0.045,
+                0.22,
+              ),
+          ease: premiumEase,
+        }}
+        className="border-t border-[var(--line)] py-14 md:py-20 lg:py-[6vw]"
+      >
+        <div className="grid gap-9 lg:grid-cols-12 lg:items-center lg:gap-[4vw] lg:px-[4vw]">
+          {/* 모바일: 이미지 먼저 */}
+          <div
+            className={
+              isReversed
+                ? "order-1 lg:order-1 lg:col-span-8"
+                : "order-1 lg:order-2 lg:col-span-8"
+            }
+          >
             <Link
               href={category.href}
               style={{
                 backgroundColor:
                   category.color,
               }}
-              className={`flex items-center justify-center overflow-hidden ${getPreviewAspectClass(
+              className={`flex w-full items-center justify-center overflow-hidden ${getPreviewAspectClass(
                 category.previewRatio,
               )}`}
             >
@@ -268,16 +306,30 @@ function CategoryShowcase({
               </span>
             </Link>
           </div>
+
+          {/* 모바일: 텍스트는 이미지 아래 */}
+          <div
+            className={`order-2 px-5 sm:px-8 md:px-12 lg:px-0 ${
+              isReversed
+                ? "lg:order-2 lg:col-span-4"
+                : "lg:order-1 lg:col-span-4"
+            }`}
+          >
+            <CategoryInformation
+              category={category}
+              projectTitle=""
+              summary=""
+              slideNumber={0}
+              slideCount={0}
+            />
+          </div>
         </div>
-      </article>
+      </motion.article>
     );
   }
 
   const currentSlide =
     slides[currentIndex] ?? slides[0];
-
-  const isReversed =
-    categoryIndex % 2 === 1;
 
   const projectHref =
     `/portfolio/project/${currentSlide.projectSlug}`;
@@ -324,37 +376,18 @@ function CategoryShowcase({
       }}
       className="border-t border-[var(--line)] py-14 md:py-20 lg:py-[6vw]"
     >
-      <div className="grid gap-9 lg:grid-cols-12 lg:items-center lg:gap-[4vw]">
+      <div className="grid gap-9 lg:grid-cols-12 lg:items-center lg:gap-[4vw] lg:px-[4vw]">
+        {/* 모바일에서는 사진이 항상 먼저 */}
         <div
           className={
             isReversed
-              ? "lg:order-2 lg:col-span-4"
-              : "lg:col-span-4"
-          }
-        >
-          <CategoryInformation
-            category={category}
-            projectTitle={
-              currentSlide.projectTitle
-            }
-            summary={currentSlide.summary}
-            slideNumber={
-              currentIndex + 1
-            }
-            slideCount={slides.length}
-          />
-        </div>
-
-        <div
-          className={
-            isReversed
-              ? "lg:order-1 lg:col-span-8"
-              : "lg:col-span-8"
+              ? "order-1 lg:order-1 lg:col-span-8"
+              : "order-1 lg:order-2 lg:col-span-8"
           }
         >
           <Link
             href={projectHref}
-            className={`group relative block overflow-hidden bg-[#dedbd3] transition-[aspect-ratio] duration-700 ${imageAspectClass}`}
+            className={`group relative block w-full overflow-hidden bg-[#dedbd3] transition-[aspect-ratio] duration-700 ${imageAspectClass}`}
             aria-label={`${currentSlide.projectTitle} 프로젝트 상세 보기`}
           >
             {slides.map(
@@ -424,7 +457,7 @@ function CategoryShowcase({
               </span>
             </div>
 
-            <div className="pointer-events-none absolute bottom-5 right-5 z-10 translate-y-2 text-2xl text-white opacity-0 drop-shadow-[0_2px_12px_rgba(0,0,0,0.25)] transition-all duration-700 group-hover:translate-y-0 group-hover:opacity-100 sm:bottom-7 sm:right-7 md:text-3xl">
+            <div className="pointer-events-none absolute bottom-5 right-5 z-10 text-2xl text-white opacity-100 drop-shadow-[0_2px_12px_rgba(0,0,0,0.25)] transition-all duration-700 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-7 sm:right-7 md:text-3xl">
               ↗
             </div>
 
@@ -464,6 +497,27 @@ function CategoryShowcase({
               </div>
             )}
           </Link>
+        </div>
+
+        {/* 모바일에서는 사진 아래, PC에서는 기존 좌우 배치 */}
+        <div
+          className={`order-2 px-5 sm:px-8 md:px-12 lg:px-0 ${
+            isReversed
+              ? "lg:order-2 lg:col-span-4"
+              : "lg:order-1 lg:col-span-4"
+          }`}
+        >
+          <CategoryInformation
+            category={category}
+            projectTitle={
+              currentSlide.projectTitle
+            }
+            summary={currentSlide.summary}
+            slideNumber={
+              currentIndex + 1
+            }
+            slideCount={slides.length}
+          />
         </div>
       </div>
     </motion.article>
@@ -606,6 +660,7 @@ export default function Portfolio({
       id="portfolio"
       className="scroll-mt-24 overflow-hidden bg-[#f5f4f0] py-24 sm:py-28 md:py-36 lg:py-[9vw]"
     >
+      {/* 섹션 상단 소개 */}
       <div className="px-5 sm:px-8 md:px-12 lg:px-[4vw]">
         <div className="grid gap-12 border-b border-[var(--line)] pb-14 md:gap-16 md:pb-20 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)] lg:items-end lg:pb-[5vw]">
           <motion.div
@@ -702,82 +757,84 @@ export default function Portfolio({
             </Link>
           </motion.div>
         </div>
-
-        <div className="mt-10 md:mt-16 lg:mt-[4vw]">
-          {categorySlides.map(
-            (
-              {
-                category,
-                slides,
-              },
-              categoryIndex,
-            ) => (
-              <CategoryShowcase
-                key={category.id}
-                category={category}
-                categoryIndex={
-                  categoryIndex
-                }
-                slides={slides}
-                reduceMotion={Boolean(
-                  reduceMotion,
-                )}
-              />
-            ),
-          )}
-        </div>
-
-        <motion.div
-          initial={
-            reduceMotion
-              ? false
-              : {
-                  opacity: 0,
-                  y: 38,
-                  filter: "blur(9px)",
-                }
-          }
-          whileInView={
-            reduceMotion
-              ? undefined
-              : {
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                }
-          }
-          viewport={{
-            once: true,
-            amount: 0.2,
-          }}
-          transition={{
-            duration: 0.85,
-            ease: premiumEase,
-          }}
-          className="mt-20 md:mt-28 lg:mt-[8vw]"
-        >
-          <Link
-            href="/portfolio"
-            className="group block border-y border-[var(--line)] py-10 md:py-14 lg:py-[4vw]"
-          >
-            <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
-              <div>
-                <p className="section-label">
-                  FULL ARCHIVE
-                </p>
-
-                <h3 className="display-en-lg mt-5 transition-colors duration-300 group-hover:text-[var(--green)] md:mt-7">
-                  Explore all work.
-                </h3>
-              </div>
-
-              <span className="flex h-14 w-14 items-center justify-center border border-[var(--text-dark)] text-xl text-[var(--text-dark)] transition-all duration-300 group-hover:translate-x-2 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] md:h-16 md:w-16">
-                →
-              </span>
-            </div>
-          </Link>
-        </motion.div>
       </div>
+
+      {/* 카테고리별 포트폴리오 */}
+      <div className="mt-10 md:mt-16 lg:mt-[4vw]">
+        {categorySlides.map(
+          (
+            {
+              category,
+              slides,
+            },
+            categoryIndex,
+          ) => (
+            <CategoryShowcase
+              key={category.id}
+              category={category}
+              categoryIndex={
+                categoryIndex
+              }
+              slides={slides}
+              reduceMotion={Boolean(
+                reduceMotion,
+              )}
+            />
+          ),
+        )}
+      </div>
+
+      {/* 전체 포트폴리오 링크 */}
+      <motion.div
+        initial={
+          reduceMotion
+            ? false
+            : {
+                opacity: 0,
+                y: 38,
+                filter: "blur(9px)",
+              }
+        }
+        whileInView={
+          reduceMotion
+            ? undefined
+            : {
+                opacity: 1,
+                y: 0,
+                filter: "blur(0px)",
+              }
+        }
+        viewport={{
+          once: true,
+          amount: 0.2,
+        }}
+        transition={{
+          duration: 0.85,
+          ease: premiumEase,
+        }}
+        className="mx-5 mt-20 sm:mx-8 md:mx-12 md:mt-28 lg:mx-[4vw] lg:mt-[8vw]"
+      >
+        <Link
+          href="/portfolio"
+          className="group block border-y border-[var(--line)] py-10 md:py-14 lg:py-[4vw]"
+        >
+          <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
+            <div>
+              <p className="section-label">
+                FULL ARCHIVE
+              </p>
+
+              <h3 className="display-en-lg mt-5 transition-colors duration-300 group-hover:text-[var(--green)] md:mt-7">
+                Explore all work.
+              </h3>
+            </div>
+
+            <span className="flex h-14 w-14 items-center justify-center border border-[var(--text-dark)] text-xl text-[var(--text-dark)] transition-all duration-300 group-hover:translate-x-2 group-hover:border-[var(--green)] group-hover:bg-[var(--green)] md:h-16 md:w-16">
+              →
+            </span>
+          </div>
+        </Link>
+      </motion.div>
     </section>
   );
 }
