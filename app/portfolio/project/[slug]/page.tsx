@@ -377,7 +377,7 @@ export default async function PortfolioProjectPage({
               ...revealTransition,
               delay: 0.16,
             }}
-            className="mx-auto max-w-[1440px] px-6 md:px-12"
+            className="mx-auto max-w-[1440px] md:px-12"
           >
             <div className="group relative aspect-[4/3] overflow-hidden bg-[#e5e1da] md:aspect-[16/8.5]">
               <Image
@@ -576,7 +576,7 @@ export default async function PortfolioProjectPage({
       </section>
 
       {/* 갤러리 제목 */}
-      <section className="mx-auto max-w-[1440px] px-6 pt-24 md:px-12 md:pt-36">
+      <section className="mx-auto max-w-[1440px] pt-24 md:px-12 md:pt-36">
         <motion.div
           initial={{
             opacity: 0,
@@ -593,7 +593,7 @@ export default async function PortfolioProjectPage({
             amount: 0.18,
           }}
           transition={revealTransition}
-          className="grid gap-12 border-b border-[var(--line)] pb-12 md:grid-cols-[1.45fr_0.55fr] md:items-end md:pb-16"
+          className="grid gap-12 border-b border-[var(--line)] px-6 pb-12 md:grid-cols-[1.45fr_0.55fr] md:items-end md:px-0 md:pb-16"
         >
           <div>
             <p className="section-label">
@@ -624,7 +624,7 @@ export default async function PortfolioProjectPage({
             {/* 배너 갤러리 */}
       {isBannerProject &&
         galleryImages.length > 0 && (
-          <section className="mx-auto max-w-[1640px] px-4 pb-24 pt-14 md:px-8 md:pb-36 md:pt-20">
+          <section className="mx-auto max-w-[1640px] px-0 pb-24 pt-14 md:px-8 md:pb-36 md:pt-20">
             <div className="columns-1 gap-5 sm:columns-2 md:gap-7 lg:columns-3">
               {galleryImages.map(
                 (image, index) => (
@@ -694,8 +694,8 @@ export default async function PortfolioProjectPage({
       {/* 일반 프로젝트 갤러리 */}
       {!isBannerProject &&
         galleryImages.length > 0 && (
-          <section className="mx-auto max-w-[1640px] px-4 pb-24 pt-14 md:px-8 md:pb-36 md:pt-20">
-            <div className="grid gap-5 md:grid-cols-2 md:gap-8">
+          <section className="mx-auto max-w-[1640px] px-0 pb-24 pt-14 md:px-8 md:pb-36 md:pt-20">
+            <div className="grid gap-y-5 md:grid-cols-2 md:gap-8">
               {galleryImages.map(
                 (image, index) => {
                   const isFullWidth =
@@ -850,7 +850,7 @@ export default async function PortfolioProjectPage({
 
             {/* 관련 프로젝트 */}
       {relatedProjects.length > 0 && (
-        <section className="mx-auto max-w-[1440px] px-6 pt-24 md:px-12 md:pt-36">
+        <section className="mx-auto max-w-[1440px] pt-24 md:px-12 md:pt-36">
           <motion.div
             initial={{
               opacity: 0,
@@ -865,7 +865,7 @@ export default async function PortfolioProjectPage({
               amount: 0.18,
             }}
             transition={revealTransition}
-            className="flex items-end justify-between gap-6"
+            className="flex items-end justify-between gap-6 px-6 md:px-0"
           >
             <div>
               <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
@@ -938,7 +938,7 @@ export default async function PortfolioProjectPage({
                         )}
                       </div>
 
-                      <div className="mt-6 flex items-end justify-between gap-6">
+                      <div className="mt-6 flex items-end justify-between gap-6 px-6 md:px-0">
                         <div>
                           <p className="text-[9px] font-semibold tracking-[0.2em] text-[var(--muted)]">
                             {
@@ -968,7 +968,7 @@ export default async function PortfolioProjectPage({
 
       {/* 다음 프로젝트 */}
       {nextProject && (
-        <section className="mx-auto max-w-[1440px] px-6 pb-24 pt-24 md:px-12 md:pb-36 md:pt-36">
+        <section className="mx-auto max-w-[1440px] pb-24 pt-24 md:px-12 md:pb-36 md:pt-36">
           <motion.div
             initial={{
               opacity: 0,
@@ -987,7 +987,7 @@ export default async function PortfolioProjectPage({
             transition={revealTransition}
             className="border-t border-[var(--line)] pt-12 md:pt-16"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between px-6 md:px-0">
               <p className="text-xs font-semibold tracking-[0.24em] text-[var(--muted)]">
                 NEXT PROJECT
               </p>
