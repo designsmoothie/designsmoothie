@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import type { CmsPortfolioProject } from "@/lib/portfolio";
+import type { CmsPortfolioProject } from "@/lib/portfolio-data";
 
 type PortfolioCategory = {
   number: string;
