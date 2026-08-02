@@ -29,19 +29,23 @@ export default function Hero() {
   const imageY = useTransform(
     scrollYProgress,
     [0, 1],
-    reduceMotion ? ["0%", "0%"] : ["-3%", "8%"],
+    reduceMotion
+      ? ["0%", "0%"]
+      : ["-2%", "5%"],
   );
 
   const imageScale = useTransform(
     scrollYProgress,
     [0, 1],
-    reduceMotion ? [1, 1] : [1.025, 1.07],
+    reduceMotion
+      ? [1, 1]
+      : [1.015, 1.045],
   );
 
   const headingY = useTransform(
     scrollYProgress,
     [0, 1],
-    reduceMotion ? [0, 0] : [0, 34],
+    reduceMotion ? [0, 0] : [0, 30],
   );
 
   const headingOpacity = useTransform(
@@ -74,7 +78,8 @@ export default function Hero() {
       id="top"
       className="relative overflow-hidden bg-[var(--cream)]"
     >
-      <div className="px-5 pb-12 pt-8 sm:px-8 sm:pb-14 sm:pt-10 md:px-12 md:pb-16 md:pt-14 lg:px-[4vw] lg:pb-[5vw] lg:pt-[4vw]">
+      {/* 상단 텍스트 영역 */}
+      <div className="px-5 pb-12 pt-8 sm:px-8 sm:pb-14 sm:pt-10 md:px-12 md:pb-16 md:pt-14 lg:px-[4vw] lg:pb-[4vw] lg:pt-[4vw]">
         <motion.div
           style={{
             y: headingY,
@@ -133,7 +138,7 @@ export default function Hero() {
             </motion.h1>
           </div>
 
-          <div className="mt-12 grid gap-10 sm:mt-14 md:mt-16 md:grid-cols-[1fr_1fr] md:items-end lg:mt-[4.5vw] lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="mt-12 grid gap-10 sm:mt-14 md:mt-16 md:grid-cols-[1fr_1fr] md:items-end lg:mt-[4vw] lg:grid-cols-[1.15fr_0.85fr]">
             <motion.div
               {...entrance}
               transition={{
@@ -193,15 +198,16 @@ export default function Hero() {
         </motion.div>
       </div>
 
+      {/* 가로 전체 대표 이미지 */}
       <motion.div
         initial={
           reduceMotion
             ? false
             : {
                 opacity: 0,
-                y: 44,
-                scale: 0.992,
-                filter: "blur(11px)",
+                y: 38,
+                scale: 0.994,
+                filter: "blur(10px)",
               }
         }
         animate={
@@ -215,15 +221,15 @@ export default function Hero() {
               }
         }
         transition={{
-          duration: 1.1,
+          duration: 1.05,
           delay: 0.42,
           ease: premiumEase,
         }}
-        className="px-0 lg:px-[1.6vw]"
+        className="w-full"
       >
-        <div className="relative min-h-[520px] overflow-hidden bg-[#ded7cb] sm:min-h-[620px] md:min-h-[700px] lg:h-[82vh] lg:max-h-[940px] lg:rounded-[20px]">
+        <div className="relative h-[38vh] min-h-[300px] w-full overflow-hidden bg-[#ded7cb] sm:h-[42vh] sm:min-h-[350px] md:h-[46vh] md:min-h-[420px] lg:h-[50vh] lg:min-h-[460px] lg:max-h-[620px]">
           <motion.div
-            className="absolute inset-[-7%] will-change-transform"
+            className="absolute inset-[-5%] will-change-transform"
             style={{
               y: imageY,
               scale: imageScale,
@@ -235,13 +241,12 @@ export default function Hero() {
               fill
               priority
               sizes="100vw"
-              className="object-cover"
+              className="object-cover object-center"
             />
           </motion.div>
 
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/52 via-black/5 to-black/5" />
-
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/18 via-transparent to-black/5" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-black/5" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-black/5" />
 
           <motion.div
             initial={
@@ -267,13 +272,13 @@ export default function Hero() {
             }}
             className="absolute inset-x-0 bottom-0"
           >
-            <div className="grid gap-8 px-5 pb-7 text-white sm:px-8 sm:pb-9 md:grid-cols-[1fr_auto] md:items-end md:px-12 md:pb-12 lg:px-[3vw] lg:pb-[3vw]">
+            <div className="grid gap-7 px-5 pb-7 text-white sm:px-8 sm:pb-9 md:grid-cols-[1fr_auto] md:items-end md:px-12 md:pb-11 lg:px-[4vw] lg:pb-[3vw]">
               <div>
                 <p className="text-[10px] font-semibold leading-[1.5] tracking-[0.2em] text-white/65 sm:text-xs">
                   SELECTED PROJECT
                 </p>
 
-                <p className="mt-4 max-w-4xl text-3xl font-semibold leading-[1.12] tracking-[-0.035em] text-white sm:text-4xl md:text-5xl lg:text-[4.2vw]">
+                <p className="mt-3 max-w-4xl text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-white sm:text-4xl md:text-5xl lg:text-[3.4vw]">
                   Signage &amp;
                   <br className="sm:hidden" />
                   Brand Experience
@@ -314,7 +319,7 @@ export default function Hero() {
               delay: 0.92,
               ease: premiumEase,
             }}
-            className="absolute right-5 top-5 hidden h-24 w-px origin-top bg-white/45 md:block lg:right-[3vw] lg:top-[3vw]"
+            className="absolute right-5 top-5 hidden h-20 w-px origin-top bg-white/45 md:block lg:right-[4vw] lg:top-[3vw]"
           />
         </div>
       </motion.div>
