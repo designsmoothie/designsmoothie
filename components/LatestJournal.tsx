@@ -74,107 +74,138 @@ export default async function LatestJournal() {
   return (
     <section
       id="journal"
-      className="bg-[#f7f3ec] px-6 py-24 md:px-10 md:py-32"
+      className="overflow-hidden bg-[#f7f3ec] py-24 md:py-32 lg:py-[9vw]"
     >
-      <div className="mx-auto max-w-7xl">
-        <header className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#94b63f]">
-              Latest Journal
+      {/* 섹션 소개 */}
+      <div className="px-5 sm:px-8 md:px-12 lg:px-[4vw]">
+        <header className="grid gap-10 border-t border-[var(--line)] pt-8 md:pt-11 lg:grid-cols-[1.3fr_0.7fr] lg:items-end">
+          <div className="max-w-4xl">
+            <p className="text-[10px] font-semibold tracking-[0.28em] text-[var(--green)] md:text-xs">
+              LATEST JOURNAL
             </p>
 
-            <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-black md:text-6xl">
+            <h2 className="mt-6 text-[3rem] font-semibold leading-[0.98] tracking-[-0.065em] text-[var(--text-dark)] sm:text-6xl md:text-7xl lg:text-[6vw] lg:leading-[0.92]">
               디자인에 관한
               <br />
               실무적인 이야기
             </h2>
-
-            <p className="mt-5 max-w-2xl text-base leading-7 text-black/55 md:text-lg">
-              브랜딩, 간판, 공간 디자인에 관한
-              디자인스무디의 기록과 노하우를 소개합니다.
-            </p>
           </div>
 
-          <Link
-            href="/blog"
-            className="inline-flex w-fit items-center gap-2 border-b border-black pb-1 text-sm font-semibold text-black transition hover:border-[#94b63f] hover:text-[#6f8e28]"
-          >
-            모든 글 보기
-            <span aria-hidden="true">
-              →
-            </span>
-          </Link>
-        </header>
+          <div className="max-w-xl lg:justify-self-end lg:pb-2">
+            <p className="text-sm leading-7 text-[var(--text)] md:text-base md:leading-8">
+              브랜딩, 간판, 공간 디자인에 관한
+              디자인스무디의 기록과 노하우를
+              소개합니다.
+            </p>
 
-        <div className="mt-14 grid gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <article
-              key={post.id}
-              className="group"
+            <Link
+              href="/blog"
+              className="group mt-7 inline-flex items-center gap-3 border-b border-[var(--text-dark)] pb-2 text-sm font-semibold text-[var(--text-dark)] transition-colors duration-300 hover:border-[var(--green)] hover:text-[var(--green)]"
             >
-              <Link
-                href={`/blog/${post.slug}`}
-                className="block"
-              >
-                <div className="aspect-[4/3] overflow-hidden rounded-[1.75rem] bg-[#ebe6dd]">
-                  {post.thumbnail_url ? (
-                    <img
-                      src={post.thumbnail_url}
-                      alt={post.title}
-                      className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
-                    />
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-                      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/25">
-                        Design Smoothie
-                      </span>
+              모든 글 보기
 
-                      <span className="mt-3 text-sm leading-6 text-black/35">
-                        Journal
+              <span className="transition-transform duration-300 group-hover:translate-x-1.5">
+                →
+              </span>
+            </Link>
+          </div>
+        </header>
+      </div>
+
+      {/* 블로그 미리보기 */}
+      <div className="mt-16 md:mt-24 lg:px-[4vw]">
+        <div className="grid gap-0 md:px-12 lg:grid-cols-3 lg:gap-6 lg:px-0">
+          {posts.map(
+            (post, index) => (
+              <article
+                key={post.id}
+                className="group border-t border-[var(--line)] pt-10 first:border-t-0 first:pt-0 md:pt-14 lg:border-t-0 lg:pt-0"
+              >
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="block"
+                >
+                  {/* 모바일은 화면 양끝까지 */}
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#ebe6dd] sm:aspect-[16/10] lg:aspect-[4/3] lg:rounded-[2px]">
+                    {post.thumbnail_url ? (
+                      <img
+                        src={post.thumbnail_url}
+                        alt={post.title}
+                        loading={
+                          index === 0
+                            ? "eager"
+                            : "lazy"
+                        }
+                        className="h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
+                      />
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center px-8 text-center">
+                        <span className="text-[10px] font-semibold tracking-[0.2em] text-[var(--muted)]">
+                          DESIGN SMOOTHIE
+                        </span>
+
+                        <span className="mt-3 text-sm text-[var(--muted)]">
+                          JOURNAL
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/[0.04]" />
+
+                    <div className="pointer-events-none absolute left-5 top-5 sm:left-7 sm:top-7">
+                      <span className="text-[10px] font-semibold tracking-[0.18em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)]">
+                        JOURNAL
                       </span>
                     </div>
-                  )}
-                </div>
 
-                <div className="mt-5">
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-black/40">
-                    <time>
-                      {formatDate(
-                        post.published_at,
-                      )}
-                    </time>
-
-                    {post.source_type ===
-                      "naver" && (
-                      <span className="rounded-full bg-[#94b63f]/10 px-2.5 py-1 text-[#587019]">
-                        네이버 블로그
-                      </span>
-                    )}
+                    <div className="pointer-events-none absolute bottom-5 right-5 text-2xl text-white opacity-100 drop-shadow-[0_2px_12px_rgba(0,0,0,0.3)] transition-all duration-500 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 sm:bottom-7 sm:right-7">
+                      ↗
+                    </div>
                   </div>
 
-                  <h3 className="mt-3 text-xl font-semibold leading-8 tracking-[-0.025em] text-black transition group-hover:text-[#6f8e28]">
-                    {post.title}
-                  </h3>
+                  {/* 텍스트는 기존 여백 유지 */}
+                  <div className="px-5 pb-14 pt-6 sm:px-8 md:px-0 md:pb-16 lg:pb-0 lg:pt-7">
+                    <div className="flex flex-wrap items-center gap-3 text-[10px] font-semibold tracking-[0.12em] text-[var(--muted)]">
+                      <time>
+                        {formatDate(
+                          post.published_at,
+                        )}
+                      </time>
 
-                  {post.excerpt && (
-                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-black/50">
-                      {post.excerpt}
+                      {post.source_type ===
+                        "naver" && (
+                        <>
+                          <span className="h-px w-4 bg-[var(--line)]" />
+
+                          <span>
+                            NAVER BLOG
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    <h3 className="mt-4 text-2xl font-semibold leading-[1.25] tracking-[-0.035em] text-[var(--text-dark)] transition-colors duration-300 group-hover:text-[var(--green)] md:text-3xl lg:text-[2rem]">
+                      {post.title}
+                    </h3>
+
+                    {post.excerpt && (
+                      <p className="mt-4 line-clamp-2 text-sm leading-7 text-[var(--muted)] md:text-base">
+                        {post.excerpt}
+                      </p>
+                    )}
+
+                    <p className="mt-6 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.08em] text-[var(--text-dark)] transition-colors duration-300 group-hover:text-[var(--green)]">
+                      글 읽기
+
+                      <span className="transition-transform duration-300 group-hover:translate-x-1.5">
+                        →
+                      </span>
                     </p>
-                  )}
-
-                  <p className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-black/65 transition group-hover:text-[#6f8e28]">
-                    글 읽기
-                    <span
-                      aria-hidden="true"
-                      className="transition-transform group-hover:translate-x-1"
-                    >
-                      →
-                    </span>
-                  </p>
-                </div>
-              </Link>
-            </article>
-          ))}
+                  </div>
+                </Link>
+              </article>
+            ),
+          )}
         </div>
       </div>
     </section>
