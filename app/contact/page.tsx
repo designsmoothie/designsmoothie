@@ -4,7 +4,7 @@ import PageTransition from "@/components/PageTransition";
 import Link from "next/link";
 import { useState } from "react";
 
-
+import ContactInquiryForm from "./ContactInquiryForm";
 
 const emailAddress = "hello_smoothie@naver.com";
 const kakaoChannelUrl = "http://pf.kakao.com/_geqBn/chat";
@@ -191,6 +191,8 @@ export default function ContactPage() {
             </button>
           </article>
         </div>
+
+        <ContactInquiryForm />
 
         <section className="mt-28 md:mt-40">
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">

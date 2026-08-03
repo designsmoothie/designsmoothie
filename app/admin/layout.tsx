@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import AdminShell from "@/components/AdminShell";
+
 type AdminLayoutProps = {
   children: ReactNode;
 };
@@ -8,8 +10,8 @@ export default function AdminLayout({
   children,
 }: AdminLayoutProps) {
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <AdminShell>
       {children}
-    </div>
+    </AdminShell>
   );
 }
