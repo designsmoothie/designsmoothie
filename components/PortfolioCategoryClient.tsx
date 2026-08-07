@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import type { CmsPortfolioProject } from "@/lib/portfolio-data";
+import ProjectPreview from "@/components/ProjectPreview";
 
 type PortfolioCategory = {
   number: string;
@@ -60,12 +61,23 @@ function ProjectImagePreview({
   projectIndex,
 }: ProjectImagePreviewProps) {
   const images = useMemo(
-    () => getProjectImages(project).slice(0, 6),
+    () =>
+      getProjectImages(project)
+        .filter(Boolean)
+        .slice(0, 6),
     [project],
   );
 
-  const [isHovering, setIsHovering] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] =
+    useState(false);
+
+  const [activeIndex, setActiveIndex] =
+    useState(0);
+
+  const isLiveWebsite =
+    project.projectType === "website" &&
+    project.previewType === "live" &&
+    Boolean(project.liveUrl);
 
   const imageSizes = isWide
     ? "(max-width: 768px) 100vw, 1400px"
@@ -79,22 +91,42 @@ function ProjectImagePreview({
         : "aspect-[4/3]";
 
   useEffect(() => {
-    if (!isHovering || images.length <= 1) {
+    /*
+     * 라이브 웹사이트는 자체 애니메이션을 사용하므로
+     * 이미지 슬라이드 타이머를 실행하지 않습니다.
+     */
+    if (
+      isLiveWebsite ||
+      !isHovering ||
+      images.length <= 1
+    ) {
       setActiveIndex(0);
       return;
     }
 
-    const intervalId = window.setInterval(() => {
-      setActiveIndex(
-        (currentIndex) =>
-          (currentIndex + 1) % images.length,
-      );
-    }, 1350);
+    const intervalId =
+      window.setInterval(() => {
+        setActiveIndex(
+          (currentIndex) =>
+            (currentIndex + 1) %
+            images.length,
+        );
+      }, 1350);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [images.length, isHovering]);
+  }, [
+    images.length,
+    isHovering,
+    isLiveWebsite,
+  ]);
+
+  const fallbackImage =
+    project.thumbnail ||
+    images[0] ||
+    project.previewFallbackUrl ||
+    "";
 
   return (
     <div
@@ -106,63 +138,102 @@ function ProjectImagePreview({
         setIsHovering(false);
       }}
     >
-      {images.map((image, index) => {
-        const isActive = activeIndex === index;
+      {isLiveWebsite ? (
+        <ProjectPreview
+          projectType={
+            project.projectType
+          }
+          previewType={
+            project.previewType
+          }
+          liveUrl={project.liveUrl}
+          image={fallbackImage}
+          title={project.title}
+          priority={priority}
+          sizes={imageSizes}
+          className="absolute inset-0"
+        />
+      ) : (
+        images.map((image, index) => {
+          const isActive =
+            activeIndex === index;
 
-        return (
-          <div
-            key={`${project.slug}-${image}-${index}`}
-            className={`absolute inset-0 transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              isActive
-                ? "scale-100 opacity-100"
-                : "scale-[1.035] opacity-0"
-            }`}
-          >
-            <Image
-              src={image}
-              alt={`${project.title} 프로젝트 이미지 ${
-                index + 1
+          return (
+            <div
+              key={`${project.slug}-${image}-${index}`}
+              className={`absolute inset-0 transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isActive
+                  ? "scale-100 opacity-100"
+                  : "scale-[1.035] opacity-0"
               }`}
-              fill
-              priority={priority && index === 0}
-              sizes={imageSizes}
-              className="object-cover"
-            />
-          </div>
-        );
-      })}
+            >
+              <Image
+                src={image}
+                alt={`${project.title} 프로젝트 이미지 ${
+                  index + 1
+                }`}
+                fill
+                priority={
+                  priority && index === 0
+                }
+                sizes={imageSizes}
+                className="object-cover"
+              />
+            </div>
+          );
+        })
+      )}
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 z-[5] bg-gradient-to-t from-black/25 via-transparent to-black/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
       <div className="absolute left-5 top-5 z-10 md:left-7 md:top-7">
         <span className="inline-flex rounded-full border border-white/30 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.18em] text-white backdrop-blur-md">
-          {String(projectIndex + 1).padStart(2, "0")}
+          {String(
+            projectIndex + 1,
+          ).padStart(2, "0")}
         </span>
       </div>
 
-      {images.length > 1 && (
-        <div className="absolute right-5 top-5 z-10 md:right-7 md:top-7">
-          <span className="inline-flex rounded-full border border-white/30 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md">
-            {String(activeIndex + 1).padStart(2, "0")} /{" "}
-            {String(images.length).padStart(2, "0")}
-          </span>
-        </div>
-      )}
-
-      {images.length > 1 && (
-        <div className="pointer-events-none absolute bottom-5 left-5 right-5 flex gap-1.5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:bottom-7 md:left-7 md:right-7">
-          {images.map((_, index) => (
-            <span
-              key={`${project.slug}-indicator-${index}`}
-              className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/35"
-            >
-              <span
-                className={`absolute inset-y-0 left-0 bg-white transition-all duration-500 ${
-                  activeIndex === index ? "w-full" : "w-0"
-                }`}
-              />
+      {!isLiveWebsite &&
+        images.length > 1 && (
+          <div className="absolute right-5 top-5 z-10 md:right-7 md:top-7">
+            <span className="inline-flex rounded-full border border-white/30 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md">
+              {String(
+                activeIndex + 1,
+              ).padStart(2, "0")}{" "}
+              /{" "}
+              {String(
+                images.length,
+              ).padStart(2, "0")}
             </span>
-          ))}
+          </div>
+        )}
+
+      {!isLiveWebsite &&
+        images.length > 1 && (
+          <div className="pointer-events-none absolute bottom-5 left-5 right-5 z-10 flex gap-1.5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:bottom-7 md:left-7 md:right-7">
+            {images.map((_, index) => (
+              <span
+                key={`${project.slug}-indicator-${index}`}
+                className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-white/35"
+              >
+                <span
+                  className={`absolute inset-y-0 left-0 bg-white transition-all duration-500 ${
+                    activeIndex === index
+                      ? "w-full"
+                      : "w-0"
+                  }`}
+                />
+              </span>
+            ))}
+          </div>
+        )}
+
+      {isLiveWebsite && (
+        <div className="pointer-events-none absolute right-5 top-5 z-10 md:right-7 md:top-7">
+          <span className="inline-flex rounded-full border border-white/30 bg-black/15 px-3.5 py-2 text-[10px] font-semibold tracking-[0.16em] text-white backdrop-blur-md">
+            LIVE WEBSITE
+          </span>
         </div>
       )}
 

@@ -6,6 +6,14 @@ export type PreviewRatio =
   | "tall"
   | "banner";
 
+export type ProjectType =
+  | "design"
+  | "website";
+
+export type ProjectPreviewType =
+  | "image"
+  | "live";
+
 export type CmsPortfolioCategory = {
   id: string;
   slug: string;
@@ -50,6 +58,11 @@ export type CmsPortfolioProject = {
 
   thumbnail: string;
   images: string[];
+
+  projectType: ProjectType;
+  previewType: ProjectPreviewType;
+  liveUrl?: string;
+  previewFallbackUrl?: string;
 
   featured: boolean;
   displayOrder: number;
@@ -108,6 +121,11 @@ type ProjectRow = {
 
   thumbnail_url: string | null;
 
+  project_type: string | null;
+  preview_type: string | null;
+  live_url: string | null;
+  preview_fallback_url: string | null;
+
   featured: boolean | null;
   display_order: number | null;
 
@@ -143,6 +161,26 @@ function normalizePreviewRatio(
   return "wide";
 }
 
+function normalizeProjectType(
+  value: string | null | undefined,
+): ProjectType {
+  if (value === "website") {
+    return "website";
+  }
+
+  return "design";
+}
+
+function normalizeProjectPreviewType(
+  value: string | null | undefined,
+): ProjectPreviewType {
+  if (value === "live") {
+    return "live";
+  }
+
+  return "image";
+}
+
 function normalizeProject(
   project: ProjectRow,
 ): CmsPortfolioProject {
@@ -166,6 +204,7 @@ function normalizeProject(
     project.thumbnail_url ||
     thumbnailImage?.public_url ||
     sortedImages[0]?.public_url ||
+    project.preview_fallback_url ||
     "";
 
   return {
@@ -211,6 +250,23 @@ function normalizeProject(
     images: sortedImages.map(
       (image) => image.public_url,
     ),
+
+    projectType:
+      normalizeProjectType(
+        project.project_type,
+      ),
+
+    previewType:
+      normalizeProjectPreviewType(
+        project.preview_type,
+      ),
+
+    liveUrl:
+      project.live_url ?? undefined,
+
+    previewFallbackUrl:
+      project.preview_fallback_url ??
+      undefined,
 
     featured:
       project.featured ?? false,
@@ -287,7 +343,7 @@ export async function getCmsCategories(): Promise<
       "0",
     ),
 
-    href: `/portfolio/${category.slug}`, 
+    href: `/portfolio/${category.slug}`,
   }));
 }
 
@@ -315,6 +371,10 @@ export async function getCmsProjects(): Promise<
       solution,
       result,
       thumbnail_url,
+      project_type,
+      preview_type,
+      live_url,
+      preview_fallback_url,
       featured,
       display_order,
       seo_title,

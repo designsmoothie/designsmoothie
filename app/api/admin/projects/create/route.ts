@@ -58,6 +58,30 @@ export async function POST(
       getFormText(formData, "status") ||
       "draft";
 
+    const projectType =
+      getFormText(
+        formData,
+        "projectType",
+      ) || "design";
+
+    const previewType =
+      getFormText(
+        formData,
+        "previewType",
+      ) || "image";
+
+    const liveUrl =
+      getFormText(
+        formData,
+        "liveUrl",
+      ) || null;
+
+    const previewFallbackUrl =
+      getFormText(
+        formData,
+        "previewFallbackUrl",
+      ) || null;
+
     if (!title || !slug || !categoryId) {
       return NextResponse.json(
         {
@@ -80,6 +104,78 @@ export async function POST(
           status: 400,
         },
       );
+    }
+
+    if (
+      projectType !== "design" &&
+      projectType !== "website"
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            "프로젝트 유형이 올바르지 않습니다.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (
+      previewType !== "image" &&
+      previewType !== "live"
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            "미리보기 방식이 올바르지 않습니다.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (
+      projectType === "website" &&
+      previewType === "live" &&
+      !liveUrl
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            "라이브 사이트 주소를 입력해주세요.",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (liveUrl) {
+      try {
+        const parsedUrl =
+          new URL(liveUrl);
+
+        if (
+          parsedUrl.protocol !== "http:" &&
+          parsedUrl.protocol !== "https:"
+        ) {
+          throw new Error(
+            "지원하지 않는 주소 형식입니다.",
+          );
+        }
+      } catch {
+        return NextResponse.json(
+          {
+            message:
+              "라이브 사이트 주소 형식이 올바르지 않습니다.",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
     }
 
     const {
@@ -195,6 +291,22 @@ export async function POST(
             "result",
           ) || null,
 
+        project_type:
+          projectType,
+
+        preview_type:
+          projectType === "website"
+            ? previewType
+            : "image",
+
+        live_url:
+          projectType === "website"
+            ? liveUrl
+            : null,
+
+        preview_fallback_url:
+          previewFallbackUrl,
+
         status,
 
         featured:
@@ -250,6 +362,7 @@ export async function POST(
       return NextResponse.json(
         {
           message:
+            createError?.message ??
             "프로젝트를 생성하지 못했습니다.",
         },
         {

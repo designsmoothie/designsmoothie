@@ -18,6 +18,8 @@ import type {
   PreviewRatio,
 } from "@/lib/portfolio-data";
 
+import WebsitePreview from "@/components/WebsitePreview";
+
 const premiumEase = [0.22, 1, 0.36, 1] as [
   number,
   number,
@@ -56,7 +58,10 @@ type PortfolioProps = {
 
 type ProjectSlide = {
   key: string;
+
   image: string;
+  previewType: "image" | "live";
+  liveUrl?: string;
 
   projectId: string;
   projectSlug: string;
@@ -128,6 +133,50 @@ function createCategorySlides(
   const slides: ProjectSlide[] = [];
 
   for (const project of categoryProjects) {
+    const isLiveWebsite =
+      project.projectType === "website" &&
+      project.previewType === "live" &&
+      Boolean(project.liveUrl);
+
+    /*
+     * 웹사이트 프로젝트는 이미지 여러 장을 슬라이드로 만들지 않고
+     * 실제 사이트 미리보기 한 장으로 등록합니다.
+     */
+    if (isLiveWebsite) {
+      slides.push({
+        key: `${project.id}-live`,
+
+        image:
+          project.thumbnail ||
+          project.previewFallbackUrl ||
+          "",
+
+        previewType: "live",
+        liveUrl: project.liveUrl,
+
+        projectId: project.id,
+        projectSlug: project.slug,
+        projectTitle: project.title,
+
+        summary: project.summary,
+        client: project.client,
+        year: project.year,
+        location: project.location,
+
+        previewRatio:
+          project.categoryPreviewRatio,
+      });
+
+      if (
+        slides.length >=
+        MAX_SLIDES_PER_CATEGORY
+      ) {
+        return slides;
+      }
+
+      continue;
+    }
+
     const projectImages = Array.from(
       new Set(
         [
@@ -143,7 +192,9 @@ function createCategorySlides(
     ] of projectImages.entries()) {
       slides.push({
         key: `${project.id}-${imageIndex}`,
+
         image,
+        previewType: "image",
 
         projectId: project.id,
         projectSlug: project.slug,
@@ -391,63 +442,87 @@ function CategoryShowcase({
             aria-label={`${currentSlide.projectTitle} 프로젝트 상세 보기`}
           >
             {slides.map(
-              (slide, slideIndex) => {
-                const isActive =
-                  slideIndex === currentIndex;
+  (slide, slideIndex) => {
+    const isActive =
+      slideIndex === currentIndex;
 
-                const isPrevious =
-                  slideIndex ===
-                  previousIndex;
+    const isPrevious =
+      slideIndex ===
+      previousIndex;
 
-                let imageState = [
-                  "pointer-events-none",
-                  "z-0",
-                  "translate-y-[2%]",
-                  "scale-[1.012]",
-                  "opacity-0",
-                  "blur-[2px]",
-                ].join(" ");
+    let previewState = [
+      "pointer-events-none",
+      "z-0",
+      "translate-y-[2%]",
+      "scale-[1.012]",
+      "opacity-0",
+      "blur-[2px]",
+    ].join(" ");
 
-                if (isActive) {
-                  imageState = [
-                    "z-[2]",
-                    "translate-y-0",
-                    "scale-100",
-                    "opacity-100",
-                    "blur-0",
-                  ].join(" ");
-                } else if (isPrevious) {
-                  imageState = [
-                    "pointer-events-none",
-                    "z-[1]",
-                    "-translate-y-[2%]",
-                    "scale-[1.006]",
-                    "opacity-0",
-                    "blur-[1.5px]",
-                  ].join(" ");
-                }
+    if (isActive) {
+      previewState = [
+        "z-[2]",
+        "translate-y-0",
+        "scale-100",
+        "opacity-100",
+        "blur-0",
+      ].join(" ");
+    } else if (isPrevious) {
+      previewState = [
+        "pointer-events-none",
+        "z-[1]",
+        "-translate-y-[2%]",
+        "scale-[1.006]",
+        "opacity-0",
+        "blur-[1.5px]",
+      ].join(" ");
+    }
 
-                return (
-                  <Image
-                    key={slide.key}
-                    src={slide.image}
-                    alt={`${slide.projectTitle} 프로젝트 이미지`}
-                    fill
-                    priority={
-                      categoryIndex === 0 &&
-                      slideIndex === 0
-                    }
-                    sizes="(max-width: 1024px) 100vw, 66vw"
-                    className={`will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[7600ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
-                      currentSlide.previewRatio ===
-                      "banner"
-                        ? "object-contain bg-[#f5f4f0]"
-                        : "object-cover"
-                    } ${imageState}`}
-                  />
-                );
-              },
-            )}
+    if (
+      slide.previewType === "live" &&
+      slide.liveUrl
+    ) {
+      return (
+        <div
+          key={slide.key}
+          className={`absolute inset-0 will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[7600ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${previewState}`}
+        >
+          <WebsitePreview
+            url={slide.liveUrl}
+            title={slide.projectTitle}
+            fallbackImage={
+              slide.image || undefined
+            }
+            priority={
+              categoryIndex === 0 &&
+              slideIndex === 0
+            }
+          />
+        </div>
+      );
+    }
+
+    return (
+      <Image
+        key={slide.key}
+        src={slide.image}
+        alt={`${slide.projectTitle} 프로젝트 이미지`}
+        fill
+        priority={
+          categoryIndex === 0 &&
+          slideIndex === 0
+        }
+        sizes="(max-width: 1024px) 100vw, 66vw"
+        className={`will-change-[opacity,transform,filter] transition-[opacity,transform,filter] duration-[7600ms] ease-[cubic-bezier(0.45,0,0.55,1)] ${
+          currentSlide.previewRatio ===
+          "banner"
+            ? "object-contain bg-[#f5f4f0]"
+            : "object-cover"
+        } ${previewState}`}
+      />
+    );
+  },
+)}
 
             <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-b from-black/[0.015] via-transparent to-black/[0.07]" />
 

@@ -166,10 +166,11 @@ async function optimizeImage(
     },
   );
 
-  const baseName = originalFile.name.replace(
-    /\.[^.]+$/,
-    "",
-  );
+  const baseName =
+    originalFile.name.replace(
+      /\.[^.]+$/,
+      "",
+    );
 
   const optimizedFile = new File(
     [blob],
@@ -200,6 +201,19 @@ export default function NewProjectForm({
 
   const [slugEdited, setSlugEdited] =
     useState(false);
+
+  const [
+    projectType,
+    setProjectType,
+  ] = useState("design");
+
+  const [
+    previewType,
+    setPreviewType,
+  ] = useState("image");
+
+  const [liveUrl, setLiveUrl] =
+    useState("");
 
   const [images, setImages] = useState<
     SelectedImage[]
@@ -311,13 +325,16 @@ export default function NewProjectForm({
 
   const imageInputLabel =
     images.length === 0
-      ? "사진을 먼저 선택해주세요."
+      ? projectType === "website"
+        ? "대표 이미지가 필요하면 선택해주세요."
+        : "사진을 먼저 선택해주세요."
       : `${images.length}장의 사진이 선택되었습니다. AI는 앞의 ${aiImageCount}장을 분석합니다.`;
 
   function handleTitleChange(
     event: ChangeEvent<HTMLInputElement>,
   ) {
-    const nextTitle = event.target.value;
+    const nextTitle =
+      event.target.value;
 
     setTitle(nextTitle);
 
@@ -334,6 +351,17 @@ export default function NewProjectForm({
     setSlug(
       makeSlug(event.target.value),
     );
+  }
+
+  function handleProjectTypeChange(
+    value: string,
+  ) {
+    setProjectType(value);
+
+    if (value === "design") {
+      setPreviewType("image");
+      setLiveUrl("");
+    }
   }
 
   function addFiles(
@@ -706,140 +734,158 @@ export default function NewProjectForm({
   }
 
   async function generateProjectContent() {
-  if (!hasAnalysis) {
+    if (!hasAnalysis) {
+      setMessage(
+        "먼저 프로젝트 사진을 분석해주세요.",
+      );
+
+      return;
+    }
+
+    const form =
+      document.querySelector<HTMLFormElement>(
+        "form",
+      );
+
+    if (!form) {
+      setMessage(
+        "프로젝트 입력 폼을 찾지 못했습니다.",
+      );
+
+      return;
+    }
+
+    setIsGenerating(true);
+
     setMessage(
-      "먼저 프로젝트 사진을 분석해주세요.",
+      "AI가 분석 결과를 바탕으로 프로젝트 글을 작성하고 있습니다...",
     );
 
-    return;
-  }
+    try {
+      const formData =
+        new FormData(form);
 
-  const form =
-    document.querySelector<HTMLFormElement>(
-      "form",
-    );
-
-  if (!form) {
-    setMessage(
-      "프로젝트 입력 폼을 찾지 못했습니다.",
-    );
-
-    return;
-  }
-
-  setIsGenerating(true);
-
-  setMessage(
-    "AI가 분석 결과를 바탕으로 프로젝트 글을 작성하고 있습니다...",
-  );
-
-  try {
-    const formData = new FormData(form);
-
-    const response = await fetch(
-      "/api/admin/projects/generate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
+      const response = await fetch(
+        "/api/admin/projects/generate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            title,
+            category: String(
+              formData.get(
+                "categoryName",
+              ) ?? "",
+            ),
+            client: String(
+              formData.get("client") ??
+                "",
+            ),
+            location: String(
+              formData.get("location") ??
+                "",
+            ),
+            industry,
+            businessType,
+            mainColors,
+            subColors,
+            materials,
+            signTypes,
+            lighting,
+            styles,
+            designFeatures,
+            visualPoints,
+            keywords,
+            designerMemo,
+          }),
         },
-        body: JSON.stringify({
-          title,
-          category: String(
-            formData.get(
-              "categoryName",
-            ) ?? "",
-          ),
-          client: String(
-            formData.get("client") ??
-              "",
-          ),
-          location: String(
-            formData.get("location") ??
-              "",
-          ),
-          industry,
-          businessType,
-          mainColors,
-          subColors,
-          materials,
-          signTypes,
-          lighting,
-          styles,
-          designFeatures,
-          visualPoints,
-          keywords,
-          designerMemo,
-        }),
-      },
-    );
+      );
 
-    const data = (await response.json()) as
-      | {
-          summary: string;
-          overview: string;
-          challenge: string;
-          solution: string;
-          result: string;
-          seoTitle: string;
-          seoDescription: string;
-        }
-      | {
-          message?: string;
-        };
+      const data =
+        (await response.json()) as
+          | {
+              summary: string;
+              overview: string;
+              challenge: string;
+              solution: string;
+              result: string;
+              seoTitle: string;
+              seoDescription: string;
+            }
+          | {
+              message?: string;
+            };
 
-    if (!response.ok) {
-      throw new Error(
-        "message" in data
-          ? data.message
+      if (!response.ok) {
+        throw new Error(
+          "message" in data
+            ? data.message
+            : "프로젝트 글 작성에 실패했습니다.",
+        );
+      }
+
+      if (!("summary" in data)) {
+        throw new Error(
+          "AI 응답 형식이 올바르지 않습니다.",
+        );
+      }
+
+      setSummary(data.summary ?? "");
+      setOverview(data.overview ?? "");
+      setChallenge(data.challenge ?? "");
+      setSolution(data.solution ?? "");
+      setResult(data.result ?? "");
+      setSeoTitle(data.seoTitle ?? "");
+
+      setSeoDescription(
+        data.seoDescription ?? "",
+      );
+
+      setMessage(
+        "프로젝트 글과 SEO 초안이 작성되었습니다. 내용을 확인한 뒤 저장해주세요.",
+      );
+    } catch (error) {
+      console.error(
+        "프로젝트 글 작성 실패:",
+        error,
+      );
+
+      setMessage(
+        error instanceof Error
+          ? error.message
           : "프로젝트 글 작성에 실패했습니다.",
       );
+    } finally {
+      setIsGenerating(false);
     }
-
-    if (!("summary" in data)) {
-      throw new Error(
-        "AI 응답 형식이 올바르지 않습니다.",
-      );
-    }
-
-    setSummary(data.summary ?? "");
-    setOverview(data.overview ?? "");
-    setChallenge(data.challenge ?? "");
-    setSolution(data.solution ?? "");
-    setResult(data.result ?? "");
-    setSeoTitle(data.seoTitle ?? "");
-    setSeoDescription(
-      data.seoDescription ?? "",
-    );
-
-    setMessage(
-      "프로젝트 글과 SEO 초안이 작성되었습니다. 내용을 확인한 뒤 저장해주세요.",
-    );
-  } catch (error) {
-    console.error(
-      "프로젝트 글 작성 실패:",
-      error,
-    );
-
-    setMessage(
-      error instanceof Error
-        ? error.message
-        : "프로젝트 글 작성에 실패했습니다.",
-    );
-  } finally {
-    setIsGenerating(false);
   }
-}
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
-    if (images.length === 0) {
+    if (
+      images.length === 0 &&
+      projectType !== "website"
+    ) {
       setMessage(
         "프로젝트 사진을 한 장 이상 선택해주세요.",
+      );
+
+      return;
+    }
+
+    if (
+      projectType === "website" &&
+      previewType === "live" &&
+      !liveUrl.trim()
+    ) {
+      setMessage(
+        "라이브 사이트 주소를 입력해주세요.",
       );
 
       return;
@@ -1050,6 +1096,9 @@ export default function NewProjectForm({
         title={title}
         slug={slug}
         industry={industry}
+        projectType={projectType}
+        previewType={previewType}
+        liveUrl={liveUrl}
         inputClass={inputClass}
         labelClass={labelClass}
         onTitleChange={
@@ -1060,6 +1109,17 @@ export default function NewProjectForm({
         }
         onIndustryChange={(event) =>
           setIndustry(
+            event.target.value,
+          )
+        }
+        onProjectTypeChange={
+          handleProjectTypeChange
+        }
+        onPreviewTypeChange={
+          setPreviewType
+        }
+        onLiveUrlChange={(event) =>
+          setLiveUrl(
             event.target.value,
           )
         }
