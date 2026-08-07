@@ -492,13 +492,27 @@ export default function NewProjectForm({
       return;
     }
 
-    if (images.length === 0) {
-      setMessage(
-        "AI가 분석할 사진을 먼저 선택해주세요.",
-      );
+    if (
+  projectType === "design" &&
+  images.length === 0
+) {
+  setMessage(
+    "AI가 분석할 사진을 먼저 선택해주세요.",
+  );
 
-      return;
-    }
+  return;
+}
+
+if (
+  projectType === "website" &&
+  !liveUrl.trim()
+) {
+  setMessage(
+    "웹사이트 주소를 먼저 입력해주세요.",
+  );
+
+  return;
+}
 
     const form =
       document.querySelector<HTMLFormElement>(
@@ -563,40 +577,54 @@ export default function NewProjectForm({
         industry.trim(),
       );
 
-      const aiImages = images.slice(
-        0,
-        MAX_AI_IMAGE_COUNT,
+      aiFormData.append(
+  "projectType",
+  projectType,
+);
+
+aiFormData.append(
+  "liveUrl",
+  liveUrl.trim(),
+);
+
+      if (projectType === "design") {
+  const aiImages =
+    images.slice(
+      0,
+      MAX_AI_IMAGE_COUNT,
+    );
+
+  for (const [
+    index,
+    image,
+  ] of aiImages.entries()) {
+
+    setMessage(
+      `${index + 1}/${aiImages.length} · AI 분석용 이미지를 준비하고 있습니다...`,
+    );
+
+    const {
+      file: optimizedFile,
+    } = await optimizeImage(
+      image.file,
+    );
+
+    if (
+      optimizedFile.size >
+      MAX_UPLOAD_FILE_SIZE
+    ) {
+      throw new Error(
+        `${image.file.name}을 최적화했지만 6MB를 초과합니다.`,
       );
+    }
 
-      for (const [
-        index,
-        image,
-      ] of aiImages.entries()) {
-        setMessage(
-          `${index + 1}/${aiImages.length} · AI 분석용 이미지를 준비하고 있습니다...`,
-        );
-
-        const {
-          file: optimizedFile,
-        } = await optimizeImage(
-          image.file,
-        );
-
-        if (
-          optimizedFile.size >
-          MAX_UPLOAD_FILE_SIZE
-        ) {
-          throw new Error(
-            `${image.file.name}을 최적화했지만 6MB를 초과합니다.`,
-          );
-        }
-
-        aiFormData.append(
-          "images",
-          optimizedFile,
-          optimizedFile.name,
-        );
-      }
+    aiFormData.append(
+      "images",
+      optimizedFile,
+      optimizedFile.name,
+    );
+  }
+}
 
       setMessage(
         "AI가 색상, 재질, 디자인 특징을 분석하고 있습니다...",
@@ -766,44 +794,52 @@ export default function NewProjectForm({
         new FormData(form);
 
       const response = await fetch(
-        "/api/admin/projects/generate",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            title,
-            category: String(
-              formData.get(
-                "categoryName",
-              ) ?? "",
-            ),
-            client: String(
-              formData.get("client") ??
-                "",
-            ),
-            location: String(
-              formData.get("location") ??
-                "",
-            ),
-            industry,
-            businessType,
-            mainColors,
-            subColors,
-            materials,
-            signTypes,
-            lighting,
-            styles,
-            designFeatures,
-            visualPoints,
-            keywords,
-            designerMemo,
-          }),
-        },
-      );
+  "/api/admin/projects/generate",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type":
+        "application/json",
+    },
+    body: JSON.stringify({
+      title,
 
+      projectType,
+      liveUrl,
+
+      category: String(
+        formData.get(
+          "categoryName",
+        ) ?? "",
+      ),
+
+      client: String(
+        formData.get("client") ??
+          "",
+      ),
+
+      location: String(
+        formData.get("location") ??
+          "",
+      ),
+
+      industry,
+      businessType,
+      mainColors,
+      subColors,
+      materials,
+      signTypes,
+      lighting,
+      styles,
+      designFeatures,
+      visualPoints,
+      keywords,
+      designerMemo,
+    }),
+  },
+);
+      
+      
       const data =
         (await response.json()) as
           | {

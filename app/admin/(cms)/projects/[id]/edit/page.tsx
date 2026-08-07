@@ -7,6 +7,7 @@ import {
   deleteProject,
   updateProject,
 } from "../../actions";
+import ProjectAiAssistant from "./ProjectAiAssistant";
 
 type EditProjectPageProps = {
   params: Promise<{
@@ -186,6 +187,78 @@ export default async function EditProjectPage({
                 className={inputClass}
               />
             </label>
+
+            <div className="grid gap-6 md:grid-cols-2">
+  <label className={labelClass}>
+    프로젝트 유형
+    <select
+      name="projectType"
+      defaultValue={
+        project.project_type ??
+        "design"
+      }
+      className={inputClass}
+    >
+      <option value="design">
+        디자인 프로젝트
+      </option>
+
+      <option value="website">
+        웹사이트 프로젝트
+      </option>
+    </select>
+  </label>
+
+  <label className={labelClass}>
+    미리보기 방식
+    <select
+      name="previewType"
+      defaultValue={
+        project.preview_type ??
+        "image"
+      }
+      className={inputClass}
+    >
+      <option value="image">
+        이미지
+      </option>
+
+      <option value="live">
+        라이브 웹사이트
+      </option>
+    </select>
+  </label>
+
+  <label className="md:col-span-2">
+    <span className={labelClass}>
+      웹사이트 주소
+    </span>
+
+    <input
+      name="liveUrl"
+      defaultValue={
+        project.live_url ?? ""
+      }
+      placeholder="https://example.com"
+      className={inputClass}
+    />
+  </label>
+
+  <label className="md:col-span-2">
+    <span className={labelClass}>
+      라이브 미리보기 실패 시 이미지
+    </span>
+
+    <input
+      name="previewFallbackUrl"
+      defaultValue={
+        project.preview_fallback_url ??
+        ""
+      }
+      className={inputClass}
+    />
+  </label>
+</div>
           </div>
         </section>
         <ProjectImageUploader projectId={id} />
@@ -193,6 +266,11 @@ export default async function EditProjectPage({
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6f8d25]">
             Project story
           </p>
+
+          <ProjectAiAssistant
+  projectType={project.project_type}
+  liveUrl={project.live_url}
+/>
 
           <h2 className="mt-2 text-xl font-semibold">
             프로젝트 내용
