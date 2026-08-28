@@ -7,6 +7,7 @@ import ScrollProgress from "@/components/ScrollProgress";
 import { getSiteSettings } from "@/lib/settings";
 
 import "./globals.css";
+import FloatingContactButtons from "@/components/FloatingContactButtons";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -362,9 +363,18 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <MotionProvider>
-          <ScrollProgress />
-          {children}
-        </MotionProvider>
+  <ScrollProgress />
+
+  <FloatingContactButtons
+    blogUrl={settings?.blog_url}
+    instagramUrl={settings?.instagram_url}
+    kakaoUrl={settings?.kakao_url}
+    email={settings?.email}
+    phone={settings?.phone}
+  />
+
+  {children}
+</MotionProvider>
 
         {/* 디자인스무디 브랜드 */}
         <script
