@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import {
+  useState,
+  useTransition,
+} from "react";
 
-import { toggleHomepageSection } from "./actions";
+import {
+  toggleHomepageSection,
+} from "./actions";
 
 export type HomepageSection = {
   id: string;
@@ -20,16 +25,28 @@ type HomepageSectionListProps = {
   sections: HomepageSection[];
 };
 
-const sectionDescriptions: Record<string, string> = {
-  hero: "홈페이지 첫 화면의 대표 문구와 비주얼을 관리합니다.",
-  about: "디자인스무디 소개 문구와 브랜드 이야기를 관리합니다.",
-  service: "제공 서비스와 서비스 설명을 관리합니다.",
-  process: "프로젝트 진행 과정과 단계별 안내를 관리합니다.",
-  contact: "문의 유도 문구와 상담 채널을 관리합니다.",
-  footer: "푸터 문구, 연락처와 외부 채널을 관리합니다.",
+const sectionDescriptions: Record<
+  string,
+  string
+> = {
+  hero:
+    "홈페이지 첫 화면의 대표 문구와 비주얼을 관리합니다.",
+  about:
+    "디자인스무디 소개 문구와 브랜드 이야기를 관리합니다.",
+  service:
+    "제공 서비스와 서비스 설명을 관리합니다.",
+  process:
+    "프로젝트 진행 과정과 단계별 안내를 관리합니다.",
+  contact:
+    "문의 유도 문구와 상담 채널을 관리합니다.",
+  footer:
+    "푸터 문구, 연락처와 외부 채널을 관리합니다.",
 };
 
-const sectionLabels: Record<string, string> = {
+const sectionLabels: Record<
+  string,
+  string
+> = {
   hero: "첫 화면",
   about: "브랜드 소개",
   service: "서비스",
@@ -41,8 +58,13 @@ const sectionLabels: Record<string, string> = {
 export default function HomepageSectionList({
   sections,
 }: HomepageSectionListProps) {
-  const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [message, setMessage] =
+    useState("");
+
+  const [
+    isPending,
+    startTransition,
+  ] = useTransition();
 
   function handleToggle(
     sectionId: string,
@@ -51,10 +73,11 @@ export default function HomepageSectionList({
     setMessage("");
 
     startTransition(async () => {
-      const result = await toggleHomepageSection(
-        sectionId,
-        !currentActiveState,
-      );
+      const result =
+        await toggleHomepageSection(
+          sectionId,
+          !currentActiveState,
+        );
 
       setMessage(result.message);
     });
@@ -77,7 +100,8 @@ export default function HomepageSectionList({
               </h2>
 
               <p className="mt-1 text-sm text-[#888]">
-                각 영역의 콘텐츠와 홈페이지 표시 여부를 관리합니다.
+                각 영역의 콘텐츠와 홈페이지
+                표시 여부를 관리합니다.
               </p>
             </div>
 
@@ -88,69 +112,85 @@ export default function HomepageSectionList({
         </div>
 
         <div className="divide-y divide-[#ecece8]">
-          {sections.map((section, index) => (
-            <div
-              key={section.id}
-              className="grid gap-5 px-6 py-6 sm:px-8 lg:grid-cols-[70px_1fr_auto] lg:items-center"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f3f3f0] text-sm font-semibold text-[#777]">
-                {String(index + 1).padStart(2, "0")}
-              </div>
-
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="text-lg font-bold text-[#333]">
-                    {sectionLabels[section.section_key] ??
-                      section.section_name}
-                  </h3>
-
-                  <span className="rounded-full bg-[#f1f1ef] px-3 py-1 text-xs text-[#777]">
-                    {section.section_key}
-                  </span>
-
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      section.is_active
-                        ? "bg-[#edf3de] text-[#78952c]"
-                        : "bg-[#f1f1ef] text-[#888]"
-                    }`}
-                  >
-                    {section.is_active ? "표시중" : "숨김"}
-                  </span>
+          {sections.map(
+            (section, index) => (
+              <div
+                key={section.id}
+                className="grid gap-5 px-6 py-6 sm:px-8 lg:grid-cols-[70px_1fr_auto] lg:items-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f3f3f0] text-sm font-semibold text-[#777]">
+                  {String(
+                    index + 1,
+                  ).padStart(2, "0")}
                 </div>
 
-                <p className="mt-2 text-sm leading-6 text-[#888]">
-                  {sectionDescriptions[section.section_key] ??
-                    "홈페이지 섹션 콘텐츠를 관리합니다."}
-                </p>
-              </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="text-lg font-bold text-[#333]">
+                      {sectionLabels[
+                        section
+                          .section_key
+                      ] ??
+                        section.section_name}
+                    </h3>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  disabled={isPending}
-                  onClick={() =>
-                    handleToggle(
-                      section.id,
-                      section.is_active,
-                    )
-                  }
-                  className="inline-flex h-11 items-center justify-center rounded-full border border-[#ddddda] bg-white px-5 text-sm font-semibold text-[#555] transition hover:bg-[#f5f5f2] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {section.is_active
-                    ? "홈페이지에서 숨기기"
-                    : "홈페이지에 표시"}
-                </button>
+                    <span className="rounded-full bg-[#f1f1ef] px-3 py-1 text-xs text-[#777]">
+                      {
+                        section.section_key
+                      }
+                    </span>
 
-                <Link
-                  href={`/admin/homepage/${section.section_key}`}
-                  className="inline-flex h-11 items-center justify-center rounded-full bg-black px-6 text-sm font-semibold text-white transition hover:bg-[#333]"
-                >
-                  콘텐츠 수정
-                </Link>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        section.is_active
+                          ? "bg-[#edf3de] text-[#78952c]"
+                          : "bg-[#f1f1ef] text-[#888]"
+                      }`}
+                    >
+                      {section.is_active
+                        ? "표시중"
+                        : "숨김"}
+                    </span>
+                  </div>
+
+                  <p className="mt-2 text-sm leading-6 text-[#888]">
+                    {sectionDescriptions[
+                      section
+                        .section_key
+                    ] ??
+                      "홈페이지 섹션 콘텐츠를 관리합니다."}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    disabled={
+                      isPending
+                    }
+                    onClick={() =>
+                      handleToggle(
+                        section.id,
+                        section.is_active,
+                      )
+                    }
+                    className="inline-flex h-11 items-center justify-center rounded-full border border-[#ddddda] bg-white px-5 text-sm font-semibold text-[#555] transition hover:bg-[#f5f5f2] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {section.is_active
+                      ? "홈페이지에서 숨기기"
+                      : "홈페이지에 표시"}
+                  </button>
+
+                  <Link
+                    href={`/admin/homepage/${section.section_key}`}
+                    className="inline-flex h-11 items-center justify-center rounded-full bg-black px-6 text-sm font-semibold !text-white transition hover:bg-[#333] hover:!text-white"
+                  >
+                    콘텐츠 수정
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       </div>
 
@@ -193,8 +233,8 @@ function GuideCard({
   description: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#e7e7e3] bg-[#fafaf8] p-5">
-      <p className="text-xs font-semibold tracking-[0.14em] text-[#94b63f]">
+    <div className="rounded-[20px] bg-[#f7f7f4] p-5">
+      <p className="text-sm font-semibold text-[#94b63f]">
         {number}
       </p>
 

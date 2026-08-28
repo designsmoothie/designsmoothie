@@ -4,7 +4,9 @@ import ContactSection, {
   type ContactSectionContent,
 } from "@/components/ContactSection";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import Hero, {
+  type HeroContent,
+} from "@/components/Hero";
 import LatestJournal from "@/components/LatestJournal";
 import Portfolio from "@/components/Portfolio";
 import Process from "@/components/Process";
@@ -24,10 +26,18 @@ export default async function Home() {
   const [
     cmsProjects,
     cmsCategories,
+    heroSectionResult,
     contactSectionResult,
   ] = await Promise.all([
     getCmsProjects(),
     getCmsCategories(),
+
+    supabase
+      .from("homepage_sections")
+      .select("content, is_active")
+      .eq("section_key", "hero")
+      .maybeSingle(),
+
     supabase
       .from("homepage_sections")
       .select("content, is_active")
@@ -35,12 +45,24 @@ export default async function Home() {
       .maybeSingle(),
   ]);
 
+  if (heroSectionResult.error) {
+    console.error(
+      "Hero CMS 데이터를 불러오지 못했습니다.",
+      heroSectionResult.error,
+    );
+  }
+
   if (contactSectionResult.error) {
     console.error(
       "Contact CMS 데이터를 불러오지 못했습니다.",
       contactSectionResult.error,
     );
   }
+
+  const heroSection = heroSectionResult.data;
+
+  const heroContent =
+    (heroSection?.content ?? {}) as HeroContent;
 
   const contactSection =
     contactSectionResult.data;
@@ -52,10 +74,13 @@ export default async function Home() {
   return (
     <>
       <Header />
+
       <AdminAccessButton />
 
       <main className="min-h-screen bg-[var(--cream)] text-[var(--text)]">
-        <Hero />
+        {heroSection?.is_active !== false && (
+          <Hero content={heroContent} />
+        )}
 
         <Reveal>
           <Service />

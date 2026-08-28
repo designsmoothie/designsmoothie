@@ -540,3 +540,83 @@ ${inquiry.admin_memo || "없음"}
     };
   }
 }
+
+export async function saveInquiryAiContent(
+  _previousState: InquiryAiActionState,
+  formData: FormData,
+): Promise<InquiryAiActionState> {
+  const id = getText(formData, "id");
+  const aiSummary = getText(
+    formData,
+    "ai_summary",
+  );
+  const aiReplyDraft = getText(
+    formData,
+    "ai_reply_draft",
+  );
+
+  if (!id) {
+    return {
+      success: false,
+      message:
+        "문의 ID를 확인할 수 없습니다.",
+      generatedText: "",
+    };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return {
+      success: false,
+      message:
+        "관리자 로그인이 필요합니다.",
+      generatedText: "",
+    };
+  }
+
+  const { error } = await supabase
+    .from("contact_inquiries")
+    .update({
+      ai_summary:
+        aiSummary || null,
+      ai_reply_draft:
+        aiReplyDraft || null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.error(
+      "AI 상담 콘텐츠 저장 오류:",
+      {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      },
+    );
+
+    return {
+      success: false,
+      message:
+        "AI 상담 내용을 저장하지 못했습니다.",
+      generatedText: "",
+    };
+  }
+
+  revalidatePath(
+    `/admin/inquiries/${id}`,
+  );
+
+  return {
+    success: true,
+    message:
+      "AI 상담 내용이 저장되었습니다.",
+    generatedText: "",
+  };
+}

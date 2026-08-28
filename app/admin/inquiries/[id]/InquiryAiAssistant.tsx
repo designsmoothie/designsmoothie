@@ -10,6 +10,7 @@ import { useFormStatus } from "react-dom";
 import {
   generateInquiryAnalysis,
   generateInquiryReply,
+  saveInquiryAiContent,
   type InquiryAiActionState,
 } from "./actions";
 
