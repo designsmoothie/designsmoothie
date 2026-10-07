@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import ProjectPreview from "@/components/ProjectPreview";
+
 
 import type {
   CmsPortfolioCategory,
@@ -36,59 +36,76 @@ export default function PortfolioArchiveRow({
       {/* 모바일·태블릿 */}
       <Link
         href={category.href}
-        className="group/mobile relative mb-3 block min-h-[132px] overflow-hidden border-b border-white/15 sm:min-h-[160px] sm:rounded-[2px] sm:border-b-0 lg:hidden"
+        className="group/mobile relative isolate mb-3 block min-h-[132px] overflow-hidden border-b border-[var(--line)] sm:min-h-[160px] sm:rounded-[2px] lg:hidden"
         aria-label={`${category.title} 카테고리 보기`}
+        style={{ backgroundColor: "var(--cream)" }}
       >
-        {leadProject ? (
-          <ProjectPreview
-            projectType={leadProject.projectType}
-            previewType={leadProject.previewType}
-            liveUrl={leadProject.liveUrl}
-            image={previewImage}
-            title={leadProject.title}
-            priority={categoryIndex === 0}
-            sizes="(max-width: 1023px) 100vw, 0px"
-            imageClassName="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-active/mobile:scale-[1.025]"
-            className="absolute inset-0"
-          />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{ backgroundColor: category.color }}
-          />
-        )}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, transparent 12%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.7) 65%, black 88%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, transparent 12%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.7) 65%, black 88%)",
+          }}
+        >
+          {previewImage ? (
+            <Image
+              src={previewImage}
+              alt=""
+              fill
+              unoptimized
+              sizes="(max-width: 1023px) 100vw, 0px"
+              className="object-cover object-right"
+            />
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{ backgroundColor: category.color }}
+            />
+          )}
+        </div>
 
-        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black/65 via-black/35 to-black/15" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0"
+          style={{
+            background:
+              "linear-gradient(to right, var(--cream) 0%, var(--cream) 30%, transparent 90%)",
+          }}
+        />
 
-        <div className="relative z-20 flex min-h-[132px] items-center justify-between gap-5 px-5 py-7 sm:min-h-[160px] sm:px-7">
+        <div className="relative z-10 flex min-h-[132px] items-center justify-between gap-4 px-5 py-7 sm:min-h-[160px] sm:px-7">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-              <span className="text-[9px] font-semibold tracking-[0.2em] text-white/65">
+              <span className="text-[9px] font-semibold tracking-[0.2em] text-[var(--text-dark)]">
                 {categoryNumber}
               </span>
-              <span className="h-px w-4 bg-white/35" />
-              <span className="text-[9px] font-semibold tracking-[0.16em] text-white/75">
+
+              <span className="h-px w-4 bg-[var(--muted)]" />
+
+              <span className="text-[9px] font-semibold tracking-[0.16em] text-[var(--text-dark)]">
                 {formatCount(projectCount)} PROJECTS
               </span>
             </div>
 
-            <h2 className="mt-3 text-[1.85rem] font-semibold leading-[0.95] tracking-[-0.055em] text-white sm:text-4xl">
+            <h2 className="mt-3 break-words text-[1.85rem] font-semibold leading-[1.05] tracking-[-0.055em] text-[var(--text-dark)] sm:text-4xl">
               {category.title}
             </h2>
 
             {category.subtitle && (
-              <p className="mt-2 truncate text-[9px] font-semibold tracking-[0.15em] text-white/70 sm:text-[10px]">
+              <p className="mt-2 text-[9px] font-semibold leading-relaxed tracking-[0.15em] text-[var(--text-dark)] sm:text-[10px]">
                 {category.subtitle}
               </p>
             )}
           </div>
 
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/35 bg-black/10 text-lg text-white backdrop-blur-sm transition-transform duration-300 group-active/mobile:translate-x-1 sm:h-12 sm:w-12">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--cream)] text-lg text-[var(--text-dark)] shadow-sm transition-transform duration-300 group-active/mobile:translate-x-1 motion-reduce:transition-none sm:h-12 sm:w-12">
             →
           </span>
         </div>
       </Link>
-
       {/* 데스크톱: 행 전체 배경 이미지 */}
       <Link
         href={category.href}
