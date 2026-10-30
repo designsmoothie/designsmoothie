@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { franchiseCategories } from "@/lib/franchise/config";
 import { createClient } from "@/lib/supabase/server";
 
 // Always reflect the current CMS, including removals and unpublished work.
@@ -48,6 +49,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if ((projects?.length ?? 0) < pageSize) break;
   }
 
+  for (let offset = 0; ; offset += pageSize) {
+    const { data: works, error } = await supabase.from("franchise_works")
+      .select("id, updated_at").eq("status", "published").order("id").range(offset, offset + pageSize - 1);
+    if (error) {
+      // Keep the original sitemap available before the new table is installed.
+      if (error.code === "42P01" || error.code === "PGRST205") break;
+      throw error;
+    }
+    for (const work of works ?? []) {
+      const modified = new Date(work.updated_at);
+      projectPages.push({ url: `${baseUrl}/franchise/work/${work.id}`, ...(Number.isNaN(modified.getTime()) ? {} : { lastModified: modified }), changeFrequency: "monthly", priority: 0.7 });
+    }
+    if ((works?.length ?? 0) < pageSize) break;
+  }
+
   // Omit lastmod where no reliable content modification timestamp exists.
   const pages: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, changeFrequency: "weekly", priority: 1 },
@@ -60,6 +76,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       })),
     ...projectPages,
+    { url: `${baseUrl}/franchise`, changeFrequency: "weekly", priority: 0.8 },
+    ...franchiseCategories.map((category) => ({ url: `${baseUrl}/franchise/${category.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${baseUrl}/contact`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/guide`, changeFrequency: "monthly", priority: 0.6 },
   ];

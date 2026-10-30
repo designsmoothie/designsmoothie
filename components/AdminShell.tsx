@@ -20,6 +20,10 @@ const adminLinks = [
     label: "프로젝트",
   },
   {
+    href: "/admin/franchise",
+    label: "프랜차이즈 제작물",
+  },
+  {
     href: "/admin/categories",
     label: "카테고리",
   },

@@ -26,6 +26,13 @@ const menuItems = [
   },
 
   {
+    label: "프랜차이즈 제작물",
+    description: "Franchise Materials",
+    href: "/franchise",
+    sectionId: "franchise",
+  },
+
+  {
   label: "BLOG",
   description: "Latest Journal",
   href: "/blog",
@@ -97,6 +104,11 @@ export default function Header() {
   }, [isMenuOpen]);
 
   useEffect(() => {
+    if (pathname.startsWith("/franchise")) {
+      setActiveMenu("프랜차이즈 제작물");
+      return;
+    }
+
     if (pathname.startsWith("/portfolio")) {
       setActiveMenu("PORTFOLIO");
       return;
@@ -248,9 +260,9 @@ export default function Header() {
           />
         </Link>
 
-        <div className="ml-auto hidden items-center md:flex">
+        <div className="ml-auto hidden items-center xl:flex">
           <nav
-            className="flex items-center gap-7 lg:gap-8"
+            className="flex items-center gap-5 2xl:gap-8"
             aria-label="주요 메뉴"
           >
             {menuItems.map((item) => {
@@ -307,7 +319,7 @@ export default function Header() {
               (previousState) => !previousState,
             );
           }}
-          className="relative z-50 ml-auto flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/45 backdrop-blur-md transition hover:bg-white/75 md:hidden"
+          className="relative z-50 ml-auto flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/45 backdrop-blur-md transition hover:bg-white/75 xl:hidden"
           aria-label={
             isMenuOpen ? "메뉴 닫기" : "메뉴 열기"
           }
@@ -346,7 +358,7 @@ export default function Header() {
       </div>
 
       <div
-        className={`fixed inset-x-0 top-[72px] z-40 h-[calc(100dvh-72px)] bg-[var(--cream)]/98 backdrop-blur-2xl transition-all duration-500 md:hidden ${
+        className={`fixed inset-x-0 top-[72px] md:top-[78px] z-40 h-[calc(100dvh-72px)] md:h-[calc(100dvh-78px)] bg-[var(--cream)]/98 backdrop-blur-2xl transition-all duration-500 xl:hidden ${
           isMenuOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-4 opacity-0"

@@ -1,3 +1,4 @@
+import FranchiseSection from "@/components/franchise/FranchiseSection";
 import About from "@/components/About";
 import AdminAccessButton from "@/components/AdminAccessButton";
 import ContactSection, {
@@ -92,6 +93,8 @@ export default async function Home() {
             cmsCategories={cmsCategories}
           />
         </Reveal>
+
+        <FranchiseSection />
 
         <Reveal>
           <LatestJournal />
